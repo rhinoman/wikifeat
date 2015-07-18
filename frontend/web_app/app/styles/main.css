@@ -1,0 +1,467 @@
+/* Color Scheme */
+/* Wiki Styles */
+/* Color Scheme */
+#wiki-toolbar {
+  background-color: #333333;
+  margin-bottom: 5px;
+  padding: 10px;
+}
+#wiki-toolbar div {
+  margin-right: 10px;
+  display: inline;
+}
+#wiki-toolbar a {
+  color: #efefef;
+}
+#wiki-toolbar a:hover, #wiki-toolbar a:focus, #wiki-toolbar a:active {
+  color: white;
+  text-decoration: none;
+}
+#wiki-toolbar ul.dropdown-menu {
+  border-radius: 0;
+}
+#wiki-toolbar ul.dropdown-menu li a {
+  color: #222222;
+}
+#wiki-toolbar #adminMenu a#deleteWikiLink {
+  color: lightcoral;
+}
+
+div.breadcrumbs {
+  height: 36px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+div.breadcrumbs ol.breadcrumb {
+  padding-bottom: 0;
+  padding-left: 20px;
+  background-color: white;
+  border-radius: 0;
+  margin: 0;
+}
+
+/* Page Styles */
+/* Color Scheme */
+button.page-control-button {
+  margin: 1px;
+  border-radius: 0;
+  border: none;
+  float: right;
+}
+
+div.tool-menu {
+  float: right;
+}
+div.tool-menu a {
+  color: #333333;
+}
+div.tool-menu a:hover, div.tool-menu a:focus, div.tool-menu a:active {
+  color: #888888;
+  text-decoration: none;
+}
+div.tool-menu ul.dropdown-menu {
+  border-radius: 0;
+}
+div.tool-menu ul.dropdown-menu li a {
+  color: #333333;
+}
+div.tool-menu ul.dropdown-menu a#deletePageLink {
+  color: lightcoral;
+}
+
+.page-container {
+  background-color: white;
+}
+.page-container .page-view {
+  margin: 0 10px 10px 10px;
+  padding: 0 20px 20px 20px;
+  min-height: 8in;
+}
+.page-container .page-view #revisionNotice {
+  display: none;
+}
+.page-container .page-view table:not(.table) {
+  width: 100%;
+  border: 1px solid #888;
+}
+.page-container .page-view table:not(.table) thead {
+  background-color: #DEDEDE;
+}
+.page-container .page-view table:not(.table) thead th {
+  border: 1px solid #888;
+  padding: 2px;
+}
+.page-container .page-view table:not(.table) tbody td {
+  padding: 2px;
+  border: 1px solid #888;
+}
+
+.raw-view-box {
+  margin-top: 20px;
+}
+.raw-view-box pre {
+  width: 100%;
+}
+.raw-view-box textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  resize: none;
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  min-width: 100%;
+}
+
+.page-editor-info {
+  font-style: italic;
+}
+
+.page-create-button {
+  color: #1ABC9C;
+}
+.page-create-button:hover {
+  color: white;
+  background-color: #1ABC9C;
+}
+
+.page-edit-button {
+  color: #1ABC9C;
+}
+.page-edit-button:hover {
+  color: white;
+  background-color: #1ABC9C;
+}
+
+.page-content-mode-link {
+  border: none;
+  margin-right: 10px;
+  float: right;
+  color: #333333;
+}
+.page-content-mode-link:hover {
+  color: #888888;
+  text-decoration: none;
+}
+
+.page-delete-button {
+  color: lightcoral;
+}
+.page-delete-button:hover {
+  color: white;
+  background-color: lightcoral;
+}
+
+form#editPageForm {
+  margin: 10px;
+  padding: 10px;
+}
+
+.page-publish-button {
+  margin: 2px;
+  border-radius: 0;
+  color: #1ABC9C;
+  border: none;
+}
+.page-publish-button:hover, .page-publish-button:active, .page-publish-button:focus {
+  color: white;
+  background-color: #1ABC9C;
+}
+
+.page-cancel-button {
+  margin: 2px;
+  border-radius: 0;
+  border: none;
+}
+
+/* User Styles */
+/* Color Scheme */
+.manage-users-view {
+  background-color: white;
+  margin: 10px 10px 10px 10px;
+  padding: 10px 20px 20px 20px;
+  min-height: 8in;
+}
+
+div.table-controls {
+  float: right;
+}
+div.table-controls button.control-button {
+  border: none;
+  border-radius: 0;
+  color: #1ABC9C;
+  background-color: white;
+}
+div.table-controls button.control-button span.plus-prepend {
+  font-size: 14pt;
+}
+div.table-controls button.control-button:hover {
+  color: white;
+  background-color: #1ABC9C;
+}
+
+tr#manage-users-item > td:last-child {
+  width: 150px;
+}
+
+/* Color Scheme */
+.input-file {
+  position: relative;
+}
+.input-file .input-group-addon {
+  border: 0px;
+  padding: 0px;
+}
+.input-file .input-group-addon .btn {
+  border-radius: 0;
+}
+.input-file .input-group-addon input {
+  position: absolute;
+  width: 72px;
+  z-index: 2;
+  height: 100%;
+  top: 0;
+  right: 0;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  background-color: transparent;
+  color: transparent;
+}
+
+body {
+  background-color: White;
+  font-family: sans-serif;
+}
+
+blockquote {
+  border-left: 2px dotted #888;
+  padding-left: 5px;
+  background: #d0f0ff;
+}
+
+.wmd-panel {
+  width: 100%;
+  min-width: 500px;
+}
+
+.wmd-button-bar {
+  width: 100%;
+  background-color: Silver;
+}
+
+.wmd-input {
+  height: 300px;
+  width: 100%;
+  border: 1px solid DarkGray;
+}
+
+.wmd-button-row {
+  position: relative;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  padding: 0px;
+  height: 20px;
+}
+
+.wmd-spacer {
+  width: 1px;
+  height: 20px;
+  margin-left: 14px;
+  position: absolute;
+  background-color: Silver;
+  display: inline-block;
+  list-style: none;
+}
+
+.wmd-button {
+  width: 20px;
+  height: 20px;
+  padding-left: 2px;
+  padding-right: 3px;
+  position: absolute;
+  display: inline-block;
+  list-style: none;
+  cursor: pointer;
+}
+
+.wmd-button > span {
+  background-image: url(../img/wmd-buttons.png);
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.wmd-spacer1 {
+  left: 50px;
+}
+
+.wmd-spacer2 {
+  left: 175px;
+}
+
+.wmd-spacer3 {
+  left: 300px;
+}
+
+.wmd-prompt-background {
+  background-color: Black;
+}
+
+.wmd-prompt-dialog {
+  border: 1px solid #999999;
+  background-color: #F5F5F5;
+}
+
+.wmd-prompt-dialog > div {
+  font-size: 0.8em;
+  font-family: arial, helvetica, sans-serif;
+}
+
+.wmd-prompt-dialog > form > input[type="text"] {
+  border: 1px solid #999999;
+  color: black;
+}
+
+.wmd-prompt-dialog > form > input[type="button"] {
+  border: 1px solid #888888;
+  font-family: trebuchet MS, helvetica, sans-serif;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+body {
+  background-color: #efefef;
+  height: 100%;
+}
+
+.sidebar {
+  display: none;
+}
+.sidebar .tooltip {
+  z-index: 9999;
+}
+.sidebar a.sbTopLevel {
+  display: block;
+  width: 100%;
+  font-weight: bold;
+  color: #eee;
+  padding: 10px;
+  text-decoration: none;
+}
+.sidebar a.sbTopLevel:hover {
+  background: #222;
+}
+.sidebar .subMenu {
+  font-size: 8pt;
+}
+.sidebar .subMenuLink {
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  padding: 5px 5px 5px 15px;
+  color: #ddd;
+}
+.sidebar .subMenuLink:hover {
+  background: #222;
+}
+.sidebar .currentSelection {
+  background: #222;
+}
+
+.form-control {
+  border-radius: 0;
+}
+
+.pagination-nav {
+  text-align: center;
+}
+
+button.btn {
+  border-radius: 0;
+}
+
+button.primary-color-btn {
+  color: #1ABC9C;
+  background-color: white;
+  border: 1px solid #1ABC9C;
+}
+button.primary-color-btn:hover {
+  color: white;
+  background-color: #1ABC9C;
+}
+
+div.modal div.modal-dialog div.modal-content {
+  border-radius: 0;
+}
+div.modal div.modal-dialog div.modal-content div.modal-footer .btn {
+  border: 1px solid #888888;
+}
+div.modal div.modal-dialog div.modal-content div.modal-footer .btn:hover {
+  background-color: #888888;
+  color: white;
+}
+div.modal div.modal-dialog div.modal-content div.modal-footer .btn-primary {
+  border: 1px solid #1ABC9C;
+  color: #1ABC9C;
+  background-color: white;
+}
+div.modal div.modal-dialog div.modal-content div.modal-footer .btn-primary:hover {
+  color: white;
+  background-color: #1ABC9C;
+}
+div.modal div.modal-dialog div.modal-content div.modal-footer .btn-danger {
+  border: 1px solid lightcoral;
+  color: lightcoral;
+  background-color: white;
+}
+div.modal div.modal-dialog div.modal-content div.modal-footer .btn-danger:hover {
+  color: white;
+  background-color: lightcoral;
+}
+div.modal div.modal-dialog div.modal-content div.modal-footer .btn-danger#deleteButton {
+  float: left;
+}
+
+pre {
+  border-radius: 0;
+}
+
+.well {
+  border-radius: 0;
+}
+
+.error-page-view {
+  background-color: white;
+  margin: 10px 10px 10px 10px;
+  padding: 10px 20px 20px 20px;
+  min-height: 8in;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #333;
+    border-right: 1px solid #999;
+    color: #DEDEDE;
+  }
+  .sidebar div#logo-view {
+    text-align: center;
+  }
+}
+
+/*# sourceMappingURL=main.css.map */

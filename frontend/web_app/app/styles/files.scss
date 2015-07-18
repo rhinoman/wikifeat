@@ -1,0 +1,27 @@
+@import 'colors.scss';
+
+.input-file {
+  position: relative;
+  //margin: 60px 60px 0;
+  .input-group-addon {
+    border: 0px; padding: 0px;
+    .btn{
+      border-radius: 0;
+    }
+    input{
+//      cursor: pointer;
+      position: absolute;
+      width: 72px;
+      z-index:2;
+      height:100%;
+      top:0;
+      right:0;
+      filter: alpha(opacity=0);
+      opacity: 0;
+      background-color: transparent;
+      color: transparent;
+    }
+  }
+}
+
+

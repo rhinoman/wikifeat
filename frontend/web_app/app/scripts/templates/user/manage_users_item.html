@@ -1,0 +1,30 @@
+<tr>
+    <td id="username"></td>
+    <td id="last_name"></td>
+    <td id="first_name"></td>
+    <td id="admin_access"></td>
+    <td id="master_access"></td>
+    <td id="user_actions">
+        <div class="table-buttons-container">
+            <button class="btn btn-sm btn-default"
+                    id="changePasswordButton"
+                    data-toggle="tooltip" data-placement="top"
+                    title="Reset Password">
+            <span class="glyphicon glyphicon-lock table-action-button"
+                  id="resetPwButton"></span>
+            </button>
+            <button class="btn btn-sm btn-default table-action-button"
+                    id="toggleAdminButton"
+                    data-toggle="tooltip" data-placement="top"
+                    title="Grant/Revoke Admin access">
+                <span class="glyphicon glyphicon-star"></span>
+            </button>
+            <button class="btn btn-sm btn-danger table-action-button"
+                    id="deleteUserButton"
+                    data-toggle="tooltip" data-placement="top"
+                    title="Delete user">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
+        </div>
+    </td>
+</tr>

@@ -1,0 +1,29 @@
+{
+  "name": "require.js",
+  "version": "0.3.97",
+  "homepage": "https://github.com/nathanfaucett/require.js",
+  "authors": [
+    "lonewolfgames <nathanfaucett@gmail.com>"
+  ],
+  "description": "node.js require loader for the browser",
+  "main": "build/require.min.js",
+  "keywords": [
+    "require",
+    "require.js",
+    "loader",
+    "module",
+    "include"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "Gruntfile.js",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "bin",
+    "examples",
+    "src"
+  ]
+}

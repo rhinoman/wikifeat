@@ -1,0 +1,8 @@
+{
+    "JavaScript": {
+        "javascriptExtraPaths": [
+            "/Users/nperriault/Sites/casperjs",
+            "/Users/nperriault/Sites/casperjs/modules"
+        ]
+    }
+}

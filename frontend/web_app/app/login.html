@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="login page">
+  <title>Login</title>
+  <link href="/app/resource/scripts/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/app/resource/styles/login.css" rel="stylesheet">
+  <script type="text/javascript" src="/app/resource/scripts/vendor/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="signin-box">
+    <form id="loginForm">
+      <h2 class="form-signin-heading">Sign in</h2>
+      <div id="alertBox" class="alert alert-danger" role="alert"></div>
+      <label for="inputEmail" class="sr-only">Username</label>
+      <div class="input-group">
+        <span class="input-group-addon glyphicon glyphicon-user" id="user-icon"></span>
+        <input type="text" id="inputEmail" class="form-control" placeholder="user@example.com" required autofocus>
+      </div>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <div class="input-group">
+        <span class="input-group-addon glyphicon glyphicon-lock" id="lock-icon"></span>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+      </div>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+    <div class="link-box">
+      <a href="/forgot_password.html">Forgot Password?</a>
+    </div>
+    </div>
+  </div>
+<script type="text/javascript">
+  $(document).ready(function(){
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+    $("div#alertBox").css("display", "none");
+    $("#loginForm").on("submit", function(event){
+      event.preventDefault();
+      console.log("I be submitted");
+      var loginCredentials = {
+        name: $("#inputEmail").val(),
+        password: $("#inputPassword").val()
+      };
+      $.ajax({
+        type: "POST",
+        url: "api/v1/users/login",
+        data: JSON.stringify(loginCredentials),
+        contentType: "application/json",
+        dataType: "json"
+      }).done(function(){
+        $("div#alertBox").css("display", "none");
+        var prevUrl = getParameterByName("ref");
+        if (typeof prevUrl === 'undefined' || prevUrl === "") {
+            window.location = "/app"
+        } else {
+            window.location = prevUrl;
+        }
+      }).fail(function(){
+        $("div#alertBox").
+            html("Login Failed.  Please try again.").
+            css("display","block");
+      });
+    });
+  });
+</script>
+</body>
+</html>

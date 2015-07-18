@@ -1,0 +1,507 @@
+(typeof(process) !== "undefined" ? process : (function() {
+    var global = (new Function("return this;"))(),
+        arrayShift = Array.prototype.shift,
+        hasOwnProperty = Object.prototype.hasOwnProperty;
+
+
+    function EventObject(listener, ctx) {
+        this.listener = listener;
+        this.ctx = ctx;
+    }
+
+
+    function EventEmitter() {
+
+        this._events = Object.create(null);
+        this._maxListeners = EventEmitter.defaultMaxListeners;
+    }
+
+    EventEmitter.prototype.on = function(type, listener, ctx) {
+        if (typeof(listener) !== "function") throw new TypeError("EventEmitter.on(type, listener[, ctx]) listener must be a function");
+        var events = this._events,
+            eventList = (events[type] || (events[type] = [])),
+            maxListeners = this._maxListeners;
+
+        eventList.push(new EventObject(listener, ctx || this));
+
+        if (maxListeners !== -1 && eventList.length > maxListeners) {
+            console.error("EventEmitter.on(type, listener, ctx) possible EventEmitter memory leak detected. " + maxListeners + " listeners added");
+        }
+
+        return this;
+    };
+
+    EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+    EventEmitter.prototype.once = function(type, listener, ctx) {
+        var _this = this;
+        ctx || (ctx = this);
+
+        function once() {
+            _this.off(type, once, ctx);
+            var length = arguments.length;
+
+            if (length === 0) {
+                return listener.call(ctx);
+            } else if (length === 1) {
+                return listener.call(ctx, arguments[0]);
+            } else if (length === 2) {
+                return listener.call(ctx, arguments[0], arguments[1]);
+            } else if (length === 3) {
+                return listener.call(ctx, arguments[0], arguments[1], arguments[2]);
+            } else if (length === 4) {
+                return listener.call(ctx, arguments[0], arguments[1], arguments[2], arguments[3]);
+            } else if (length === 5) {
+                return listener.call(ctx, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+            }
+
+            return listener.apply(ctx, arguments);
+        }
+
+        return this.on(type, once, ctx);
+    };
+
+    EventEmitter.prototype.listenTo = function(obj, type, listener, ctx) {
+        if (!(hasOwnProperty.call(obj, "on") && typeof(obj.on) === "function")) {
+            throw new TypeError("EventEmitter.listenTo(obj, type, listener, ctx) obj must have a on function taking (type, listener[, ctx])");
+        }
+
+        obj.on(type, listener, ctx || this);
+        return this;
+    };
+
+    EventEmitter.prototype.off = function(type, listener, ctx) {
+        var events = this._events,
+            eventList, event, i;
+
+        if (!type) return this.removeAllListeners();
+
+        eventList = events[type];
+        if (!eventList) return this;
+
+        if (!listener) {
+            i = eventList.length;
+            while (i--) {
+                event = eventList[i];
+                this.emit("removeListener", type, event.listener, event.ctx);
+            }
+            eventList.length = 0;
+            delete events[type];
+        } else {
+            ctx = ctx || this;
+            i = eventList.length;
+            while (i--) {
+                event = eventList[i];
+
+                if (event.listener === listener) {
+                    this.emit("removeListener", type, event.listener, event.ctx);
+                    eventList.splice(i, 1);
+                }
+            }
+            if (eventList.length === 0) delete events[type];
+        }
+
+        return this;
+    };
+
+    EventEmitter.prototype.removeListener = EventEmitter.prototype.off;
+
+    EventEmitter.prototype.removeAllListeners = function() {
+        var events = this._events,
+            eventList, event, i, type;
+
+        for (type in events) {
+            if ((eventList = events[type])) {
+                i = eventList.length;
+                while (i--) {
+                    event = eventList[i];
+                    this.emit("removeListener", type, event.listener, event.ctx);
+                }
+                eventList.length = 0;
+                delete events[type];
+            }
+        }
+
+        return this;
+    };
+
+    function emit(eventList, args) {
+        var a1, a2, a3, a4,
+            length = args.length,
+            event, i;
+
+        if (length === 1) {
+            i = eventList.length;
+            while (i--) {
+                if ((event = eventList[i])) event.listener.call(event.ctx);
+            }
+        } else if (length === 2) {
+            a1 = args[1];
+            i = eventList.length;
+            while (i--) {
+                if ((event = eventList[i])) event.listener.call(event.ctx, a1);
+            }
+        } else if (length === 3) {
+            a1 = args[1];
+            a2 = args[2];
+            i = eventList.length;
+            while (i--) {
+                if ((event = eventList[i])) event.listener.call(event.ctx, a1, a2);
+            }
+        } else if (length === 4) {
+            a1 = args[1];
+            a2 = args[2];
+            a3 = args[3];
+            i = eventList.length;
+            while (i--) {
+                if ((event = eventList[i])) event.listener.call(event.ctx, a1, a2, a3);
+            }
+        } else if (length === 5) {
+            a1 = args[1];
+            a2 = args[2];
+            a3 = args[3];
+            a4 = args[4];
+            i = eventList.length;
+            while (i--) {
+                if ((event = eventList[i])) event.listener.call(event.ctx, a1, a2, a3, a4);
+            }
+        } else {
+            arrayShift.apply(args);
+            i = eventList.length;
+            while (i--) {
+                if ((event = eventList[i])) event.listener.apply(event.ctx, args);
+            }
+        }
+    }
+
+    EventEmitter.prototype.emit = function(type) {
+        var eventList = this._events[type];
+
+        if (!eventList || !eventList.length) return this;
+        emit(eventList, arguments);
+
+        return this;
+    };
+
+    EventEmitter.prototype.listeners = function(type) {
+        var eventList = this._events[type];
+
+        return eventList ? eventList.slice() : [];
+    };
+
+    EventEmitter.prototype.listenerCount = function(type) {
+        var eventList = this._events[type];
+
+        return eventList ? eventList.length : 0;
+    };
+
+    EventEmitter.prototype.setMaxListeners = function(value) {
+        if ((value = +value) !== value) throw new TypeError("EventEmitter.setMaxListeners(value) value must be a number");
+
+        this._maxListeners = value < 0 ? -1 : value;
+        return this;
+    };
+
+
+    EventEmitter.defaultMaxListeners = 10;
+
+    EventEmitter.listeners = function(obj, type) {
+        if (obj == null) throw new TypeError("EventEmitter.listeners(obj, type) obj required");
+        var eventList = obj._events && obj._events[type];
+
+        return eventList ? eventList.slice() : [];
+    };
+
+    EventEmitter.listenerCount = function(obj, type) {
+        if (obj == null) throw new TypeError("EventEmitter.listenerCount(obj, type) obj required");
+        var eventList = obj._events && obj._events[type];
+
+        return eventList ? eventList.length : 0;
+    };
+
+    EventEmitter.setMaxListeners = function(value) {
+        if ((value = +value) !== value) throw new TypeError("EventEmitter.setMaxListeners(value) value must be a number");
+
+        EventEmitter.defaultMaxListeners = value < 0 ? -1 : value;
+        return value;
+    };
+
+    EventEmitter.extend = function(child, parent) {
+        if (!parent) parent = this;
+
+        child.prototype = Object.create(parent.prototype);
+        child.prototype.constructor = child;
+        child._super = parent.prototype;
+        child.extend = parent.extend;
+
+        return child;
+    };
+
+
+    function Process() {
+
+        EventEmitter.call(this);
+
+        this.pid = 0;
+        this.title = "browser";
+        this.env = {};
+        this.argv = [];
+        this.version = "1.0.0";
+        this.versions = {};
+        this.config = {};
+        this.execPath = ".";
+        this.execArgv = [];
+        this.arch = global.navigator ? ((/\b(?:AMD|IA|Win|WOW|x86_|x)[32|64]+\b/i.exec(global.navigator.userAgent) || "")[0] || "unknown").replace(/86_/i, "").toLowerCase() : "unknown";
+        this.platform = global.navigator ? (global.navigator.platform ? global.navigator.platform.split(/[ \s]+/)[0] : "unknown").toLowerCase() : "unknown";
+        this.maxTickDepth = 1000;
+        this._cwd = global.location ? global.location.pathname : "/";
+    }
+    EventEmitter.extend(Process);
+
+    Object.defineProperty(Process.prototype, "browser", {
+        get: function() {
+            return true;
+        }
+    });
+
+    Process.prototype.memoryUsage = (function() {
+        var performance = global.performance || {},
+            memory = {
+                rss: 0,
+                heapTotal: 0,
+                heapUsed: 0
+            };
+
+        performance.memory || (performance.memory = {});
+
+        return function memoryUsage() {
+            memory.rss = performance.memory.jsHeapSizeLimit || 0;
+            memory.heapTotal = performance.memory.totalJSHeapSize || 0;
+            memory.heapUsed = performance.memory.usedJSHeapSize || 0;
+
+            return memory;
+        };
+    }());
+
+    Process.prototype.nextTick = (function() {
+        var canSetImmediate = !!global.setImmediate,
+            canMutationObserver = !!global.MutationObserver,
+            canPost = global.postMessage && global.addEventListener,
+            queue;
+
+        if (canSetImmediate) {
+            return function(fn) {
+                return global.setImmediate(fn);
+            };
+        }
+
+        queue = [];
+
+        if (canMutationObserver) {
+            var hiddenDiv = document.createElement("div"),
+                observer = new MutationObserver(function hander() {
+                    var queueList = queue.slice(),
+                        length = queueList.length,
+                        i = -1;
+
+                    queue.length = 0;
+
+                    while (++i < length) {
+                        queueList[i]();
+                    }
+                });
+
+            observer.observe(hiddenDiv, {
+                attributes: true
+            });
+
+            return function nextTick(fn) {
+                if (!queue.length) {
+                    hiddenDiv.setAttribute("yes", "no");
+                }
+                queue.push(fn);
+            };
+        }
+
+        if (canPost) {
+
+            global.addEventListener("message", function onNextTick(e) {
+                var source = e.source,
+                    fn;
+
+                if ((source === global || source === null) && e.data === "process-tick") {
+                    e.stopPropagation();
+
+                    if (queue.length > 0) {
+                        fn = queue.shift();
+                        fn();
+                    }
+                }
+            }, true);
+
+            return function nextTick(fn) {
+                queue.push(fn);
+                global.postMessage("process-tick", "*");
+            };
+        }
+
+        if (global.setTimeout) {
+            return function nextTick(fn) {
+                global.setTimeout(fn, 0);
+            };
+        }
+
+        return function nextTick(fn) {
+            fn();
+        };
+    }());
+
+    Process.prototype.cwd = function() {
+        return this._cwd;
+    };
+
+    Process.prototype.chdir = function(dir) {
+        var cwd = global.location ? global.location.pathname : "/",
+            length, newDir;
+
+        if (dir === "/") {
+            newDir = "/";
+        } else {
+            length = cwd.length;
+            newDir = dir.length >= length ? dir : dir.substring(0, length) + "/";
+        }
+
+        if (cwd.indexOf(newDir) === 0) {
+            this._cwd = dir;
+        } else {
+            throw new Error("process.chdir can't change to directory " + dir);
+        }
+    };
+
+    Process.prototype.hrtime = (function() {
+        var performance = global.performance || {},
+            start;
+
+        Date.now || (Date.now = function now() {
+            return (new Date()).getTime();
+        });
+        start = Date.now();
+
+        performance.now || (performance.now =
+            performance.mozNow ||
+            performance.msNow ||
+            performance.oNow ||
+            performance.webkitNow ||
+            function now() {
+                return Date.now() - start;
+            }
+        );
+
+        function performanceNow() {
+            return start + performance.now();
+        }
+
+        return function hrtime(previousTimestamp) {
+            var clocktime = performanceNow() * 1e-3,
+                seconds = Math.floor(clocktime),
+                nanoseconds = (clocktime % 1) * 1e9;
+
+            if (previousTimestamp) {
+                seconds -= previousTimestamp[0];
+                nanoseconds -= previousTimestamp[1];
+
+                if (nanoseconds < 0) {
+                    seconds--;
+                    nanoseconds += 1e9;
+                }
+            }
+
+            return [seconds, nanoseconds];
+        };
+    }());
+
+    Process.prototype.uptime = (function() {
+        var start = Date.now();
+
+        return function uptime() {
+            return ((Date.now() - start) * 1e-3) | 0;
+        };
+    }());
+
+    Process.prototype.abort = function() {
+        throw new Error("process.abort is not supported");
+    };
+
+    Process.prototype.binding = function(name) {
+        throw new Error("process.binding is not supported");
+    };
+
+    Process.prototype.umask = function(mask) {
+        throw new Error("process.umask is not supported");
+    };
+
+    Process.prototype.kill = function(id, signal) {
+        throw new Error("process.kill is not supported");
+    };
+
+    Process.prototype.initgroups = function(user, extra_group) {
+        throw new Error("process.initgroups is not supported");
+    };
+
+    Process.prototype.setgroups = function(groups) {
+        throw new Error("process.setgroups is not supported");
+    };
+
+    Process.prototype.getgroups = function() {
+        throw new Error("process.getgroups is not supported");
+    };
+
+    Process.prototype.getuid = function() {
+        throw new Error("process.getuid is not supported");
+    };
+
+    Process.prototype.setgid = function() {
+        throw new Error("process.setgid is not supported");
+    };
+
+    Process.prototype.getgid = function() {
+        throw new Error("process.getgid is not supported");
+    };
+
+    Process.prototype.exit = function() {
+        throw new Error("process.exit is not supported");
+    };
+
+    Process.prototype.setuid = function(id) {
+        throw new Error("process.setuid is not supported");
+    };
+
+    Object.defineProperty(Process.prototype, "stderr", {
+        get: function() {
+            throw new Error("process.stderr is not supported");
+        },
+        set: function() {
+            throw new Error("process.stderr is not supported");
+        }
+    });
+
+    Object.defineProperty(Process.prototype, "stdin", {
+        get: function() {
+            throw new Error("process.stderr is not supported");
+        },
+        set: function() {
+            throw new Error("process.stderr is not supported");
+        }
+    });
+
+    Object.defineProperty(Process.prototype, "stdout", {
+        get: function() {
+            throw new Error("process.stderr is not supported");
+        },
+        set: function() {
+            throw new Error("process.stderr is not supported");
+        }
+    });
+
+    return new Process();
+}()))

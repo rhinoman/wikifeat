@@ -1,0 +1,35 @@
+<h1>Manage Files</h1>
+<hr>
+<div id="alertBox"></div>
+<div class="table-controls">
+    <button class="btn control-button" id="addFileButton">
+        <span class="plus-prepend">+</span>
+        <span class="glyphicon glyphicon-file"></span>&nbsp;Add New File
+    </button>
+</div>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Content</th>
+        <th>Size</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody id="fileListContainer">
+    </tbody>
+</table>
+<nav class="pagination-nav">
+    <ul class="pagination">
+        <li id="previousLink">
+            <a href="#" id="pagePrevious" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li id="nextLink">
+            <a href="#" id="pageNext" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>

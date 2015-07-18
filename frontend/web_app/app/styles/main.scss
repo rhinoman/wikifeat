@@ -1,0 +1,151 @@
+@import 'colors.scss';
+@import 'wiki.scss';
+@import 'page.scss';
+@import 'user.scss';
+@import 'files.scss';
+@import 'pagedown.scss';
+
+* {
+}
+
+body{
+  background-color: $almostWhite;
+  height: 100%;
+}
+
+.sidebar {
+  .tooltip{
+    z-index:9999;
+  }
+  display: none;
+  a.sbTopLevel {
+    display:block;
+    width: 100%;
+    font-weight: bold;
+    color:#eee;
+    padding:10px;
+    text-decoration: none;
+    &:hover {
+      background: #222;
+    }
+  }
+  .subMenu{
+    font-size:8pt;
+  }
+  .subMenuLink{
+    text-decoration:none;
+    display:block;
+    width: 100%;
+    padding: 5px 5px 5px 15px;
+    color:#ddd;
+    &:hover {
+      background: #222;
+    }
+  }
+  .currentSelection{
+    background: #222;
+  }
+}
+
+//Override Bootstrap
+.form-control {
+  border-radius: 0;
+}
+
+.pagination-nav{
+  text-align: center;
+}
+
+button.btn{
+  border-radius: 0;
+}
+
+button.primary-color-btn{
+  color: $lightShade;
+  background-color: white;
+  border: 1px solid $lightShade;
+  &:hover{
+    color: white;
+    background-color: $lightShade;
+  }
+}
+
+//div.alert{
+//  display: none;
+//}
+
+div.modal{
+  div.modal-dialog{
+    div.modal-content{
+      border-radius: 0;
+      div.modal-footer{
+        .btn{
+          border: 1px solid $lightGrey;
+          &:hover {
+            background-color: $lightGrey;
+            color: white;
+          }
+        }
+        .btn-primary{
+          border: 1px solid $lightShade;
+          color: $lightShade;
+          background-color: white;
+          &:hover {
+            color: white;
+            background-color: $lightShade;
+          }
+        }
+        .btn-danger{
+          border: 1px solid lightcoral;
+          color: lightcoral;
+          background-color: white;
+          &:hover {
+            color: white;
+            background-color: lightcoral;
+          }
+          &#deleteButton{
+            float:left;
+          }
+        }
+      }
+    }
+  }
+}
+
+pre {
+  border-radius: 0;
+}
+
+.well {
+  border-radius: 0;
+}
+
+.error-page-view{
+  background-color: white;
+  margin: 10px 10px 10px 10px;
+  padding: 10px 20px 20px 20px;
+  min-height: 8in;
+}
+
+
+
+
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #333;
+    border-right: 1px solid #999;
+    color: $lighterGrey;
+    div#logo-view{
+      text-align: center;
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "path_utils",
+  "version": "0.0.1",
+  "homepage": "https://github.com/nathanfaucett/path_utils",
+  "authors": [
+    "nathanfaucett <nathanfaucett@gmail.com>"
+  ],
+  "description": "path utils for the browser and node.js",
+  "main": "src/index.js",
+  "keywords": [
+    "path_utils",
+    "path_utils.js"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ]
+}

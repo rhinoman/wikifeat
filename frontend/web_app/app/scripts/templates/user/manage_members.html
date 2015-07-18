@@ -1,0 +1,36 @@
+<h1 id="manage_members_header">Manage Members</h1>
+<hr>
+<div id="alertBox"></div>
+<div class="table-controls">
+    <button class="btn control-button" id="addMemberButton">
+        <span class="plus-prepend">+</span>
+        <span class="glyphicon glyphicon-user"></span>&nbsp;Add Member
+    </button>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>Write Access</th>
+            <th>Admin Access</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="memberListContainer"></tbody>
+</table>
+<nav class="pagination-nav">
+    <ul class="pagination">
+        <li id="previousLink">
+            <a href="#" id="pagePrevious" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li id="nextLink">
+            <a href="#" id="pageNext" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>

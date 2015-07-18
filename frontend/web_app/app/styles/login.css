@@ -1,0 +1,77 @@
+body {
+    padding-top: 100px;
+    padding-bottom: 40px;
+    background: url('../img/ocean.jpg');
+    /*background-color: #fff;*/
+}
+
+.signin-box {
+    max-width: 430px;
+    padding: 20px;
+    margin: 0 auto;
+    background-color: #eee;
+    /*border-radius: 0.5em;*/
+    border: 10px solid rgba(0, 0, 0, 0.3);
+    background-clip: padding-box;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding;
+}
+
+.signin-box .signin-box-heading,
+.signin-box .checkbox {
+    margin-bottom: 10px;
+}
+
+.signin-box .alert {
+    border-radius: 0;
+}
+
+.signin-box .checkbox {
+    font-weight: normal;
+}
+.signin-box .form-control {
+    border-radius:0;
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 14pt;
+}
+
+.signin-box .input-group {
+    margin-top:5px;
+}
+
+.signin-box .input-group span {
+    border-radius:0;
+}
+
+.signin-box .form-control:focus {
+    z-index: 2;
+}
+.signin-box input[type="email"] {
+    /*margin-bottom: -1px;*/
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.signin-box input[type="password"] {
+    /*margin-bottom: 10px;*/
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.signin-box .link-box {
+    padding:5px;
+    text-align: center;
+}
+
+button.btn {
+    border-radius:0;
+}
+
+button.btn-lg{
+    font-size:16pt;
+    margin-top:10px;
+}

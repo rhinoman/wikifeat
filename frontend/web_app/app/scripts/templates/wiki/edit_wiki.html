@@ -1,0 +1,27 @@
+<div class="wiki-form-container">
+    <form id="editWikiForm">
+        <div class="alert alert-danger" role="alert"></div>
+        <div class="form-group" id="name-input-group">
+            <label for="inputName" class="control-label">Wiki Name:</label>
+            <input type="text" class="form-control" id="inputName" placeholder="Untitled">
+        </div>
+        <div class="form-group" id="description-input-group">
+            <label for="inputDescription" class="control-label">Description:</label>
+            <input type="text" class="form-control" id="inputDescription" placeholder="No Description">
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="inputAllowGuest"> Allow Guest Access
+            </label>
+        </div>
+        <button type="submit"
+                class="page-publish-button btn btn-default btn-lg">
+            <span class="glyphicon glyphicon-save"></span>
+            &nbsp;Save
+        </button>
+        <!--<button class="page-cancel-button btn btn-default btn-lg">-->
+            <!--<span class="glyphicon glyphicon-remove"></span>-->
+            <!--&nbsp;Cancel-->
+        <!--</button>-->
+    </form>
+</div>

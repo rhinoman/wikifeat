@@ -1,0 +1,55 @@
+<div class="modal fade" id="editFileModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editFileTitle">Create File</h4>
+            </div>
+            <div class="modal-body">
+                <div id="alertBox"></div>
+                <form id="fileForm" role="form">
+                    <div class="row">
+                        <div class="form-group col-lg-12">
+                            <label for="inputName" class="control-label">Name</label>
+                            <input type="text" class="form-control" id="inputName"
+                                   placeholder="The File" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-12">
+                            <label for="inputDescription" class="control-label">Description</label>
+                            <input type="text" class="form-control" id="inputDescription"
+                                   placeholder="Description" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-12">
+                            <label for="inputFile" class="control-label">Upload File</label>
+                            <div class="input-group input-file" id="inputFile">
+                                <div class="form-control" id="fileNameDisplay">
+                                    file_name.txt
+                                </div>
+                                <span class="input-group-addon">
+                                    <a class="btn btn-primary" id="fileBrowseButton">
+                                        Browse
+                                        <input type="file" id="file-data" name="file-data">
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="hidden" id="theSubmit"></button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelButton" class="btn btn-default" data-dismiss="modal">
+                    <span>&#x2716;</span>&nbsp;Close</button>
+                <button id="saveButton" type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-save"></span>&nbsp;Save</button>
+            </div>
+        </div>
+    </div>
+</div>

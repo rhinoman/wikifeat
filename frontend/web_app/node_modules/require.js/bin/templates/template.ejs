@@ -1,0 +1,73 @@
+// Compiled with Require.js on <%= date %>
+
+(function(main, modules, paths, Buffer, process, __require__, global) {
+    var isCommonJS = typeof(module) !== "undefined" && module.exports,
+        cache = {};
+
+    if (!isCommonJS && (process !== null && process !== undefined)) {
+        <% if (USE_ENV) { %>
+        var env = <%= env %>,
+            processEnv = process.env,
+            key, value;
+
+        for (key in env) {
+            if ((value = env[key]) && !processEnv[key]) processEnv[key] = env[key];
+        }
+        <% } %>
+        
+        if (process.argv.length === 0) {
+            process.argv.push("browser", main);
+        }
+        <% if (USE_ARGV) { %>
+        process.argv.push( <%= argv %> );
+        <% } %>
+    }
+
+    function Module(filename, dirname) {
+
+        this.id = filename;
+
+        this.exports = {};
+
+        this.dirname = dirname;
+        this.filename = filename;
+
+        this.loaded = true;
+    }
+
+    function require(path) {
+        var module = cache[path],
+            data;
+
+        if (!module) {
+            data = modules[paths[path]];
+            cache[path] = module = new Module(data[1], data[2]);
+            module.require = require;
+            data[0].call(module.exports, __require__, require, module.exports, module.filename, module.dirname, module, process, Buffer, global);
+        }
+
+        return module.exports;
+    }
+    require.resolve = function(path) {
+        return path;
+    };
+    Module.prototype.require = require;
+
+    if (isCommonJS) {
+        module.exports = require(main); 
+    } else {
+        <% if (USE_EXPORT_NAME) { %>
+        global[<%= exportName %>] = require(main);
+        <% } else { %>
+        require(main);
+        <% } %>
+    }
+}(
+    <%= main %>,
+    <%= modules %>,
+    <%= paths %>,
+    <%= Buffer %>,
+    <%= process %>,
+    typeof(__require__) !== "undefined" ? __require__ : (typeof(require) !== "undefined" ? require : undefined),
+    (new Function("return this;"))()
+));

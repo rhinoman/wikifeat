@@ -1,0 +1,71 @@
+{
+  "name": "grunt-sass",
+  "version": "0.18.1",
+  "description": "Compile Sass to CSS using node-sass",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sindresorhus/grunt-sass"
+  },
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "http://sindresorhus.com"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "grunt"
+  },
+  "files": [
+    "tasks"
+  ],
+  "keywords": [
+    "gruntplugin",
+    "css",
+    "sass",
+    "scss",
+    "style",
+    "compile",
+    "preprocess",
+    "compile",
+    "libsass"
+  ],
+  "dependencies": {
+    "each-async": "^1.0.0",
+    "node-sass": "^2.0.1",
+    "object-assign": "^2.0.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-nodeunit": "^0.4.1"
+  },
+  "gitHead": "5b0c8a231574f043e16c3d2c2e7c6b84bc1796c3",
+  "bugs": {
+    "url": "https://github.com/sindresorhus/grunt-sass/issues"
+  },
+  "homepage": "https://github.com/sindresorhus/grunt-sass",
+  "_id": "grunt-sass@0.18.1",
+  "_shasum": "afc8519fdc79c102cf20a81385e1f713d8c67713",
+  "_from": "grunt-sass@*",
+  "_npmVersion": "1.4.28",
+  "_npmUser": {
+    "name": "sindresorhus",
+    "email": "sindresorhus@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "sindresorhus",
+      "email": "sindresorhus@gmail.com"
+    }
+  ],
+  "dist": {
+    "shasum": "afc8519fdc79c102cf20a81385e1f713d8c67713",
+    "tarball": "http://registry.npmjs.org/grunt-sass/-/grunt-sass-0.18.1.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/grunt-sass/-/grunt-sass-0.18.1.tgz"
+}

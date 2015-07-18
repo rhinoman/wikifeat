@@ -1,0 +1,70 @@
+<div class="modal fade" id="editUserModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editUserTitle">Create User</h4>
+            </div>
+            <div class="modal-body">
+                <div id="alertBox"></div>
+                <form id="userForm" role="form">
+                    <div class="row">
+                        <div class="form-group col-lg-12">
+                            <label for="inputUsername" class="control-label">Username</label>
+                            <input type="text" class="form-control" id="inputUsername"
+                                   placeholder="Username" required>
+                        </div>
+                    </div>
+                    <div class="row" id="passwordRow">
+                        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                            <label for="inputPassword" class="control-label">Initial Password</label>
+                            <input type="password" class="form-control" id="inputPassword"
+                                   placeholder="New Password" required>
+                        </div>
+                        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                            <label for="inputVerifyPassword" class="control-label">Verify Password</label>
+                            <input type="password" class="form-control" id="inputVerifyPassword"
+                                   placeholder="Verify Password" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                            <label for="inputLastName" class="control-label">Last Name</label>
+                            <input type="text" class="form-control" id="inputLastName"
+                                   placeholder="Last Name" required>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                            <label for="inputFirstName" class="control-label">First Name</label>
+                            <input type="text" class="form-control" id="inputFirstName"
+                                   placeholder="First Name" required>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                            <label for="inputMiddleName" class="control-label">Middle Name</label>
+                            <input type="text" class="form-control" id="inputMiddleName"
+                                   placeholder="Middle Name">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                            <label for="inputTitle" class="control-label">Title</label>
+                            <input type="text" class="form-control" id="inputTitle"
+                                   placeholder="Title">
+                        </div>
+                        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                            <label for="inputEmail" class="control-label">Email</label>
+                            <input type="email" class="form-control" id="inputEmail"
+                                   placeholder="Email address" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="hidden" id="theSubmit"></button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelButton" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="saveButton" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

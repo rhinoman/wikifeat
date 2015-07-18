@@ -1,0 +1,2141 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"ENGINE",
+				"ENGINE_EXECUTABLE"
+			],
+			[
+				"eval",
+				"evaluate"
+			],
+			[
+				"revert",
+				"revertFrame"
+			],
+			[
+				"test_node_mod_",
+				"test_node_mod_json_package"
+			],
+			[
+				"ext",
+				"extension"
+			],
+			[
+				"fre",
+				"frequencies"
+			],
+			[
+				"_onUserL",
+				"_onUserListReceived"
+			],
+			[
+				"create",
+				"createFakeSidebarApp"
+			],
+			[
+				"calledWi",
+				"calledWithExactly"
+			],
+			[
+				"broadC",
+				"broadcastEvent"
+			],
+			[
+				"Sidebar",
+				"SidebarApp"
+			],
+			[
+				"_onLo",
+				"_onLogoutSuccess"
+			],
+			[
+				"res",
+				"s-resize"
+			],
+			[
+				"Assertion",
+				"AssertionError	error"
+			],
+			[
+				"waitFor",
+				"waitForElement"
+			],
+			[
+				"switc",
+				"switchToChatWindow"
+			],
+			[
+				"assertCh",
+				"assertChatMessageReceived"
+			],
+			[
+				"upgr",
+				"upgradeData"
+			],
+			[
+				"after",
+				"aftereach	After Each"
+			],
+			[
+				"moz",
+				"mozRTCPeerConnection"
+			],
+			[
+				"fake",
+				"fakeClickEvent"
+			],
+			[
+				"incom",
+				"incoming_call"
+			],
+			[
+				"broacas",
+				"broadcastEvent"
+			],
+			[
+				"default",
+				"defaultConstraints"
+			],
+			[
+				"TextCh",
+				"TextChat"
+			],
+			[
+				"_prepare",
+				"_prepareEstablishment"
+			],
+			[
+				"def",
+				"defmethod"
+			],
+			[
+				"_onSignal",
+				"_onSignalingStateChange"
+			],
+			[
+				"connection",
+				"connection-terminated"
+			],
+			[
+				"onLocal",
+				"onLocalMediaAnswerReady"
+			],
+			[
+				"initial",
+				"initialize"
+			],
+			[
+				"waitF",
+				"waitForText"
+			],
+			[
+				"find_element_by",
+				"find_element_by_css_selector"
+			],
+			[
+				"TextC",
+				"TextChatEntryView"
+			],
+			[
+				"textChat",
+				"textChatView"
+			],
+			[
+				"constr",
+				"constraints"
+			],
+			[
+				"regis",
+				"registerPortEvents"
+			],
+			[
+				"Sideba",
+				"SidebarApp"
+			],
+			[
+				"audio",
+				"audioLibrary"
+			],
+			[
+				"broadc",
+				"broadcastEvent"
+			],
+			[
+				"broad",
+				"broadcastEvent"
+			],
+			[
+				"_ringSt",
+				"_ringStart"
+			],
+			[
+				"calledw",
+				"calledWithExactly"
+			],
+			[
+				"before",
+				"beforeeach	Before Each"
+			],
+			[
+				"offer",
+				"offerView"
+			],
+			[
+				"wait",
+				"waitForSelector"
+			],
+			[
+				"sign",
+				"signInUser"
+			],
+			[
+				"desc",
+				"describe	Describe"
+			],
+			[
+				"called",
+				"calledWithExactly"
+			],
+			[
+				"webr",
+				"webrtc"
+			],
+			[
+				"setup",
+				"setupDataChannel"
+			],
+			[
+				"data",
+				"dataChannel"
+			],
+			[
+				"postMes",
+				"postMessageSpy"
+			],
+			[
+				"postMe",
+				"postMessageSpy"
+			],
+			[
+				"user",
+				"userSet"
+			],
+			[
+				"init",
+				"initPortListener"
+			],
+			[
+				"port",
+				"portListener"
+			],
+			[
+				"liste",
+				"listeners"
+			],
+			[
+				"presen",
+				"presenceSocket"
+			],
+			[
+				"proto",
+				"prototype"
+			],
+			[
+				"call",
+				"calledWithExactly"
+			],
+			[
+				"login-",
+				"login-success"
+			],
+			[
+				"calledWith",
+				"calledWithExactly"
+			],
+			[
+				"current",
+				"currentTarget"
+			],
+			[
+				"broadca",
+				"broadcastError"
+			],
+			[
+				"Port",
+				"PortCollection"
+			],
+			[
+				"prot",
+				"prototype"
+			],
+			[
+				"ex",
+				"ex"
+			],
+			[
+				"logi",
+				"login-pending"
+			],
+			[
+				"install",
+				"install_selenium"
+			],
+			[
+				"ev",
+				"event"
+			],
+			[
+				"Pendin",
+				"PendingCallNotificationView"
+			],
+			[
+				"Notifi",
+				"NotificationView"
+			],
+			[
+				"No",
+				"NotificationSet"
+			],
+			[
+				"collect",
+				"collection"
+			],
+			[
+				"v",
+				"vendor"
+			],
+			[
+				"SAUCE_",
+				"SAUCE_ACCESS_KEY"
+			],
+			[
+				"SAUCE",
+				"SAUCE_USERNAME"
+			],
+			[
+				"selenium",
+				"seleniumConfig"
+			],
+			[
+				"serverH",
+				"serverHttpBase"
+			],
+			[
+				"server",
+				"serverHttpBase"
+			],
+			[
+				"notify",
+				"notifyUI"
+			],
+			[
+				"incomin",
+				"incomingCall"
+			],
+			[
+				"notifi",
+				"notification"
+			],
+			[
+				"Notification",
+				"NotificationsView"
+			],
+			[
+				"confi",
+				"configRoot"
+			],
+			[
+				"parse",
+				"parseConfigurations"
+			],
+			[
+				"Login",
+				"LoginView"
+			],
+			[
+				"event",
+				"eventType"
+			],
+			[
+				"ini",
+				"initialize"
+			],
+			[
+				"pro",
+				"proto	Prototype"
+			],
+			[
+				"conferen",
+				"conferenceView"
+			],
+			[
+				"logg",
+				"loggedUser"
+			],
+			[
+				"font-",
+				"font-family"
+			],
+			[
+				"target",
+				"currentTarget  (variable)"
+			],
+			[
+				"i",
+				"italic"
+			],
+			[
+				"list",
+				"list-style-type"
+			],
+			[
+				"font-s",
+				"font-style"
+			],
+			[
+				"TEMPL",
+				"TEMPLATE_DIRS"
+			],
+			[
+				"first",
+				"first-of-type  (pseudo-class)"
+			],
+			[
+				"cspt",
+				"csptest	Casper test script"
+			],
+			[
+				"arg",
+				"arguments"
+			],
+			[
+				"file",
+				"fileName"
+			],
+			[
+				"term",
+				"termination"
+			],
+			[
+				"test",
+				"testFiles"
+			],
+			[
+				"ca",
+				"casper"
+			],
+			[
+				"scri",
+				"scriptCode"
+			],
+			[
+				"cofee",
+				"coffee-script"
+			],
+			[
+				"casp",
+				"casperPath  (variable)"
+			],
+			[
+				"pa",
+				"patchedRequire"
+			],
+			[
+				"casper",
+				"casperBuiltins"
+			],
+			[
+				"request",
+				"requestPath"
+			],
+			[
+				"patter",
+				"patternType"
+			],
+			[
+				"pat",
+				"patternType"
+			],
+			[
+				"redu",
+				"reduction_driver"
+			],
+			[
+				"initial_",
+				"initial_driver"
+			],
+			[
+				"wi",
+				"withdrawal"
+			],
+			[
+				"che",
+				"checklist"
+			],
+			[
+				"inpu",
+				"input_name"
+			],
+			[
+				"chec",
+				"checkStarted"
+			],
+			[
+				"inje",
+				"injectClientUtils"
+			],
+			[
+				"defau",
+				"defaultWaitTimeout"
+			],
+			[
+				"csps",
+				"cspscript	Casper script"
+			],
+			[
+				"assert",
+				"assertEquals"
+			],
+			[
+				"getElement",
+				"getElementBounds"
+			],
+			[
+				"phan",
+				"phantom"
+			],
+			[
+				"requi",
+				"require"
+			],
+			[
+				"patched",
+				"patchedRequire"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 75.0,
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"coffee",
+				"SublimeREPL: CoffeeScript"
+			],
+			[
+				"format ",
+				"Format: Javascript"
+			],
+			[
+				"json",
+				"JSON Reindent: reindent file or selection"
+			],
+			[
+				"upg",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"clojure",
+				"Set Syntax: Clojure"
+			],
+			[
+				"cloju",
+				"SublimeREPL: Clojure"
+			],
+			[
+				"syntax clo",
+				"Set Syntax: Clojure"
+			],
+			[
+				"repl",
+				"SublimeREPL: Clojure"
+			],
+			[
+				"cloj",
+				"Set Syntax: Clojure"
+			],
+			[
+				"remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"up",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"javas",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"extend",
+				"Set Syntax: Markdown Extended"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"diff",
+				"Git: Diff All"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"html",
+				"Set Syntax: HTML"
+			],
+			[
+				"dele",
+				"File: Delete"
+			],
+			[
+				"upgrade",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"blame",
+				"Git: Blame"
+			],
+			[
+				"java",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"move",
+				"File: Move"
+			],
+			[
+				"jshin",
+				"JSHint"
+			],
+			[
+				"jsh",
+				"JSHint"
+			],
+			[
+				"previ",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"read",
+				"ReadmePlease"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"mark",
+				"Set Syntax: MultiMarkdown"
+			],
+			[
+				"upgra",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"linter",
+				"Preferences: SublimeLinter Settings – Default"
+			],
+			[
+				"remove ",
+				"Package Control: Remove Package"
+			],
+			[
+				"hint",
+				"SublimeHighlight: convert to RTF"
+			],
+			[
+				"rmeove",
+				"Package Control: Remove Package"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			],
+			[
+				"diff all",
+				"Git: Diff All"
+			],
+			[
+				"git blame",
+				"Git: Blame"
+			],
+			[
+				"disab",
+				"Package Control: Disable Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"brow",
+				"File: Open In Browser - Production Server"
+			],
+			[
+				"Readm",
+				"ReadmePlease"
+			],
+			[
+				"REPL",
+				"SublimeREPL: Clojure"
+			],
+			[
+				"LOW",
+				"Convert Case: Lower Case"
+			],
+			[
+				"browser",
+				"File: Open In Browser - Production Server"
+			],
+			[
+				"diff c",
+				"Git: Diff Current File"
+			],
+			[
+				"preview",
+				"Markdown Preview: preview in Browser"
+			],
+			[
+				"syntax text",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"syntax ",
+				"Set Syntax: R Console"
+			],
+			[
+				"syntax log",
+				"Set Syntax: LaTeX Log"
+			],
+			[
+				"syntax",
+				"Set Syntax: Makefile"
+			],
+			[
+				"indent",
+				"Indent JSON"
+			],
+			[
+				"format",
+				"Format: Javascript"
+			],
+			[
+				"entit",
+				"StringEncode: HTML Entitize"
+			],
+			[
+				"upgr",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"lower",
+				"Convert Case: Lower Case"
+			],
+			[
+				"py",
+				"Set Syntax: Python"
+			],
+			[
+				"diff curr",
+				"Git: Diff Current File"
+			],
+			[
+				"previous",
+				"Spotify: Previous Track"
+			],
+			[
+				"next",
+				"Spotify: Next Track"
+			],
+			[
+				"play",
+				"Spotify: Play"
+			],
+			[
+				"pause",
+				"Spotify: Pause"
+			],
+			[
+				"log",
+				"Git: Log Current File"
+			],
+			[
+				"js",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"upgade",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"disabl",
+				"Package Control: Disable Package"
+			],
+			[
+				"git diff",
+				"Git: Diff All"
+			],
+			[
+				"remove p",
+				"Package Control: Remove Package"
+			],
+			[
+				"disable p",
+				"Package Control: Disable Package"
+			],
+			[
+				"diable",
+				"SublimeLinter: Disable Linting"
+			],
+			[
+				"disable",
+				"Package Control: Disable Package"
+			],
+			[
+				"upp",
+				"Convert Case: Upper Case"
+			],
+			[
+				"open",
+				"File: Open In Browser - Production Server"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"checkout",
+				"Git: Checkout Current File"
+			],
+			[
+				"checkou",
+				"Git: Checkout Current File"
+			],
+			[
+				"revert",
+				"File: Revert"
+			],
+			[
+				"disa",
+				"SublimeLinter: Disable Linting"
+			],
+			[
+				"prev",
+				"Markdown Preview: preview in Browser"
+			],
+			[
+				"forma",
+				"Format: Javascript"
+			],
+			[
+				"reload",
+				"TernJS: Reload"
+			],
+			[
+				"handle",
+				"Set Syntax: Handlebars"
+			],
+			[
+				"handl",
+				"Set Syntax: Handlebars"
+			],
+			[
+				"xml",
+				"Set Syntax: XML"
+			],
+			[
+				"django",
+				"Set Syntax: HTML (Django)"
+			],
+			[
+				"todo",
+				"Show TODOs: Project and open files"
+			],
+			[
+				"encode",
+				"StringEncode: URL Encode"
+			],
+			[
+				"urlen",
+				"StringEncode: URL Encode"
+			],
+			[
+				"pre",
+				"Markdown Preview: preview in Browser"
+			],
+			[
+				"plain",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"url",
+				"StringEncode: URL Decode"
+			],
+			[
+				"javasc",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"package",
+				"Package Control: List Packages"
+			],
+			[
+				"upper",
+				"Convert Case: Upper Case"
+			],
+			[
+				"run",
+				"Run JavaScript in the browser"
+			],
+			[
+				"add repo",
+				"Package Control: Add Repository"
+			],
+			[
+				"INSTALL",
+				"Package Control: Install Package"
+			],
+			[
+				"upd",
+				"Package Control: Upgrade Package"
+			],
+			[
+				"github",
+				"GitHubinator"
+			],
+			[
+				"css",
+				"Set Syntax: CSS"
+			],
+			[
+				"ini",
+				"Set Syntax: INI"
+			],
+			[
+				"text",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"javascr",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"ruby",
+				"Set Syntax: Ruby"
+			],
+			[
+				"low",
+				"Convert Case: Lower Case"
+			],
+			[
+				"convert",
+				"DataConverter: to Python"
+			],
+			[
+				"favop",
+				"Favorite Files: Open File(s)"
+			],
+			[
+				"fav",
+				"Favorite Files: Add File(s)"
+			],
+			[
+				"repl clo",
+				"SublimeREPL: Clojure"
+			],
+			[
+				"gist",
+				"Gist: Create Public Gist"
+			],
+			[
+				"javascript",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"create gi",
+				"Gist: Create Public Gist"
+			],
+			[
+				"tweet",
+				"Tweet"
+			],
+			[
+				"twee",
+				"Tweet"
+			],
+			[
+				"quick",
+				"Quick File Creator: Create file"
+			],
+			[
+				"tag",
+				"Tag: Remove All Attributes From Tags in Document"
+			],
+			[
+				"anno",
+				"Git: Toggle Annotations"
+			],
+			[
+				"git",
+				"Git: Diff Tool"
+			],
+			[
+				"rein",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"reind",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"form",
+				"Format: Javascript"
+			],
+			[
+				"priva",
+				"Gist: Create Private Gist"
+			],
+			[
+				"wr",
+				"Word Wrap: Toggle"
+			],
+			[
+				"enco",
+				"HTML: Encode Special Characters"
+			],
+			[
+				"wrap",
+				"Word Wrap: Toggle"
+			],
+			[
+				"markdo",
+				"Set Syntax: Markdown"
+			],
+			[
+				"ind",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"update",
+				"Gist: Update File"
+			]
+		],
+		"width": 615.0
+	},
+	"console":
+	{
+		"height": 255.0,
+		"history":
+		[
+			"buffer",
+			"buffer_id",
+			"buffer",
+			"plop",
+			"print(\"plop\")",
+			"print \"plop\"",
+			"print \"plop",
+			"plop"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": true,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/niko/Sites/casperjs/tests/site/waitFor.html",
+		"/Users/niko/Sites/casperjs/bin/bootstrap.js",
+		"/Users/niko/Sites/casperjs/docs/modules/casper.rst",
+		"/Users/niko/Sites/casperjs/samples/googlematch.js",
+		"/Users/niko/Sites/casperjs/tests/run.js",
+		"/Users/niko/Sites/casperjs/modules/tester.js",
+		"/Users/niko/Sites/casperjs-formation/exercices/2/1.js",
+		"/Users/niko/Sites/casperjs/samples/googlematch.coffee",
+		"/Users/niko/Sites/casperjs/modules/casper.js",
+		"/Users/niko/Sites/casperjs-formation/pourquoi",
+		"/Users/niko/Sites/casperjs/tests/clitests/tester/step_throws.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/runtests.py",
+		"/Users/niko/Sites/casperjs/docs/testing.rst",
+		"/Users/niko/Sites/casperjs/README.md",
+		"/Users/niko/Sites/casperjs/tests/clitests/tester/exit.js",
+		"/Users/niko/Sites/casperjs/modules/cli.js",
+		"/Users/niko/Sites/casperjs/bin/casperjs",
+		"/Users/niko/Sites/casperjs/docs/upgrading/1.1.rst",
+		"/Users/niko/Sites/casperjs/c.js",
+		"/Users/niko/Sites/casperjs/docs/modules/tester.rst",
+		"/Users/niko/Sites/casperjs/tests/clitests/exit/exit.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/exit",
+		"/Users/niko/Library/Application Support/Sublime Text 3/Packages/User/SublimeLinter.sublime-settings",
+		"/Users/niko/Sites/casperjs/.jshintignore",
+		"/Users/niko/Desktop/TODO.txt",
+		"/Users/niko/Sites/casperjs/.travis.yml",
+		"/Users/niko/Sites/casperjs/casperjs.gemspec",
+		"/usr/local/Library/Formula/casperjs.rb",
+		"/Users/niko/Sites/casperjs/package.json",
+		"/Users/niko/Sites/casperjs/CHANGELOG.md",
+		"/Users/niko/Sites/casperjs/modules/clientutils.js",
+		"/Users/niko/Sites/casperjs/Makefile",
+		"/Users/niko/Sites/casperjs/tests/suites/casper/visible.js",
+		"/Users/niko/Sites/casperjs/tests/site/visible.html",
+		"/Users/niko/Library/Application Support/Sublime Text 3/Packages/EasyMotion/Default (OSX).sublime-keymap",
+		"/Users/niko/Sites/casperjs/modules/xunit.js",
+		"/Users/niko/Sites/casperjs/tests/suites/casper/debug.js",
+		"/Users/niko/Sites/casperjs/tests/site/form.html",
+		"/Users/niko/Sites/casperjs/tests/suites/casper/keys.js",
+		"/tmp/subl stdin N7gdmn.txt",
+		"/Users/niko/Sites/casperjs/tests/suites/casper/formfill.js",
+		"/Users/niko/Sites/casperjs/t.js",
+		"/Users/niko/Sites/casperjs/modules/events.js",
+		"/tmp/subl stdin c3s2Rj.txt",
+		"/Users/niko/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/niko/Sites/casperjs/.jshintrc",
+		"/Users/niko/Sites/casperjs/modules/utils.js",
+		"/Users/niko/Sites/casperjs/modules/mouse.js",
+		"/Users/niko/Sites/casperjs/modules/pagestack.js",
+		"/Users/niko/Sites/casperjs/src/casperjs.cs",
+		"/Users/niko/Sites/casperjs/test.js",
+		"/Users/niko/Sites/new.html",
+		"/Users/niko/Sites/gcontacts.html",
+		"/Users/niko/Sites/casperjs/tmp/t1.js",
+		"/Users/niko/Sites/casperjs/tmp/t2.js",
+		"/Users/niko/Sites/casperjs/docs/conf.py",
+		"/Users/niko/Sites/casperjs/log.xml",
+		"/Users/niko/Sites/casperjs/.codeintel/config",
+		"/Users/niko/Sites/casperjs/.codeintel/remarques-formation-scrum.md",
+		"/Users/niko/Sites/casperjs/tests/suites/utils.js",
+		"/Users/niko/Sites/casperjs/post.js",
+		"/Users/niko/Sites/casperjs/c2.js",
+		"/Users/niko/Sites/casperjs/thing.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/test_node_mod_json_package.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/node_modules/baz/package.json",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/test_node_mod_index.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/node_modules/bar/package.json",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/node_modules/bar/bar.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/node_modules/bar.js",
+		"/Users/niko/Sites/casperjs/tests/suites/require.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/test_coffee.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/sub/coffeemod.coffee",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/mod.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/test.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/test_node_json.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/test_node_mod.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/node_modules/json.json",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/node_modules/foo/index.js",
+		"/Users/niko/Sites/casperjs/tests/clitests/modules/node_modules/index.js",
+		"/Users/niko/Sites/casperjs/tests/site/popup.html",
+		"/Users/niko/Sites/casperjs/tests/suites/casper/popup.js",
+		"/Users/niko/Sites/casperjs/tests/site/index.html",
+		"/Users/niko/Sites/casperjs/tests/suites/clientutils.js",
+		"/Users/niko/Sites/exercism/javascript/anagram/anagram.js",
+		"/Users/niko/Sites/exercism/.jshintrc",
+		"/Users/niko/Sites/exercism/javascript/beer-song/beer-song_test.spec.js",
+		"/Users/niko/Sites/exercism/javascript/beer-song/beer.js",
+		"/Users/niko/Library/Application Support/Sublime Text 3/Packages/SideBarEnhancements/CHANGELOG",
+		"/Users/niko/Library/Application Support/Sublime Text 3/Packages/JSHint Gutter/JSHint.sublime-settings",
+		"/Users/niko/Library/Application Support/Sublime Text 3/Packages/JSHint Gutter/README.md",
+		"/Users/niko/Sites/exercism/javascript/anagram/anagram_test.spec.js",
+		"/Users/niko/Sites/exercism/javascript/word-count/words.js",
+		"/Users/niko/Sites/exercism/elixir/bob/bob.exs",
+		"/Users/niko/Sites/exercism/javascript/bob/bob_test.spec.js",
+		"/Users/niko/Sites/exercism/javascript/bob/bob3.js",
+		"/Users/niko/Sites/exercism/elixir/bob/bob_test.exs",
+		"/Users/niko/Sites/exercism/ruby/bob/bob_test.rb",
+		"/Users/niko/Sites/exercism/ruby/bob/bob.rb",
+		"/Users/niko/Desktop/st.md",
+		"/Users/niko/Sites/exercism/javascript/bob/bob2.js",
+		"/Users/niko/Sites/exercism/javascript/word-count/word-count_test.spec.js",
+		"/Users/niko/Sites/exercism/clojure/bob/bob.clj",
+		"/Users/niko/Sites/exercism/python/bob/bob.py",
+		"/Users/niko/Sites/stpackages/MVP.md",
+		"/Users/niko/Sites/stpackages/db.json",
+		"/Users/niko/Sites/stpackages/lib/import.js",
+		"/Users/niko/Sites/stpackages/app.js",
+		"/Users/niko/Library/Application Support/Sublime Text 3/Packages/SublimeLinter/SublimeLinter.sublime-settings",
+		"/Users/niko/Sites/stpackages/test/test.github.js",
+		"/Users/niko/Sites/stpackages/lib/github.js",
+		"/Users/niko/Sites/stpackages/lib/.tern-port",
+		"/Users/niko/Sites/stpackages/test/.tern-port",
+		"/Users/niko/Sites/stpackages/test/test.import.js",
+		"/Users/niko/Sites/stpackages/stpackages.sublime-project",
+		"/Users/niko/Sites/talkilla/static/js/models.js",
+		"/Users/niko/Sites/talkilla/Makefile",
+		"/Users/niko/Sites/talkilla/package.json",
+		"/Users/niko/Sites/talkilla/presence.js",
+		"/Users/niko/Sites/talkilla/.jshintrc",
+		"/Users/niko/Sites/talkilla/test/frontend/worker/serverhandlers_test.js",
+		"/Users/niko/Sites/talkilla/test/frontend/chat/index.html",
+		"/Users/niko/Sites/talkilla/firefox.log",
+		"/Users/niko/Sites/talkilla/test/frontend/usermodels_test.js",
+		"/Users/niko/Sites/talkilla/test/frontend/utils_test.js",
+		"/Users/niko/Sites/talkilla/test/frontend/index.html",
+		"/Users/niko/Sites/talkilla/test/frontend/run_tests.js",
+		"/Users/niko/Sites/talkilla/test/frontend/frontend_all_units_test.py",
+		"/Users/niko/Sites/talkilla/test/frontend/worker/conversation_test.js"
+	],
+	"find":
+	{
+		"height": 39.0
+	},
+	"find_in_files":
+	{
+		"height": 103.0,
+		"where_history":
+		[
+			"/Users/niko/Sites/casperjs",
+			"/Users/niko/Sites/casperjs/tests",
+			"/Users/niko/Sites/casperjs/tests/suites/casper",
+			"/Users/niko/Sites/casperjs",
+			"/Users/niko/Sites/casperjs/docs",
+			"/Users/niko/Sites/casperjs/tests",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/test/frontend/sidebar",
+			"/Users/niko/Sites/talkilla/test/frontend/chat",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test/frontend/sidebar",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test/frontend/chat",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/static/js/chat",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test/functional",
+			"/Users/niko/Sites/talkilla/.venv",
+			"/Users/niko/Sites/talkilla/test/functional",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/test/frontend/worker",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/test/frontend/chat",
+			"/Users/niko/Sites/talkilla/node_modules/selenium-webdriver",
+			"/Users/niko/Sites/talkilla/bin",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test/frontend/chat",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static/js/chat",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/test/frontend/chat",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test/frontend/chat",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/.venv/lib/python2.7/site-packages/selenium/webdriver/remote",
+			"/Users/niko/Sites/talkilla/.venv/lib/python2.7/site-packages/selenium",
+			"/Users/niko/Sites/talkilla/test",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/.venv/lib/python2.7/site-packages/selenium/webdriver",
+			"/Users/niko/Sites/talkilla/.venv/lib/python2.7/site-packages/selenium",
+			"/Users/niko/Sites/talkilla/.venv/lib/python2.7/site-packages/selenium/webdriver",
+			"/Users/niko/Sites/talkilla/.venv/lib/python2.7/site-packages/selenium",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/node_modules/selenium-webdriver/lib/webdriver",
+			"/Users/niko/Sites/talkilla/node_modules/wd",
+			"/Users/niko/Sites/talkilla/node_modules/wd/lib",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/static/js/chat",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static/js/chat",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static/js/chat",
+			"/Users/niko/Sites/talkilla/test/frontend/chat",
+			"/Users/niko/Sites/talkilla/static/js/chat",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/test/frontend/chat",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test/frontend/chat",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static/js/chat",
+			"/Users/niko/Sites/talkilla/node_modules/selenium-webdriver",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/test",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/test/frontend",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/node_modules/selenium-webdriver/lib",
+			"/Users/niko/Sites/talkilla/node_modules/selenium-webdriver/lib/webdriver",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/node_modules/mocha/lib",
+			"/Users/niko/Sites/talkilla/node_modules/mocha/lib/reporters",
+			"/Users/niko/Sites/talkilla/node_modules/mocha/lib",
+			"/Users/niko/Sites/talkilla/node_modules/wd/lib",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/talkilla/static",
+			"/Users/niko/Sites/talkilla/static/js",
+			"/Users/niko/Sites/casperjs",
+			"/Users/niko/Sites/casperjs/tests/suites",
+			"/Users/niko/Sites/casperjs/tests/suites/casper",
+			"/Users/niko/Sites/casperjs/tests/suites",
+			"/Users/niko/Sites/casperjs",
+			"/Users/niko/Sites/casperjs/tests/suites/casper",
+			"/Users/niko/Sites/casperjs/tests",
+			"/Users/niko/Sites/casperjs",
+			"/Users/niko/Sites/casperjs/tests/suites/casper",
+			"/Users/niko/Sites/casperjs/tests/suites",
+			"/Users/niko/Sites/casperjs/modules",
+			"/Users/niko/Sites/casperjs",
+			"/Users/niko/Sites/casperjs/docs/builder/sources",
+			"/Users/niko/Sites/casperjs",
+			"/Users/niko/Sites/casperjs/modules",
+			"/Users/niko/Sites/casperjs/bin/bootstrap.js,/Users/niko/Sites/casperjs/modules",
+			"/Users/niko/Sites/casperjs/modules",
+			"/Users/niko/Sites/casperjs/bin/bootstrap.js,/Users/niko/Sites/casperjs/modules",
+			"/Users/niko/Sites/casperjs/modules",
+			"/Users/niko/Sites/casperjs"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			".error",
+			"casper.opt",
+			"step_throws.js",
+			"step.error",
+			"autoExit",
+			"saveResults",
+			".cli",
+			"assertCommandOutputContains",
+			"In Casper",
+			"failures",
+			"\"pass",
+			"terminate",
+			"versionremoved",
+			"getFailure",
+			"getSuccess",
+			"/10/",
+			"1.0.3",
+			"jshint",
+			"make ",
+			"TEST_COMMAND",
+			"TEST_COMMAND=\"make test\"",
+			"DOTNET",
+			" ENGINE",
+			"ENGINE",
+			"--local-to-remote-url-access=yes --ignore-ssl-errors=yes",
+			"ENGINE_EXEC",
+			"PHANTOMJS_EXEC",
+			"ENGINE_VERSION=\"",
+			"ENGINE_EXECUTABLE=\"engine",
+			"ENGINE_EXECUTABLE=\"",
+			"\" ENGINE_VERSION",
+			"EXECU",
+			"ENGINE_DOWNLOAD",
+			"\" ENGINE_VERSION",
+			"ENGINE_DOWNLOAD",
+			"NATIVE",
+			"new ",
+			"eachThen",
+			"resourceExists",
+			"waitForResou",
+			"resourceExists",
+			"assertField",
+			"sendKeys",
+			"event.error",
+			"test_step_throwing_test",
+			"GI_",
+			"pageSetting",
+			"TestSuiteResult",
+			"addListener =",
+			"addListener",
+			"errorHandler",
+			"processPhantomError",
+			"Mouse",
+			"extends",
+			"switchToMainFrame",
+			"Raphaë",
+			"fNOP",
+			"191",
+			"1.9.1",
+			"190",
+			"1.9.0",
+			"beta1",
+			"test_node_mod_index",
+			"require_index",
+			".exists",
+			"resolveFile",
+			"package",
+			"foo",
+			"like",
+			"pageSett",
+			"customHeaders",
+			"post",
+			"resource.r",
+			"jsh",
+			"'<",
+			"basen",
+			"json",
+			"currentRoot",
+			"casperScriptBaseDir",
+			"separator",
+			"casperBuiltinPath",
+			"modules",
+			"confi",
+			"setF",
+			"setField",
+			"initial",
+			"i",
+			"g\"",
+			"b",
+			"a",
+			"c2",
+			"c1",
+			"frequencies",
+			"xit",
+			"frequencies",
+			"freqObj",
+			"shouting?",
+			"question?",
+			" end",
+			"if ",
+			" msg",
+			"@",
+			"      skip\n",
+			"input",
+			"message",
+			"indent",
+			"removeEmpty",
+			"memo",
+			"    ",
+			"excludeExisting",
+			"writeFile",
+			"unknown",
+			"\"gith",
+			"a.github.io/a",
+			")).",
+			"supportedRepoURL",
+			"));",
+			"to.be.True",
+			"));",
+			"extractRepoUrlInfo",
+			"supportedRepoURL",
+			"REPO_REGEX",
+			"if (!process.env.GITHUB_API_TOKEN)\njsh",
+			"if (!process.env.GITHUB_API_TOKEN)\nJSH",
+			"	JSHIN",
+			"stop",
+			"json",
+			"app.get"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"  ",
+			"app.port",
+			"\\t",
+			"\\n",
+			"    ",
+			" = Tester.prototype.$1 =",
+			"Tester.prototype.$1",
+			"require('fs')",
+			"require('./modules/",
+			"\\\\n",
+			"  ",
+			", ",
+			"$1\"use strict\";\\n    ",
+			"$1\"use strict\";\\n",
+			"    ",
+			"standard:",
+			"casper.run(function onRun()",
+			"<a href=\"selectors.html\">",
+			"",
+			"<h3 id=\"colorizer.",
+			"](#colorizer.",
+			"<h3 id=\"tester.",
+			"](#tester.",
+			"](#clientutils.",
+			"<h3 id=\"clientutils.",
+			"](#casper.",
+			"h3 id=\"casper.",
+			"    ",
+			"](selectors.html)",
+			"[selector expression](selectors.html)",
+			"",
+			"  ",
+			"\\t",
+			"-",
+			".",
+			" \"\" %}\",",
+			"analysis_",
+			"",
+			"à",
+			"é",
+			"    ",
+			"- ",
+			"    "
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 30.0
+	},
+	"input":
+	{
+		"height": 34.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.GoSublime-main-output":
+	{
+		"height": 128.0
+	},
+	"output.exec":
+	{
+		"height": 226.0
+	},
+	"output.find_results":
+	{
+		"height": 116.0
+	},
+	"output.git":
+	{
+		"height": 128.0
+	},
+	"project": "casperjs.sublime-project",
+	"replace":
+	{
+		"height": 56.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"boots",
+				"bin/bootstrap.js"
+			],
+			[
+				"casper.rst",
+				"docs/modules/casper.rst"
+			],
+			[
+				"casper.js",
+				"modules/casper.js"
+			],
+			[
+				"googlematch",
+				"samples/googlematch.js"
+			],
+			[
+				"run.js",
+				"tests/run.js"
+			],
+			[
+				"tester.js",
+				"modules/tester.js"
+			],
+			[
+				"runtest",
+				"tests/clitests/runtests.py"
+			],
+			[
+				"modules/tester.js",
+				"modules/tester.js"
+			],
+			[
+				"rea",
+				"README.md"
+			],
+			[
+				"exit.js",
+				"tests/clitests/tester/exit.js"
+			],
+			[
+				"testing.rst",
+				"docs/testing.rst"
+			],
+			[
+				"tester",
+				"modules/tester.js"
+			],
+			[
+				"tester.rst",
+				"docs/modules/tester.rst"
+			],
+			[
+				"c.js",
+				"c.js"
+			],
+			[
+				"upgra",
+				"docs/upgrading/1.1.rst"
+			],
+			[
+				"casperjs",
+				"bin/casperjs"
+			],
+			[
+				"visible.html",
+				"tests/site/visible.html"
+			],
+			[
+				"client",
+				"modules/clientutils.js"
+			],
+			[
+				"casper",
+				"bin/casperjs"
+			],
+			[
+				"xunit",
+				"modules/xunit.js"
+			],
+			[
+				"cas",
+				"modules/casper.js"
+			],
+			[
+				"form.h",
+				"tests/site/form.html"
+			],
+			[
+				"t.js",
+				"t.js"
+			],
+			[
+				"clientutil",
+				"modules/clientutils.js"
+			],
+			[
+				"read",
+				"README.md"
+			],
+			[
+				"jshint",
+				".jshintrc"
+			],
+			[
+				"tester.",
+				"modules/tester.js"
+			],
+			[
+				"casp",
+				"modules/casper.js"
+			],
+			[
+				"packa",
+				"package.json"
+			],
+			[
+				"travis",
+				".travis.yml"
+			],
+			[
+				"boo",
+				"bin/bootstrap.js"
+			],
+			[
+				"runte",
+				"tests/clitests/runtests.py"
+			],
+			[
+				"tests/suites/casper/popup.js",
+				"tests/suites/casper/popup.js"
+			],
+			[
+				"presence.js",
+				"presence.js"
+			],
+			[
+				"chat/in",
+				"test/frontend/chat/index.html"
+			],
+			[
+				"fronendtest",
+				"test/frontend/worker/serverhandlers_test.js"
+			],
+			[
+				"webrtc.js",
+				"static/js/webrtc.js"
+			],
+			[
+				"sidebar/models.js",
+				"static/js/sidebar/models.js"
+			],
+			[
+				"run_t",
+				"test/frontend/run_tests.js"
+			],
+			[
+				"port.js",
+				"static/js/port.js"
+			],
+			[
+				"worker.js",
+				"static/js/worker.js"
+			],
+			[
+				"chat/views",
+				"static/js/chat/views.js"
+			],
+			[
+				"chatv",
+				"test/frontend/chat/textchatview_test.js"
+			],
+			[
+				"sideba",
+				"static/sidebar.html"
+			],
+			[
+				"style.css",
+				"static/css/style.css"
+			],
+			[
+				"webdriver.py",
+				".venv/lib/python2.7/site-packages/selenium/webdriver/remote/webdriver.py"
+			],
+			[
+				"webdriver",
+				".venv/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py"
+			],
+			[
+				"expected_",
+				".venv/lib/python2.7/site-packages/selenium/webdriver/support/expected_conditions.py"
+			],
+			[
+				"expected",
+				".venv/lib/python2.7/site-packages/selenium/webdriver/support/expected_conditions.py"
+			],
+			[
+				"webdri",
+				".venv/lib/python2.7/site-packages/selenium/webdriver/remote/webdriver.py"
+			],
+			[
+				"chat.html",
+				"static/chat.html"
+			],
+			[
+				"webdriverwait",
+				".venv/lib/python2.7/site-packages/selenium/webdriver/support/wait.py"
+			],
+			[
+				"expected_conditions",
+				".venv/lib/python2.7/site-packages/selenium/webdriver/support/expected_conditions.py"
+			],
+			[
+				"by.py",
+				".venv/lib/python2.7/site-packages/selenium/webdriver/common/by.py"
+			],
+			[
+				"style",
+				"static/css/style.css"
+			],
+			[
+				"styles",
+				".venv/lib/python2.7/site-packages/IPython/frontend/qt/console/styles.py"
+			],
+			[
+				"callmodel",
+				"test/frontend/chat/callmodel_test.js"
+			],
+			[
+				"readme",
+				"README.md"
+			],
+			[
+				"chatapptes",
+				"test/frontend/chat/chatapp_test.js"
+			],
+			[
+				"chapp",
+				"static/js/chat/app.js"
+			],
+			[
+				"webrtctes",
+				"test/frontend/webrtc/webrtc_test.js"
+			],
+			[
+				"webtest",
+				"test/frontend/webrtc/webrtc_test.js"
+			],
+			[
+				"webrtc.",
+				"static/js/webrtc.js"
+			],
+			[
+				"firefox_binary",
+				".venv/lib/python2.7/site-packages/selenium/webdriver/firefox/firefox_binary.py"
+			],
+			[
+				"chat/app",
+				"static/js/chat/app.js"
+			],
+			[
+				"chatapp",
+				"test/frontend/chat/chatapp_test.js"
+			],
+			[
+				"webrtctest",
+				"test/frontend/webrtc/webrtc_test.js"
+			],
+			[
+				"chatapp_test",
+				"test/frontend/chat/chatapp_test.js"
+			],
+			[
+				"webrtc",
+				"static/js/webrtc.js"
+			],
+			[
+				"models.",
+				"static/js/models.js"
+			],
+			[
+				"app.js",
+				"static/js/chat/app.js"
+			],
+			[
+				"models",
+				"static/js/models.js"
+			],
+			[
+				"test.py",
+				"test/functional/test.py"
+			],
+			[
+				"selenium.sh",
+				"bin/selenium.sh"
+			],
+			[
+				"chat/views.js",
+				"static/js/chat/views.js"
+			],
+			[
+				"index.html",
+				"static/index.html"
+			],
+			[
+				"models.js",
+				"static/js/models.js"
+			],
+			[
+				"helpers",
+				"test/functional/helpers.js"
+			],
+			[
+				"views.js",
+				"static/js/views.js"
+			],
+			[
+				"utils_test",
+				"test/frontend/utils_test.js"
+			],
+			[
+				"webdriver.js",
+				"node_modules/wd/lib/webdriver.js"
+			],
+			[
+				"worker.",
+				"static/js/worker.js"
+			],
+			[
+				"model",
+				"static/js/models.js"
+			],
+			[
+				"lib/webdriver/webdriver.js",
+				"node_modules/selenium-webdriver/lib/webdriver/webdriver.js"
+			],
+			[
+				"lib/atoms/response.js",
+				"node_modules/selenium-webdriver/lib/atoms/response.js"
+			],
+			[
+				"callestablishview_test",
+				"test/frontend/chat/callestablishview_test.js"
+			],
+			[
+				"textchatview_test.js",
+				"test/frontend/chat/textchatview_test.js"
+			],
+			[
+				"worker_test",
+				"test/frontend/worker_test.js"
+			],
+			[
+				"helper",
+				"test/functional/helpers.js"
+			],
+			[
+				"textchatmodel_test.js",
+				"test/frontend/chat/textchatmodel_test.js"
+			],
+			[
+				"chaapp",
+				"static/js/chat/app.js"
+			],
+			[
+				"backbone",
+				"static/vendor/backbone-1.0.0.js"
+			],
+			[
+				"views",
+				"static/js/views.js"
+			],
+			[
+				"static/js/browserdetection.js",
+				"static/js/browserDetection.js"
+			],
+			[
+				"make",
+				"Makefile"
+			],
+			[
+				"chai.js",
+				"node_modules/chai/chai.js"
+			],
+			[
+				"worker",
+				"static/social/worker.js"
+			],
+			[
+				"webdr",
+				"node_modules/selenium-webdriver/lib/webdriver/webdriver.js"
+			],
+			[
+				"presence",
+				"presence.js"
+			],
+			[
+				"server.js",
+				"server.js"
+			],
+			[
+				"handleb",
+				"static/scripts/vendor/handlebars.js"
+			],
+			[
+				"text.js",
+				"static/scripts/vendor/text.js"
+			],
+			[
+				"require.",
+				"node_modules/requirejs/require.js"
+			],
+			[
+				"unders",
+				"static/scripts/vendor/underscore.js"
+			],
+			[
+				"builder.py",
+				"builder.py"
+			],
+			[
+				"builder",
+				"builder.py"
+			],
+			[
+				"styles.css",
+				"sources/static/css/styles.css"
+			],
+			[
+				"post.h",
+				"sources/templates/post.html"
+			],
+			[
+				"blog.html",
+				"sources/templates/blog.html"
+			],
+			[
+				"base",
+				"sources/templates/base.html"
+			],
+			[
+				"page.h",
+				"sources/templates/page.html"
+			],
+			[
+				"base.rss",
+				"sources/templates/base.rss"
+			],
+			[
+				"requi",
+				"requirements.txt"
+			],
+			[
+				"build",
+				"builder.py"
+			],
+			[
+				"stylecss",
+				"static/css/styles.css"
+			],
+			[
+				"base.html",
+				"templates/base.html"
+			],
+			[
+				"homepa",
+				"pages/homepage.md"
+			],
+			[
+				"home",
+				"pages/homepage.md"
+			],
+			[
+				"transpa",
+				"pages/transparence.md"
+			],
+			[
+				"bien-",
+				"pages/bien-etre.md"
+			],
+			[
+				"niko",
+				"pages/version-niko.md"
+			],
+			[
+				"utils",
+				"casperjs/modules/utils.js"
+			],
+			[
+				"alert.html",
+				"casperjs/tests/site/alert.html"
+			],
+			[
+				"page1",
+				"casperjs/tests/site/page1.html"
+			],
+			[
+				"faq",
+				"casperjs/docs/builder/sources/faq_toc.md"
+			],
+			[
+				"clientu",
+				"casperjs/docs/builder/sources/clientutils_toc.md"
+			],
+			[
+				"clien",
+				"casperjs/docs/builder/sources/clientutils_toc.md"
+			],
+			[
+				"chan",
+				"casperjs/CHANGELOG.md"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 374.0,
+		"selected_items":
+		[
+			[
+				"drop",
+				"drop"
+			]
+		],
+		"width": 894.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 184.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
