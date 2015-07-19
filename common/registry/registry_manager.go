@@ -22,7 +22,7 @@ package registry
 import (
 	"errors"
 	"fmt"
-	"github.com/coreos/go-etcd/etcd"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/coreos/go-etcd/etcd"
 	"github.com/rhinoman/wikifeat/common/config"
 	"log"
 	"math/rand"

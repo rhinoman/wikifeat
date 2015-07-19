@@ -22,7 +22,7 @@ package user_service
 
 import (
 	"errors"
-	"github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/common/services"

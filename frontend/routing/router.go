@@ -20,14 +20,14 @@ package routing
 
 import (
 	"bytes"
-	"github.com/daaku/go.httpgzip"
-	"github.com/gorilla/mux"
-	"github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/daaku/go.httpgzip"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/golang.org/x/net/html"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/frontend/fserv"
-	"golang.org/x/net/html"
 	"log"
 	"net/http"
 	"os"

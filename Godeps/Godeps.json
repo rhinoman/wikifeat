@@ -1,0 +1,88 @@
+{
+	"ImportPath": "github.com/rhinoman/wikifeat",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/alyu/configparser",
+			"Rev": "ec4ca64c5c3e8c0156cacdba6e69b9f521cdd1ae"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/etcdserver/etcdhttp/httptypes",
+			"Comment": "v2.0.4-405-g3aa7a31",
+			"Rev": "3aa7a317719446a4b19dcb4cdd1568e474aaf507"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/types",
+			"Comment": "v2.0.4-405-g3aa7a31",
+			"Rev": "3aa7a317719446a4b19dcb4cdd1568e474aaf507"
+		},
+		{
+			"ImportPath": "github.com/coreos/go-etcd/etcd",
+			"Comment": "v0.4.6-14-g6c0c031",
+			"Rev": "6c0c031546a10bafb185c792b0b05cf7dccd2754"
+		},
+		{
+			"ImportPath": "github.com/daaku/go.httpgzip",
+			"Rev": "a336c4bfd42faf5b18b9d90dcdfe3b4fc13a8fa5"
+		},
+		{
+			"ImportPath": "github.com/emicklei/go-restful",
+			"Comment": "v1.1.2-53-g2886c7c",
+			"Rev": "2886c7c9261c778a69805f00eec160d6784d62f9"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "14f550f51af52180c2eefed15e5fd18d63c0a64a"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "e444e69cbd2e2e3e0749a2f3c717cec491552bbf"
+		},
+		{
+			"ImportPath": "github.com/jtolds/gls",
+			"Rev": "f1ac7f4f24f50328e6bc838ca4437d1612a0243c"
+		},
+		{
+			"ImportPath": "github.com/microcosm-cc/bluemonday",
+			"Rev": "cb3660f44463dfacda51a0bfdd6b7524c22e2ecb"
+		},
+		{
+			"ImportPath": "github.com/rhinoman/couchdb-go",
+			"Rev": "72a71927e70573d2a1557046aea2365c0d275301"
+		},
+		{
+			"ImportPath": "github.com/rhinoman/go-commonmark",
+			"Comment": "0.18.3-5-g80bd6c3",
+			"Rev": "80bd6c32ee452a3fc309840aa055b911be235ea4"
+		},
+		{
+			"ImportPath": "github.com/rhinoman/go-slugification",
+			"Rev": "74a9aac4722d946d4dfc1a9ff41edd8c47122eb6"
+		},
+		{
+			"ImportPath": "github.com/rhinoman/wikifeat-wikis/wiki_service/wikit",
+			"Rev": "72efff929fa353867d853146683e28dde4da52de"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey",
+			"Comment": "1.5.0-342-g6d19cf7",
+			"Rev": "6d19cf7374f8e51f0691872e46cb51c5e9794e5a"
+		},
+		{
+			"ImportPath": "github.com/twinj/uuid",
+			"Rev": "4d772442af203e27723acc7d1eea6c93cd319c57"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Rev": "84ba27dd5b2d8135e9da1395277f2c9333a2ffda"
+		},
+		{
+			"ImportPath": "gopkg.in/natefinch/lumberjack.v2",
+			"Comment": "v1.0-12-gd28785c",
+			"Rev": "d28785c2f27cd682d872df46ccd8232843629f54"
+		}
+	]
+}

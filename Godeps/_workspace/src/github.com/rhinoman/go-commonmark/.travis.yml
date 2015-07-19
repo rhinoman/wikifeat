@@ -1,0 +1,16 @@
+# Travis build settings for go-commonmark
+language: go
+go:
+ - 1.4
+before_install:
+ - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
+ - sudo apt-get update -qq
+ - sudo apt-get install gcc
+ - sudo apt-get install build-essential
+ - sudo apt-get install python3
+ - sudo apt-get install re2c
+ - sudo apt-get install pandoc
+ - sudo apt-get install texlive-latex-recommended
+ - cd $HOME/gopath/src/github.com/rhinoman/go-commonmark
+script:
+ - go test -v ./...

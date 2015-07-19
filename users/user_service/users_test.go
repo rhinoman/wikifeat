@@ -20,14 +20,14 @@ package user_service_test
 
 import (
 	"fmt"
-	"github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/smartystreets/goconvey/convey"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/users/user_service"
-	"github.com/rhinoman/wikifeat/vendor/github.com/twinj/uuid"
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"time"
 )

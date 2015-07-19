@@ -20,7 +20,7 @@
 package wiki_service
 
 import (
-	"github.com/emicklei/go-restful"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/wikis/wiki_service/wikit"

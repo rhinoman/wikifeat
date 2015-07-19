@@ -20,8 +20,8 @@
 package wiki_service
 
 import (
-	"github.com/microcosm-cc/bluemonday"
-	"github.com/rhinoman/go-commonmark"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/microcosm-cc/bluemonday"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/go-commonmark"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/wikis/wiki_service/wikit"

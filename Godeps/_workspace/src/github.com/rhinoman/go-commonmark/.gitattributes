@@ -1,0 +1,5 @@
+*.c linguist-vendored=true
+*.h linguist-vendored=true
+*.inc linguist-vendored=true
+*.gperf linguist-vendored=true
+*.re linguist-vendored=true

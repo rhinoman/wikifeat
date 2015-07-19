@@ -1,0 +1,6 @@
+# Travis build settings for go-slugification
+language: go
+go:
+ - 1.4
+script:
+ - go test -v ./...

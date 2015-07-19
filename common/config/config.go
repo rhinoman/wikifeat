@@ -21,7 +21,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/alyu/configparser"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/alyu/configparser"
 	"log"
 	"strconv"
 )
