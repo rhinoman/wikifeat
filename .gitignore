@@ -61,3 +61,7 @@ crashlytics-build.properties
 
 #Other
 default.etcd/
+wikifeat-users
+wikifeat-wikis
+wikifeat-frontend
+*.log
