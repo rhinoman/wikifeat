@@ -1,0 +1,16 @@
+{
+	"_id" : "_design/user_queries",
+	"language" : "javascript",
+	"views" : {
+		"listUsers" : {
+			"map" : "function(doc){if(doc.type===\"user\" && doc.name !==\"guest\"){emit(doc._id,{name: doc.name, roles: doc.roles, userPublic: doc.userPublic});}}"
+		},
+		"usersByRole":{
+			 "map": "function(doc){if(doc.type===\"user\"){for(var r in doc.roles){emit(doc.roles[r],{id: doc._id, name: doc.name, roles: doc.roles, userPublic: doc.userPublic});}}}",
+       "reduce": "_count"
+		}
+	},
+	"lists": {
+		"browseUsers": "function(head,req){start({\"headers\":{\"Content-Type\": \"application/json\"}});var row;var response={total_rows:0, offset:0, rows:[]};var dupes = [];while(row = getRow()){if(dupes.indexOf(row.value.id) == -1){dupes.push(row.value.id);response.rows.push({\"id\":row.value.id, \"value\":row.value});}}response.total_rows=head.total_rows;response.offset=head.offset;send(toJSON(response));}"
+	}
+}

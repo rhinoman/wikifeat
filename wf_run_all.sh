@@ -1,10 +1,12 @@
 #!/bin/sh
 
-ORGPATH=$GOPATH/src/github.com/rhinoman
+WIKIPATH=$GOPATH/src/github.com/rhinoman/wikifeat
 
-cd $ORGPATH/wikifeat-users
-./wikifeat-users&
-cd $ORGPATH/wikifeat-wikis
-./wikifeat-wikis&
-cd $ORGPATH/wikifeat-frontend
-./wikifeat-frontend&
+cd $WIKIPATH/users
+./users&
+sleep 2
+cd $WIKIPATH/wikis
+./wikis&
+sleep 2
+cd $WIKIPATH/frontend
+./frontend&

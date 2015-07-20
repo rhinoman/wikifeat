@@ -1,0 +1,1 @@
+{ "_id": "_design/_auth", "validate_doc_update": "function(newDoc, oldDoc, userCtx){ if((userCtx.roles.indexOf(\"wikifeat_main_db:write\") === -1) && (userCtx.roles.indexOf(\"wikifeat_main_db:admin\") === -1) && (userCtx.roles.indexOf(\"_admin\") === -1)){ throw({forbidden: \"Not authorized\"}); }}" }

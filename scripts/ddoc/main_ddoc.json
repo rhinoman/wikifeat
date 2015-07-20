@@ -1,0 +1,26 @@
+{
+	"_id" : "_design/wiki_query",
+	"language" : "javascript",
+	"views" : {
+		"getWikis": {
+			"map" : "function(doc) {if(doc.type===\"wiki_record\"){emit(doc.name,doc);}}"
+		},
+		"getWikiBySlug": {
+			"map" : "function(doc) {if(doc.type===\"wiki_record\"){emit(doc.slug,{wikiRev:doc._rev,wiki_record:doc});}}"
+		},
+		"userWikiList": {
+			"map" : "function(head,req){var row;var user=req['userCtx']['name'];var response={total_rows:0,offset:0,rows:[]};while(row=getRow()){if(user in row.value.members){response.rows.push(row);}}response.total_rows=response.rows.length;send(toJSON(response));}"
+		},
+		"checkUniqueSlug": {
+			"map" : "function(doc){if(doc.type===\"wiki_record\"){emit(doc.slug,1);}}",
+			"reduce" : "_count"
+		}
+
+	},
+	"lists":{
+		"userWikiList": {
+			"map" : "function(head,req){var row;var user=req['userCtx']['name'];var response={total_rows:0,offset:0,rows:[]};while(row=getRow()){if(user in row.value.members){response.rows.push(row);}}response.total_rows=response.rows.length;send(toJSON(response));}"
+		}
+
+	}
+}
