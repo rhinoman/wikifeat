@@ -42,14 +42,11 @@ url=http://$host:$port/_config/couch_httpd_auth/public_fields
 content_type="Content-Type: application/json"
 field=userPublic
 auth=$admin_user:$admin_password
-public_user_fields_cmd="curl -X PUT $url -H \"$content_type\" -d \"$field\" -u $auth"
-$public_user_fields_cmd
+curl -X PUT $url -d \""$field\"" -u $auth
 
 #Set up views in the user database
 echo -n "Creating design document for user queries"
 url=http://$host:$port/_users/_design/user_queries
 echo -n $userDdoc
-writeDesignDocCmd="curl -X PUT $url -H \"$content_type\" --data-binary @ddoc/user_ddoc.json -u $auth"
-echo -n $writeDesignDocCmd
-$writeDesignDocCmd
+curl -X PUT $url -H "$content_type" --data-binary @ddoc/user_ddoc.json -u $auth
 
