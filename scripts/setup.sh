@@ -5,6 +5,8 @@
 # Sets up Wikifeat prior to first run
 # Format setup.sh hostname portnumber
 
+set -e
+
 if [ $# -eq 0 ]
 then
 	echo
@@ -54,12 +56,14 @@ auth=$admin_user:$admin_password
 content_type="Content-Type: application/json"
 
 # Create the main database
-echo -n "Creating Wikifeat Main Database $main_db"
-curl -X PUT $couch_host/$main_db -u $auth
+echo "Creating Wikifeat Main Database $main_db"
+echo
+curl -sS -X PUT $couch_host/$main_db -u $auth > /dev/null
 
 # Load the main database design docs
-writeDesignDocCmd="curl -X PUT $couch_host/$main_db/_design/wiki_query -H "$content_type" --data-binary @ddoc/main_ddoc.json -u $auth"
-$writeDesignDocCmd
+echo "Loading Main Database Design Doc"
+echo
+curl -sS -X PUT $couch_host/$main_db/_design/wiki_query -H "$content_type" --data-binary @ddoc/main_ddoc.json -u $auth > /dev/null
 
 # Load in the valdiation function
 write_role="$main_db:write"
@@ -75,57 +79,25 @@ auth_doc="{ \
 \"validate_doc_update\": \"$validation_func\" \
 }"
 
-echo
-curl -X PUT $couch_host/$main_db/_design/_auth -H "$content_type" -d "$auth_doc" -u $auth
-echo
+echo "Setting Security for Main Database"
+curl -sS -X PUT $couch_host/$main_db/_design/_auth -H "$content_type" -d "$auth_doc" -u $auth > /dev/null
 echo
 
 # Run the user db setup script
-sh setup_users.sh $host $port $admin_user $admin_password
+sh setup_users.sh $host $port $admin_user $admin_password $main_db
+
+# Should we create a master user?
+
+echo -n "Would you like to create a master user now (y/n)?"
+read create_master
+if echo "$create_master" | grep -iq "^y" ;then
+	sh ./create_master_user.sh $host $port $admin_user $admin_password $main_db
+fi
 
 # TODO: Create config.ini ? 
 
-#Create master user
-while [ 1 ]
-do 
-	echo -n "Create the master user" 
-	echo
-	echo -n "Enter master username: " 
-	read master_username 
-	echo
-	echo -n "Enter password for $master_username: " 
-	stty -echo 
-	read master_password 
-	echo
-	stty echo 
-	echo -n "Verify password: " 
-	stty -echo 
-	read verify_password 
-	stty echo 
-	if [ $master_password != $verify_password ] 
-	then 
-		echo -n "Passwords don't match!"
-		echo
-	       	echo -n "Try again" 
-		echo
-	else 
-		break
-	fi
-done
-echo
 
-url=http://$host:$port/_users/org.couchdb.user:$master_username
-
-user_data="{\
-  \"_id\":\"org.couchdb.user:$master_username\",\
-  \"name\":\"$master_username\",\
-  \"type\":\"user\",\
-  \"roles\": [\"master\",\"admin\"],\
-  \"password\": \"$master_password\",\
-  \"userPublic\": {}\
-}"
-
-curl -X PUT $url -H "$content_type" -d "$user_data" -u $auth
 echo
-echo
+echo "Setup Complete!"
+
 

@@ -5,6 +5,8 @@
 # Sets up the user database in couchdb 
 # Format: setup_users.sh hostname portnumber
 
+set -e
+
 if [ $# -eq 0 ]
 then
 	echo
@@ -37,16 +39,17 @@ fi
 echo
 
 #Set the user public fields
+echo
 echo -n "Setting user database public fields"
 url=http://$host:$port/_config/couch_httpd_auth/public_fields
 content_type="Content-Type: application/json"
 field=userPublic
 auth=$admin_user:$admin_password
-curl -X PUT $url -d \""$field\"" -u $auth
+curl -sS -X PUT $url -d \""$field\"" -u $auth > /dev/null
 
 #Set up views in the user database
+echo
 echo -n "Creating design document for user queries"
 url=http://$host:$port/_users/_design/user_queries
-echo -n $userDdoc
-curl -X PUT $url -H "$content_type" --data-binary @ddoc/user_ddoc.json -u $auth
-
+curl -sS -X PUT $url -H "$content_type" --data-binary @ddoc/user_ddoc.json -u $auth > /dev/null
+echo

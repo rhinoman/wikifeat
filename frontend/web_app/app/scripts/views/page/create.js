@@ -25,10 +25,11 @@ define([
     'marionette',
     'backbone.radio',
     'backbone.stickit',
+    'markdown',
     'entities/wiki/page',
     'text!templates/page/edit_page.html',
     'text!templates/main/alert.html'
-], function($,_,Marionette,Radio,Stickit,
+], function($,_,Marionette,Radio,Stickit,Markdown,
             PageModel,EditPageTemplate,AlertTemplate){
 
     return Marionette.ItemView.extend({
@@ -50,13 +51,29 @@ define([
         initialize: function(options){
             this.wikiModel = options.wikiModel || null;
             this.homePage = options.homePage || false;
+            this.model.on('invalid', this.showError, this);
+        },
+
+        showError: function(model, error){
+            var alertText = 'Please correct the following errors: <ul id="error_list">';
+            if(error.hasOwnProperty('title')){
+                this.$("#title-input-group").addClass('has-error');
+                alertText += "<li>Page Title " + error.title + "</li>"
+            }
+            alertText += "</ul>";
+            var alertView = new AlertView({
+                el: $("#alertBox"),
+                alertType: 'alert-danger',
+                alertMessage: alertText
+            });
+            alertView.render();
         },
 
         //Persist page
         publishPage: function(event){
             event.preventDefault();
             var pageContent = this.model.get('content');
-            pageContent.raw = $("#rawPageText").val();
+            pageContent.raw = $("#wmd-input").val();
             this.model.set('content', pageContent);
             Radio.channel('wikiManager').request('save:page', this.model)
                 .done(this.afterSave.bind(this));
@@ -79,12 +96,12 @@ define([
         },
         //Callback after the wiki is saved
         afterWikiSave: function(response){
-           if(typeof response !== 'undefined'){
-               Radio.channel('page').trigger('show:page',
-                   this.model.id, this.wikiModel);
-           } else {
-               //TODO: Handle undefined
-           }
+            if(typeof response !== 'undefined'){
+                Radio.channel('page').trigger('show:page',
+                    this.model.id, this.wikiModel);
+            } else {
+                //TODO: Handle undefined
+            }
         },
 
         //Cancel and go back!
@@ -99,9 +116,16 @@ define([
         },
 
         onRender: function(){
+            this.$(".alert").css('display','none');
             if(typeof this.model !== 'undefined'){
                 this.stickit();
             }
+        },
+
+        onShow: function(){
+            var converter = new Markdown.Converter();
+            var editor = new Markdown.Editor(converter);
+            editor.run();
         },
 
         onClose: function(){
