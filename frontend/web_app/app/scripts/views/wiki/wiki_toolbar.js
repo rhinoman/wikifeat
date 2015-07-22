@@ -10,9 +10,13 @@ define([
     'backbone.radio',
     'bootstrap',
     'entities/wiki/wiki',
+    'entities/error',
+    'views/main/confirm_dialog',
+    'views/main/error_dialog',
     'text!templates/wiki/wiki_toolbar.html'
 ], function($,_,Marionette,Radio,Bootstrap,
-            WikiModel,WikiToolbarTemplate){
+            WikiModel,ErrorModel,ConfirmDialog,
+            ErrorDialog,WikiToolbarTemplate){
 
     return Marionette.ItemView.extend({
         id: 'wiki-toolbar',
@@ -70,6 +74,31 @@ define([
 
         deleteWiki: function(event){
             event.preventDefault();
+            var confirmCallback = function(){
+                Radio.channel('wikiManager').request('delete:wiki', self.model)
+                    .done(function(response){
+                        if(typeof response === 'undefined'){
+                            var errorDialog = new ErrorDialog({
+                                model: new ErrorModel({
+                                    errorTitle: "Error deleting wiki",
+                                    errorMessage: "Could not delete wiki"
+                                })
+                            });
+                            Radio.channel('main').trigger('show:dialog', errorDialog);
+                        } else {
+                            Radio.channel('sidebar').trigger('remove:wiki', self.model);
+                            Radio.channel('home').trigger('show:home');
+                        }
+                    });
+            };
+            var confirmDialog = new ConfirmDialog({
+                message: 'Are you sure you wish to delete the wiki "' +
+                    this.model.get('name') + '?" This action is irreversible.',
+                confirmCallback: confirmCallback
+            });
+            Radio.channel('main')
+                .trigger('show:dialog', confirmDialog);
+            var self = this;
         },
 
         viewFiles: function(event){

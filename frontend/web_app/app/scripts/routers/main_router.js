@@ -8,10 +8,8 @@ define([
     'marionette',
     'controllers/main/home'
 ], function($, _, Marionette,
-            HomeController){
+            homeController){
     'use strict';
-
-    var hc = new HomeController();
 
     var router = Marionette.AppRouter.extend({
         initialize: function(){
@@ -22,7 +20,7 @@ define([
         },
         controller: {
             showHome: function(){
-                hc.showHome();
+                homeController.showHome();
             }
         }
     });

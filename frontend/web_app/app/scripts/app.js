@@ -110,7 +110,7 @@ define([
 
         Radio.channel('sidebar').trigger('init:layout', this.sidebarRegion);
         if (this.getCurrentRoute() === "") {
-            WikiClient.trigger("showHome")
+            WikiClient.trigger("showHome");
         }
         //Handler for content region
         Radio.channel('main').on('show:content', function(content){

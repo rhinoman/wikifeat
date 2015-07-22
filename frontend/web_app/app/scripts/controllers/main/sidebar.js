@@ -105,6 +105,10 @@ define([
     sideBarChannel.on('add:wiki', function(wikiModel){
         wikiCollection.push(wikiModel);
     });
+    //Remove a wiki from the list (usually called when a wiki is deleted).
+    sideBarChannel.on('remove:wiki', function(wikiModel){
+        wikiCollection.remove(wikiModel);
+    });
 
     return sideBarController;
 });

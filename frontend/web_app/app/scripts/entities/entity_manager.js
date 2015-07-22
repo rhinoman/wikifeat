@@ -94,6 +94,10 @@ define([
         return wikiManager.saveEntity(wikiModel);
     });
 
+    wikiChannel.reply("delete:wiki", function(wikiModel){
+        return wikiManager.deleteEntity(wikiModel);
+    });
+
     wikiChannel.reply("get:slug:page", function(slug, wikiSlug){
         return wikiManager.getPageBySlug(slug, wikiSlug);
     });

@@ -6,10 +6,11 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'backbone.radio',
     'marionette'
-], function($, _, Backbone, Marionette){
+], function($, _, Backbone, Radio, Marionette){
 
-    return Marionette.Controller.extend({
+    var HomeController =  Marionette.Controller.extend({
         showHome: function(){
             $.ajax({
                 url: "app/home"
@@ -20,4 +21,12 @@ define([
             });
         }
     });
+    var homeController = new HomeController();
+    var homeChannel = Radio.channel('home');
+
+    homeChannel.on("show:home", function(){
+        homeController.showHome();
+    });
+
+    return homeController;
 });
