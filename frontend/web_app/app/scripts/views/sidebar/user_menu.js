@@ -45,10 +45,17 @@ define([
             }
         },
         events: {
+            "click a#accountSettingsLink": "accountSettings",
             "click a#logoutLink": "logout"
         },
 
         template: _.template(UserMenuTemplate),
+
+        /* Account Settings Menu */
+        accountSettings: function(event){
+            event.preventDefault();
+            //TODO: Actually implement this
+        },
 
         /* Logout the current user */
         logout: function(event){
