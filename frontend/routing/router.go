@@ -65,7 +65,10 @@ func Start() {
 	handlePluginRoutes(pr)
 	log.Print("Starting HTTP router")
 	if config.Service.UseSSL {
-		log.Fatal("SSL not yet supported.")
+		certFile := config.Service.SSLCertFile
+		keyFile := config.Service.SSLKeyFile
+		log.Fatal(http.ListenAndServeTLS(":"+config.Service.Port,
+			certFile, keyFile, r))
 	} else {
 		log.Fatal(http.ListenAndServe(":"+config.Service.Port, r))
 	}

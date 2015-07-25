@@ -79,7 +79,6 @@ func sendHeartbeat(registryLocation string) {
 	nodeId := config.Service.NodeId
 	for {
 		time.Sleep(time.Duration(ttl/2) * time.Second)
-		log.Print(nodeId + " Sending heartbeat...")
 		if _, err := client.Set(registryLocation+nodeId, hostUrl(), ttl); err != nil {
 			log.Print("Can't send Heartbeat to registry! - " + err.Error())
 		}

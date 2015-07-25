@@ -33,6 +33,8 @@ var Service struct {
 	ApiVersion       string
 	RegistryLocation string
 	UseSSL           bool
+	SSLCertFile      string
+	SSLKeyFile       string
 }
 
 var Frontend struct {
@@ -167,6 +169,10 @@ func setServiceConfig(serverSection *configparser.Section) {
 			} else {
 				Service.UseSSL = false
 			}
+		case "sslCertFile":
+			Service.SSLCertFile = value
+		case "sslKeyFile":
+			Service.SSLKeyFile = value
 		}
 	}
 }

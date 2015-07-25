@@ -53,6 +53,12 @@ func main() {
 	services.InitDb()
 	registry.Init("Wikis", registry.WikisLocation)
 	httpAddr := ":" + config.Service.Port
-	server := &http.Server{Addr: httpAddr, Handler: wsContainer}
-	log.Fatal(server.ListenAndServe())
+	if config.Service.UseSSL == true {
+		certFile := config.Service.SSLCertFile
+		keyFile := config.Service.SSLKeyFile
+		log.Fatal(http.ListenAndServeTLS(httpAddr,
+			certFile, keyFile, wsContainer))
+	} else {
+		log.Fatal(http.ListenAndServe(httpAddr, wsContainer))
+	}
 }
