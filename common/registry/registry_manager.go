@@ -151,7 +151,7 @@ func GetServiceLocation(serviceName string) (string, error) {
 		} else {
 			index := 0
 			if max > 1 {
-				index = random.Intn(max - 1)
+				index = random.Intn(max)
 			}
 			return getEndpointFromNode(serviceCache.m["users"][index]), nil
 		}
@@ -161,7 +161,7 @@ func GetServiceLocation(serviceName string) (string, error) {
 		} else {
 			index := 0
 			if max > 1 {
-				index = random.Intn(max - 1)
+				index = random.Intn(max)
 			}
 			return getEndpointFromNode(serviceCache.m["wikis"][index]), nil
 		}
