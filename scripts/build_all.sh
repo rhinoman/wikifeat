@@ -20,5 +20,6 @@ go build -o ../build/frontend/frontend ../frontend
 cp ../users/config.ini ../build/users/config.ini
 cp ../wikis/config.ini ../build/wikis/config.ini
 cp ../frontend/config.ini ../build/frontend/config.ini
+cp -R ../frontend/plugins ../build/frontend/plugins
 # Copy the web app for the frontend service
 cp -R ../frontend/web_app ../build/frontend/web_app
