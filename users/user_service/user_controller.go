@@ -72,12 +72,6 @@ func (uc UsersController) Register(container *restful.Container) {
 		Reads(User{}).
 		Writes(UserResponse{}))
 
-	usersWebService.Route(usersWebService.POST("/setup").To(uc.setup).
-		Doc("New Install Set up").
-		Operation("setup").
-		Reads(Registration{}).
-		Writes(BooleanResponse{}))
-
 	usersWebService.Route(usersWebService.PUT("/{user-id}").To(uc.update).
 		Filter(AuthUser).
 		Doc("Updates a User").
@@ -373,28 +367,6 @@ func (uc UsersController) del(request *restful.Request,
 	response.AddHeader("ETag", rev)
 	rr := BooleanResponse{Success: true}
 	SetAuth(response, curUser.Auth)
-	response.WriteEntity(rr)
-}
-
-//New User Signup
-func (uc UsersController) setup(request *restful.Request,
-	response *restful.Response) {
-	registration := new(Registration)
-	err := request.ReadEntity(registration)
-	if err != nil {
-		LogError(request, response, err)
-		WriteIllegalRequestError(response)
-		return
-	}
-	rev, err := new(UserManager).SetUp(registration)
-	if err != nil {
-		LogError(request, response, err)
-		WriteError(err, response)
-		return
-	}
-	response.AddHeader("ETag", rev)
-	rr := BooleanResponse{Success: true}
-	response.WriteHeader(http.StatusCreated)
 	response.WriteEntity(rr)
 }
 
