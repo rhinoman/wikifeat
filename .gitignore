@@ -65,5 +65,6 @@ users/users
 wikis/wikis
 frontend/frontend
 build/
+dist/
 *.log
 

@@ -7,22 +7,44 @@
 CC=gcc
 export CC
 
+VERSION=0.1-alpha
+ARCH=`uname -p`
+OS=`uname`
+BUILDNAME=wikifeat_${VERSION}.${OS}-${ARCH}
+TARNAME=${BUILDNAME}.tar.gz
+BUILD_DIR=../build/${BUILDNAME}
+# erase any previous build
+rm -rf ../build
+
 # Make some directories
 mkdir ../build
-mkdir ../build/users
-mkdir ../build/wikis
-mkdir ../build/frontend
-mkdir ../build/frontend/web_app
+mkdir $BUILD_DIR
+mkdir ${BUILD_DIR}/users
+mkdir ${BUILD_DIR}/scripts
+mkdir ${BUILD_DIR}/wikis
+mkdir ${BUILD_DIR}/frontend
+mkdir ${BUILD_DIR}/frontend/web_app
 # Build stuff
-go build -v -o ../build/users/users ../users
-go build -v -o ../build/wikis/wikis ../wikis 
-go build -v -o ../build/frontend/frontend ../frontend 
+go build -v -o ${BUILD_DIR}/users/users ../users
+go build -v -o ${BUILD_DIR}/wikis/wikis ../wikis 
+go build -v -o ${BUILD_DIR}/frontend/frontend ../frontend 
 # Copy some supporting files
-cp ../users/config.ini ../build/users/config.ini
-cp ../wikis/config.ini ../build/wikis/config.ini
-cp ../frontend/config.ini ../build/frontend/config.ini
-cp -R ../frontend/plugins ../build/frontend/plugins
-# Copy the web app for the frontend service
+cp ../users/config.ini ${BUILD_DIR}/users/config.ini
+cp ../wikis/config.ini ${BUILD_DIR}/wikis/config.ini
+cp ../frontend/config.ini ${BUILD_DIR}/frontend/config.ini
+cp -R ../frontend/plugins ${BUILD_DIR}/frontend/plugins
+# "Compile" the webapp, then copy it to the build dir
 r.js -o ../frontend/web_app/app/scripts/app.build.js
-cp -R ../frontend/web_app/wikifeat-build ../build/frontend/web_app/app
+cp -R ../frontend/web_app/wikifeat-build ${BUILD_DIR}/frontend/web_app/app
 rm -rf ../frontend/web_app/wikifeat-build
+# Copy some scripts, man
+cp -p ../wf_run_all.sh ${BUILD_DIR}/wf_run_all.sh
+cp -R ../scripts/ddoc ${BUILD_DIR}/scripts
+cp -p ../scripts/setup_users.sh ${BUILD_DIR}/scripts
+cp -p ../scripts/setup.sh ${BUILD_DIR}/scripts
+# Now make a tarball
+mkdir ../dist
+echo "Creating ${TARNAME}"
+tar cvzf ../dist/${TARNAME} ${BUILD_DIR}
+echo "All Done!"
+
