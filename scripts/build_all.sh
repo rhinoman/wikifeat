@@ -45,6 +45,7 @@ cp -p ../scripts/setup.sh ${BUILD_DIR}/scripts
 # Now make a tarball
 mkdir ../dist
 echo "Creating ${TARNAME}"
-tar cvzf ../dist/${TARNAME} ${BUILD_DIR}
+cd ../build
+tar cvzf ../dist/${TARNAME} ${BUILDNAME}
 echo "All Done!"
 
