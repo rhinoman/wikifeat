@@ -1,4 +1,5 @@
-domainName = bsdvm1
+[Service]
+domainName = localhost
 apiVersion = v1
 # Node Id to register with the service registry. 
 # MUST BE UNIQUE!
