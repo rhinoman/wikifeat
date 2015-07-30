@@ -41,6 +41,7 @@ rm -rf ../frontend/web_app/wikifeat-build
 cp -p ../wf_run_all.sh ${BUILD_DIR}/wf_run_all.sh
 cp -R ../scripts/ddoc ${BUILD_DIR}/scripts
 cp -p ../scripts/setup_users.sh ${BUILD_DIR}/scripts
+cp -p ../scripts/create_master_user.sh ${BUILD_DIR}/scripts
 cp -p ../scripts/setup.sh ${BUILD_DIR}/scripts
 # Now make a tarball
 mkdir ../dist
