@@ -60,6 +60,7 @@ crashlytics.properties
 crashlytics-build.properties
 
 #Other project specific stuff
+config.ini
 default.etcd/
 users/users
 wikis/wikis
