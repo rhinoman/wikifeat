@@ -1,5 +1,5 @@
-Welcome to Wikifeat
-===================
+Wikifeat
+========
 
 Wikifeat is an open source collaboration platform built around the ever-popular [Wiki](http://wikipedia.org/wiki/Wiki) concept.
 
