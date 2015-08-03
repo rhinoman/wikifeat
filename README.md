@@ -19,4 +19,4 @@ Documentation
 Please see the [Wikifeat](https://www.wikifeat.com) website for more information and documentation.  Documentation is also a work in progress :)
 
 
-  [1]: /app/wikis/wikifeat/pages/technical-overview
+  [1]: https://www.wikifeat.com/app/wikis/wikifeat/pages/technical-overview
