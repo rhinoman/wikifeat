@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <div id="alertBox"></div>
-                <form id="userForm" role="form">
+                <form id="userForm" role="form" autocomplete="off">
                     <div class="row">
                         <div class="form-group col-lg-12">
                             <label for="inputUsername" class="control-label">Username</label>
@@ -21,7 +21,8 @@
                         <div class="form-group col-lg-6 col-md-6 col-sm-6">
                             <label for="inputPassword" class="control-label">Initial Password</label>
                             <input type="password" class="form-control" id="inputPassword"
-                                   placeholder="New Password" required>
+                                   placeholder="New Password" autocomplete="new-password" required
+                                    readonly style="background-color: white;">
                         </div>
                         <div class="form-group col-lg-6 col-md-6 col-sm-6">
                             <label for="inputVerifyPassword" class="control-label">Verify Password</label>

@@ -112,7 +112,7 @@ define([
             event.preventDefault();
             var password = this.$("#inputPassword").val();
             var verifyPassword = this.$("#inputVerifyPassword").val();
-            if (password === ""){
+            if (this.model.get('update')){
                 this.model.unset('password');
                 this.model.unset('verifyPassword');
             } else {
@@ -162,7 +162,11 @@ define([
                     this.$('#inputPassword').removeAttr('required');
                     this.$('#inputVerifyPassword').removeAttr('required');
                 } else {
+                    //Ugly hackaround for Firefox's buggy autocomplete behavior
                     this.model.set('update', false);
+                    this.$('#inputPassword').focus(function(){
+                        this.removeAttribute('readonly');
+                    });
                 }
                 this.$("#editUserModal").modal();
             }
