@@ -12,11 +12,15 @@ define([
 
     return Marionette.AppRouter.extend({
         appRoutes: {
-            "users/manage": "manageUsers"
+            "users/manage": "manageUsers",
+            "users/account": "accountSettings"
         },
         controller: {
             manageUsers: function(){
                 Radio.channel('user').trigger('manage:users');
+            },
+            accountSettings: function(){
+                Radio.channel('user').trigger('user:accountSettings');
             }
         }
     });

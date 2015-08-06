@@ -178,11 +178,29 @@ form#editPageForm {
 
 /* User Styles */
 /* Color Scheme */
-.manage-users-view {
+.manage-users-view, .account-settings-view {
   background-color: white;
   margin: 10px 10px 10px 10px;
   padding: 10px 20px 20px 20px;
   min-height: 8in;
+}
+
+.account-settings-view #profileArea button#editProfileButton {
+  display: inline;
+  border: none;
+}
+.account-settings-view #profileArea h2#nameField {
+  margin-top: 0;
+  display: inline;
+}
+.account-settings-view #profileArea .profile-item {
+  font-size: 125%;
+  line-height: 100%;
+}
+.account-settings-view #pictureWrapper {
+  max-width: 200px;
+  max-height: 200px;
+  padding: 10px;
 }
 
 div.table-controls {

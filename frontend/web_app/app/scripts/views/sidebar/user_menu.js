@@ -55,6 +55,7 @@ define([
         accountSettings: function(event){
             event.preventDefault();
             //TODO: Actually implement this
+            Radio.channel('user').trigger('user:accountSettings');
         },
 
         /* Logout the current user */

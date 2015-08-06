@@ -2,11 +2,33 @@
 
 @import 'colors.scss';
 
-.manage-users-view{
+.manage-users-view, .account-settings-view{
   background-color: white;
   margin: 10px 10px 10px 10px;
   padding: 10px 20px 20px 20px;
   min-height: 8in;
+}
+
+.account-settings-view{
+  #profileArea{
+    button#editProfileButton{
+      display: inline;
+      border: none;
+    }
+    h2#nameField {
+      margin-top: 0;
+      display: inline;
+    }
+    .profile-item {
+      font-size: 125%;
+      line-height: 100%;
+    }
+  }
+  #pictureWrapper{
+    max-width: 200px;
+    max-height: 200px;
+    padding: 10px;
+  }
 }
 
 div.table-controls {

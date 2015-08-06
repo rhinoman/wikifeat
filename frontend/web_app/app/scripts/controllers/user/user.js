@@ -25,9 +25,10 @@ define([
     'marionette',
     'backbone.radio',
     'views/user/manage_users',
-    'views/user/manage_members'
+    'views/user/manage_members',
+    'views/user/account_settings'
 ], function($,_,Marionette,Radio,ManageUsersView,
-            ManageMembersView){
+            ManageMembersView,AccountSettingsView){
     var userChannel = Radio.channel('user');
 
     var UserController = Marionette.Controller.extend({
@@ -39,6 +40,19 @@ define([
                 console.log("logout: " + msg);
                 window.location = '/login';
             });
+        },
+
+        accountSettings: function(options){
+            Radio.channel('userManager').request('get:currentUser')
+                .done(function(curUser){
+                    if(typeof curUser === 'undefined'){
+                        console.log("Error fetching curretn user.");
+                        return;
+                    }
+                    var asv = new AccountSettingsView({model: curUser});
+                    Radio.channel('main').trigger('show:content', asv);
+                    window.history.pushState('','','/app/users/account');
+                })
         },
 
         manageUsers: function(options){
@@ -53,7 +67,6 @@ define([
                     var muv = new ManageUsersView({collection: userList});
                     Radio.channel('main').trigger('show:content', muv);
                     window.history.pushState('','','/app/users/manage');
-
                 });
         },
 
@@ -82,6 +95,10 @@ define([
 
     userChannel.on("user:logout", function(){
         userController.logout();
+    });
+
+    userChannel.on("user:accountSettings", function(){
+        userController.accountSettings();
     });
 
     userChannel.on("manage:users", function(){
