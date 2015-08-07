@@ -12,12 +12,11 @@
 .account-settings-view{
   #profileArea{
     button#editProfileButton{
-      display: inline;
       border: none;
+      float:right;
     }
     h2#nameField {
       margin-top: 0;
-      display: inline;
     }
     .profile-item {
       font-size: 125%;

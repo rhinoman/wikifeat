@@ -186,12 +186,11 @@ form#editPageForm {
 }
 
 .account-settings-view #profileArea button#editProfileButton {
-  display: inline;
   border: none;
+  float: right;
 }
 .account-settings-view #profileArea h2#nameField {
   margin-top: 0;
-  display: inline;
 }
 .account-settings-view #profileArea .profile-item {
   font-size: 125%;

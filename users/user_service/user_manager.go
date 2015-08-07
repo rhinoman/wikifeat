@@ -60,7 +60,7 @@ type RoleRequest struct {
 }
 
 type ChangePasswordRequest struct {
-	OldPassword string `json:old_password"`
+	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
 }
 
@@ -240,7 +240,7 @@ func (um *UserManager) ChangePassword(id string, rev string,
 		auth = curUser.Auth
 	}
 	//Must we validate the old password?
-	if !isAdmin || (isAdmin && curUser.User.Id == id) {
+	if !isAdmin || (isAdmin && theUser.UserName == id) {
 		//yes, let's use the old password to do this thing
 		auth = &couchdb.BasicAuth{Username: id, Password: cpr.OldPassword}
 	}

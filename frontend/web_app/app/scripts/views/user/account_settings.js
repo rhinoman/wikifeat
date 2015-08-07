@@ -27,20 +27,40 @@ define([
     'marionette',
     'backbone.radio',
     'bootstrap',
+    'views/user/edit_user_dialog',
+    'views/user/change_password_dialog',
     'text!templates/user/account_settings.html',
     'entities/user/user',
     'md5-js'
-], function($,_,Marionette,Radio,Bootstrap,
-            AccountSettingsTemplate, UserModel, MD5){
+], function($,_,Marionette,Radio,Bootstrap,EditUserDialog,
+            ChangePasswordDialogView,AccountSettingsTemplate,
+            UserModel, MD5){
 
     return Marionette.ItemView.extend({
         className: "account-settings-view",
         model: UserModel,
         template: _.template(AccountSettingsTemplate),
+        events: {
+            'click #editProfileButton': 'editProfile',
+            'click #changePasswordButton': 'changePassword'
+        },
+
+        initialize: function(){
+            this.model.on('change', this.render, this);
+        },
+
+        editProfile: function(event){
+            var editUserDialog = new EditUserDialog({model: this.model});
+            Radio.channel('main').trigger('show:dialog', editUserDialog);
+        },
+
+        changePassword: function(event){
+            var cpv = new ChangePasswordDialogView({model: this.model});
+            Radio.channel('main').trigger('show:dialog', cpv);
+        },
 
         onRender: function(){
             if(typeof this.model !== 'undefined'){
-                this.stickit();
                 var userPublic = this.model.get("userPublic");
                 var fullName = userPublic.firstName + " " + userPublic.lastName;
                 var title = userPublic.title;
@@ -59,7 +79,6 @@ define([
         },
 
         onClose: function(){
-            this.unstickit();
         }
 
     });
