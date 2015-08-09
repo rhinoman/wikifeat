@@ -308,15 +308,6 @@ func (um *UserManager) GrantRole(id string,
 	if err != nil {
 		return "", err
 	}
-	//If this is a wiki resource, add to member list
-	/*if grantRequest.ResourceType == "wiki" {
-		WikiMgr := new(WikiManager)
-		util.Retry(5, func() error {
-			_, err := WikiMgr.addMemberToWiki(grantRequest.ResourceId,
-				id, grantRequest.AccessType, curUser)
-			return err
-		})
-	}*/
 	return rev, nil
 }
 
@@ -350,15 +341,6 @@ func (um *UserManager) RevokeRole(id string,
 	if err != nil {
 		return "", err
 	}
-	//if this is a wiki resource, remove member's role from member list
-	/*if revokeRequest.ResourceType == "wiki" {
-		util.Retry(5, func() error {
-			WikiMgr := new(WikiManager)
-			_, err := WikiMgr.removeMemberFromWiki(revokeRequest.ResourceId,
-				id, revokeRequest.AccessType, curUser)
-			return err
-		})
-	}*/
 	return rev, nil
 }
 

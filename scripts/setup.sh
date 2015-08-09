@@ -58,13 +58,22 @@ content_type="Content-Type: application/json"
 # Create the main database
 echo "Creating Wikifeat Main Database $main_db"
 echo
-curl -sS -X PUT $couch_host/$main_db -u $auth > /dev/null
+curl -sS -X PUT $couch_host/$main_db -u $auth 
 
 # Load the main database design docs
 echo "Loading Main Database Design Doc"
 echo
-curl -sS -X PUT $couch_host/$main_db/_design/wiki_query -H "$content_type" --data-binary @ddoc/main_ddoc.json -u $auth > /dev/null
-
+url=$couch_host/$main_db/_design/wiki_query
+echo "Check if Main database design doc already exists"
+ddocRev=`sh ./get_rev.sh "$url" "$auth"`
+if [ "$ddocRev" != "" ]; then
+	revHeader="If-Match: $ddocRev"
+	echo $revHeader
+	echo "Design Doc Already exists: "$ddocRev"  Updating..."
+	curl -sS -X PUT $url -H "$revHeader" -H "$content_type" --data-binary @ddoc/main_ddoc.json -u $auth 
+else
+	curl -sS -X PUT $url -H "$content_type" --data-binary @ddoc/main_ddoc.json -u $auth 
+fi
 # Load in the valdiation function
 write_role="$main_db:write"
 admin_role="$main_db:admin"
@@ -79,8 +88,17 @@ auth_doc="{ \
 \"validate_doc_update\": \"$validation_func\" \
 }"
 
+url=$couch_host/$main_db/_design/_auth
+echo "Check if security doc exists"
+ddocRev=`sh ./get_rev.sh "$url" "$auth"`
 echo "Setting Security for Main Database"
-curl -sS -X PUT $couch_host/$main_db/_design/_auth -H "$content_type" -d "$auth_doc" -u $auth > /dev/null
+if [ "$ddocRev" != "" ]; then
+	revHeader="If-Match: $ddocRev"
+	echo "Design Doc Already exists: $ddocRev  Updating..."
+	curl -sS -X PUT $url -H "$revHeader" -H "$content_type" -d "$auth_doc" -u $auth 
+else
+	curl -sS -X PUT $url -H "$content_type" -d "$auth_doc" -u $auth 
+fi
 echo
 
 # Run the user db setup script

@@ -40,7 +40,7 @@ echo
 
 #Set the user public fields
 echo
-echo -n "Setting user database public fields"
+echo "Setting user database public fields"
 url=http://$host:$port/_config/couch_httpd_auth/public_fields
 content_type="Content-Type: application/json"
 field=userPublic
@@ -49,7 +49,21 @@ curl -sS -X PUT $url -d \""$field\"" -u $auth > /dev/null
 
 #Set up views in the user database
 echo
-echo -n "Creating design document for user queries"
+echo "Creating design document for user queries"
 url=http://$host:$port/_users/_design/user_queries
-curl -sS -X PUT $url -H "$content_type" --data-binary @ddoc/user_ddoc.json -u $auth > /dev/null
+echo "Check if user design doc already exists"
+ddocRev=`sh ./get_rev.sh "$url" "$auth"`
+if [ "$ddocRev" != "" ]; then
+	revHeader="If-Match: $ddocRev"
+	echo "Design doc already exists: $ddocRev  Updating...."
+	curl -sS -X PUT $url -H "$revHeader" -H "$content_type"  --data-binary @ddoc/user_ddoc.json -u $auth 
+else
+	curl -sS -X PUT $url -H "$content_type"  --data-binary @ddoc/user_ddoc.json -u $auth 
+fi
 echo
+
+#Create the user avatar database
+echo "Creating User Avatar Database"
+url=http://$host:$port/user_avatars
+curl -sS -X PUT $url -u $auth 
+

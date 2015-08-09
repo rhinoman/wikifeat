@@ -51,6 +51,22 @@ type User struct {
 	Public UserPublic `json:"userPublic,omitempty"`
 }
 
+type UserAvatar struct {
+	UserName    string                `json:"_id"`
+	UseGravatar bool                  `json:"use_gravatar"`
+	CreatedAt   time.Time             `json:"createdAt,omitempty"`
+	ModifiedAt  time.Time             `json:"modifiedAt,omitempty"`
+	Attachments map[string]Attachment `json:"_attachments,omitempty"`
+}
+
+type Attachment struct {
+	MimeType string `json:"content_type"`
+	Digest   string `json:"digest,omitempty"`
+	Length   int    `json:"length"`
+	RevPos   int    `json:"revpos,omitempty"`
+	Stub     bool   `json:"stub,omitempty"`
+}
+
 type CurrentUserInfo struct {
 	Auth  couchdb.Auth
 	Roles []string
