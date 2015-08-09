@@ -106,6 +106,10 @@ define([
         return wikiManager.getAllWikiList();
     });
 
+    wikiChannel.reply("get:memberWikiList", function(){
+        return wikiManager.getMemberWikiList();
+    });
+
     wikiChannel.reply("get:page", function(pageId, wikiId){
         return wikiManager.getPage(pageId, wikiId);
     });

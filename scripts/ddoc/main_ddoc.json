@@ -8,9 +8,6 @@
 		"getWikiBySlug": {
 			"map" : "function(doc) {if(doc.type===\"wiki_record\"){emit(doc.slug,{wikiRev:doc._rev,wiki_record:doc});}}"
 		},
-		"userWikiList": {
-			"map" : "function(head,req){var row;var user=req['userCtx']['name'];var response={total_rows:0,offset:0,rows:[]};while(row=getRow()){if(user in row.value.members){response.rows.push(row);}}response.total_rows=response.rows.length;send(toJSON(response));}"
-		},
 		"checkUniqueSlug": {
 			"map" : "function(doc){if(doc.type===\"wiki_record\"){emit(doc.slug,1);}}",
 			"reduce" : "_count"
@@ -18,9 +15,7 @@
 
 	},
 	"lists":{
-		"userWikiList": {
-			"map" : "function(head,req){var row;var user=req['userCtx']['name'];var response={total_rows:0,offset:0,rows:[]};while(row=getRow()){if(user in row.value.members){response.rows.push(row);}}response.total_rows=response.rows.length;send(toJSON(response));}"
-		}
+		       "userWikiList": "function(head,req){var row;var user=req['userCtx']['name'];var userRoles=req['userCtx']['roles'];var response={total_rows:0,offset:0,rows:[]};while(row=getRow()){var wikiName=\"wiki_\"+row.id; if(userRoles.indexOf(wikiName+\":read\") > -1 || userRoles.indexOf(wikiName+\":admin\") > -1 || userRoles.indexOf(wikiName+\":write\") > -1 || userRoles.indexOf(\"admin\") > -1 || userRoles.indexOf(\"master\") > -1){response.rows.push(row);}}response.total_rows=response.rows.length;send(toJSON(response));}"
+   	}
 
-	}
 }

@@ -82,7 +82,10 @@ func GenIndexLinks(userRoles []string, dbName string, uri string) HatLinks {
 //Create the basic CRUD links for a resource record
 func GenRecordLinks(userRoles []string, dbName string, uri string) HatLinks {
 	links := HatLinks{}
-	admin := util.HasRole(userRoles, AdminRole(dbName))
+	//Admin can be a resource admin OR a site admin/master
+	admin := util.HasRole(userRoles, AdminRole(dbName)) ||
+		util.HasRole(userRoles, AdminRole(MainDbName())) ||
+		util.HasRole(userRoles, MasterRole())
 	write := util.HasRole(userRoles, WriteRole(dbName))
 	//Generate the self link
 	links.Self = &HatLink{Href: uri, Method: "GET"}

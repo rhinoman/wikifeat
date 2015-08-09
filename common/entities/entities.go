@@ -75,16 +75,15 @@ type CurrentUserInfo struct {
 
 //WikiRecord entries go in the main database
 type WikiRecord struct {
-	Id          string              `json:"id,omitempty"`
-	Slug        string              `json:"slug,omitempty"`
-	Name        string              `json:"name"`
-	Description string              `json:"description,omitempty"`
-	CreatedAt   time.Time           `json:"createdAt"`
-	ModifiedAt  time.Time           `json:"modifiedAt"`
-	Members     map[string][]string `json:"members,omitempty"`
-	HomePageId  string              `json:"homePageId,omitempty"`
-	AllowGuest  bool                `json:"allowGuest"`
-	Type        string              `json:"type"`
+	Id          string    `json:"id,omitempty"`
+	Slug        string    `json:"slug,omitempty"`
+	Name        string    `json:"name"`
+	Description string    `json:"description,omitempty"`
+	CreatedAt   time.Time `json:"createdAt"`
+	ModifiedAt  time.Time `json:"modifiedAt"`
+	HomePageId  string    `json:"homePageId,omitempty"`
+	AllowGuest  bool      `json:"allowGuest"`
+	Type        string    `json:"type"`
 }
 
 func (wr WikiRecord) Validate() error {

@@ -54,6 +54,11 @@ define([
         return this.fetchDeferred(fileCollection);
     };
 
+    WikiManager.prototype.getMemberWikiList = function(){
+        var wikiCollection = new WikiCollection();
+        return this.fetchDeferred(wikiCollection,{data: $.param({memberOnly: true})});
+    };
+
     WikiManager.prototype.getFile = function(id, wikiId){
         var fileModel = new FileModel({id: id}, {wikiId: wikiId});
         return this.fetchDeferred(fileModel);

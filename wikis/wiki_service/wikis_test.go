@@ -172,7 +172,7 @@ func TestWiki(t *testing.T) {
 
 	//Test List
 	wlr := wiki_service.WikiListResponse{}
-	err = wm.GetWikiList(1, 1, &wlr, curUser)
+	err = wm.GetWikiList(1, 1, false, &wlr, curUser)
 	if err != nil {
 		t.Error(err)
 	}
@@ -184,7 +184,7 @@ func TestWiki(t *testing.T) {
 		t.Errorf("Wrong length: %v", len(wlr.Rows))
 	}
 	nextWlr := wiki_service.WikiListResponse{}
-	err = wm.GetWikiList(2, 1, &nextWlr, curUser)
+	err = wm.GetWikiList(2, 1, false, &nextWlr, curUser)
 	if err != nil {
 		t.Error(err)
 	}

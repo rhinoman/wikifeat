@@ -90,10 +90,6 @@ func (wm *WikiManager) Create(id string, wr *WikiRecord,
 	wr.Slug = slugification.Slugify(wr.Name)
 	wr.CreatedAt = time.Now().UTC()
 	wr.ModifiedAt = time.Now().UTC()
-	//Make our members map
-	wr.Members = make(map[string][]string)
-	//Set our admin
-	wr.Members[owner] = []string{"admin"}
 	wr.Type = "wiki_record"
 	if err := wr.Validate(); err != nil {
 		return "", err
@@ -251,7 +247,6 @@ func (wm *WikiManager) Update(id string, rev string,
 	//update the data
 	wr.Name = updateRecord.Name
 	wr.Description = updateRecord.Description
-	wr.Members = updateRecord.Members
 	wr.HomePageId = updateRecord.HomePageId
 	wr.AllowGuest = updateRecord.AllowGuest
 	wr.ModifiedAt = time.Now().UTC()
@@ -280,58 +275,6 @@ func (wm *WikiManager) Update(id string, rev string,
 	}
 	updateRecord.Id = id
 	return nRev, err
-}
-
-//Add a member to a wiki
-//Not meant to be called directly
-func (wm *WikiManager) addMemberToWiki(wikiId string, memberId string,
-	role string, curUser *CurrentUserInfo) (string, error) {
-	wr := new(WikiRecord)
-	rev, err := wm.Read(wikiId, wr, curUser)
-	if err != nil {
-		return "", err
-	}
-	if val, ok := wr.Members[memberId]; ok {
-		if util.HasRole(wr.Members[memberId], role) {
-			//Nothing to do
-			return "", nil
-		}
-		//Add role to member
-		wr.Members[memberId] = append(val, role)
-	} else {
-		//Add new member if not in member list
-		wr.Members[memberId] = []string{role}
-	}
-	return wm.Update(wikiId, rev, wr, curUser)
-}
-
-//Remove a member from a wiki
-//Also not meant to be called directly
-func (wm *WikiManager) removeMemberFromWiki(wikiId string, memberId string,
-	role string, curUser *CurrentUserInfo) (string, error) {
-	wr := new(WikiRecord)
-	rev, err := wm.Read(wikiId, wr, curUser)
-	if err != nil {
-		return "", err
-	}
-	if val, ok := wr.Members[memberId]; ok {
-		//remove specified role from member entry
-		for i, r := range val {
-			if r == role {
-				memRoles := wr.Members[memberId]
-				wr.Members[memberId] =
-					append(memRoles[:i], memRoles[i+1:]...)
-				break
-			}
-		}
-		//If member has no roles, remove totally from member list
-		if len(wr.Members[memberId]) == 0 {
-			delete(wr.Members, memberId)
-		}
-	} else { //nothing to do, already not a member
-		return "", nil
-	}
-	return wm.Update(wikiId, rev, wr, curUser)
 }
 
 //Delete a wiki record and the associated wiki database
@@ -376,7 +319,7 @@ func (wm *WikiManager) Delete(id string, curUser *CurrentUserInfo) error {
 }
 
 //Get list of all wikis
-func (wm *WikiManager) GetWikiList(pageNum int, numPerPage int,
+func (wm *WikiManager) GetWikiList(pageNum int, numPerPage int, memberOnly bool,
 	wlr *WikiListResponse, curUser *CurrentUserInfo) error {
 	params := url.Values{}
 	if numPerPage != 0 {
@@ -389,7 +332,13 @@ func (wm *WikiManager) GetWikiList(pageNum int, numPerPage int,
 	auth := curUser.Auth
 	mainDb := MainDbName()
 	cDb := Connection.SelectDB(mainDb, auth)
-	err := cDb.GetView("wiki_query", "getWikis", &wlr, &params)
+	var err error
+	if memberOnly {
+		err = cDb.GetList("wiki_query", "userWikiList", "getWikis",
+			&wlr, &params)
+	} else {
+		err = cDb.GetView("wiki_query", "getWikis", &wlr, &params)
+	}
 	if err != nil {
 		return err
 	}

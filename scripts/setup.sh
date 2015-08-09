@@ -76,10 +76,11 @@ else
 fi
 # Load in the valdiation function
 write_role="$main_db:write"
-admin_role="$main_db:admin"
+admin_role="admin"
 validation_func="function(newDoc, oldDoc, userCtx){ \
 if((userCtx.roles.indexOf(\\\"$write_role\\\") === -1) && \
 (userCtx.roles.indexOf(\\\"$admin_role\\\") === -1) && \
+(userCtx.roles.indexOf(\\\"master\\\") === -1) && \
 (userCtx.roles.indexOf(\\\"_admin\\\") === -1)){ \
 throw({forbidden: \\\"Not authorized\\\"}); \
 }}" 

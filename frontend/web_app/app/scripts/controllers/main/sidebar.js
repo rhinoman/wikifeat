@@ -59,7 +59,7 @@ define([
 
             });
             //Get our wiki list
-            wikiChannel.request('get:allWikiList').done(function(data){
+            wikiChannel.request('get:memberWikiList').done(function(data){
                 if(typeof data !== 'undefined') {
                     wikiCollection.reset(data.models);
                     var wikiListView = new WikiListView({collection: wikiCollection});

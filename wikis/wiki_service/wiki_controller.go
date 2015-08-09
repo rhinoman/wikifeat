@@ -165,11 +165,14 @@ func (wc WikisController) index(request *restful.Request,
 		}
 	}
 	memberOnly, err := strconv.ParseBool(request.QueryParameter("memberOnly"))
-	if err == nil && memberOnly == true {
+	if err != nil {
+		log.Printf("Error: %v", err)
+		WriteIllegalRequestError(response)
 		return
 	}
 	wlr := WikiListResponse{}
-	err = new(WikiManager).GetWikiList(pageNum, limit, &wlr, curUser)
+	err = new(WikiManager).GetWikiList(pageNum, limit, memberOnly,
+		&wlr, curUser)
 	if err != nil {
 		WriteError(err, response)
 		return
@@ -336,7 +339,9 @@ func (wc WikisController) genWikiLinks(userRoles []string,
 	links := wikiLinks{}
 	//Now check admin rights for wiki db and add links
 	wikiDb := "wiki_" + wikiId
-	admin := util.HasRole(userRoles, AdminRole(wikiDb))
+	admin := util.HasRole(userRoles, AdminRole(wikiDb)) ||
+		util.HasRole(userRoles, AdminRole(MainDbName())) ||
+		util.HasRole(userRoles, MasterRole())
 	read := util.HasRole(userRoles, ReadRole(wikiDb))
 	write := util.HasRole(userRoles, WriteRole(wikiDb))
 	pageUri := uri + "/pages"

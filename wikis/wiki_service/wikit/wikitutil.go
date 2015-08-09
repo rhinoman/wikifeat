@@ -142,7 +142,9 @@ func InitDb(db *Database, wikiName string) error {
 	adminRole := wikiName + ":admin"
 	writeRole := wikiName + ":write"
 	readRole := wikiName + ":read"
-	sec.Admins.Roles = []string{adminRole}
+	//Wiki Admin and also 'site admin' and 'master' accounts shall have
+	//admin privileges
+	sec.Admins.Roles = []string{adminRole, "admin", "master"}
 	sec.Members.Roles = []string{readRole, writeRole}
 	err = db.SaveSecurity(*sec)
 	if err != nil {
@@ -167,6 +169,8 @@ func createValidator(wikiName string, writeRole string,
 	validationFunc := "function(newDoc, oldDoc, userCtx){" +
 		"if((userCtx.roles.indexOf('" + writeRole + "') == -1) &&" +
 		"(userCtx.roles.indexOf('" + adminRole + "') == -1) &&" +
+		"(userCtx.roles.indexOf('admin') == -1) &&" +
+		"(userCtx.roles.indexOf('master') == -1) &&" +
 		"(userCtx.roles.indexOf('_admin') == -1)){" +
 		"throw({forbidden: \"Not Authorized\"});" +
 		"}" +
