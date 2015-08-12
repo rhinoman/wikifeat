@@ -76,6 +76,12 @@ var ServiceRegistry struct {
 	CacheRefreshInterval uint64
 }
 
+var Users struct {
+	EnableGravatars bool
+	DisableAvatars  bool
+	AvatarDb        string
+}
+
 // Initialize Default values
 func LoadDefaults() {
 	Service.DomainName = "127.0.0.1"
@@ -102,6 +108,9 @@ func LoadDefaults() {
 	Auth.PersistentSessions = true
 	Auth.AllowGuest = true
 	Auth.MinPasswordLength = 6
+	Users.AvatarDb = "avatar_ut"
+	Users.EnableGravatars = true
+	Users.DisableAvatars = false
 }
 
 // Load config values from file
@@ -133,6 +142,10 @@ func LoadConfig(filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	userSection, err := config.Section("Users")
+	if err != nil {
+		log.Fatal(err)
+	}
 	//Optional sections
 	frontendSection, err := config.Section("Frontend")
 	searchSection, err := config.Section("Search")
@@ -147,6 +160,7 @@ func LoadConfig(filename string) {
 	setLogConfig(logSection)
 	setAuthConfig(authSection)
 	setRegistryConfig(registrySection)
+	setUsersConfig(userSection)
 }
 
 // Load Service configuration options
@@ -293,6 +307,28 @@ func setRegistryConfig(registrySection *configparser.Section) {
 			setUint64Val(value, &ServiceRegistry.EntryTTL)
 		case "cacheRefreshInterval":
 			setUint64Val(value, &ServiceRegistry.CacheRefreshInterval)
+		}
+	}
+}
+
+// Load Users configuraiton
+func setUsersConfig(userSection *configparser.Section) {
+	for key, value := range userSection.Options() {
+		switch key {
+		case "enableGravatars":
+			if value == "true" {
+				Users.EnableGravatars = true
+			} else {
+				Users.EnableGravatars = false
+			}
+		case "disableAvatars":
+			if value == "true" {
+				Users.DisableAvatars = true
+			} else {
+				Users.DisableAvatars = false
+			}
+		case "avatarDB":
+			Users.AvatarDb = value
 		}
 	}
 }

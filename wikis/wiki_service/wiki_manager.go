@@ -221,12 +221,7 @@ func (wm *WikiManager) Read(id string, wikiRecord *WikiRecord,
 	auth := curUser.Auth
 	mainDb := MainDbName()
 	cDb := Connection.SelectDB(mainDb, auth)
-	rev, err := cDb.Read(id, wikiRecord, nil)
-	if err != nil {
-		return "", err
-	} else {
-		return rev, nil
-	}
+	return cDb.Read(id, wikiRecord, nil)
 }
 
 //Update a wiki record

@@ -38,6 +38,9 @@ var AdminAuth couchdb.Auth
 //The name of the main database
 var MainDb string
 
+//The name of the user avatar database
+var AvatarDb string
+
 //The name of the users database
 var UserPrefix = "org.couchdb.user:"
 var UserDbName = "_users"
@@ -93,6 +96,10 @@ func MainDbName() string {
 	return MainDb
 }
 
+func AvatarDbName() string {
+	return AvatarDb
+}
+
 func AllUsersRole() string {
 	return "all_users"
 }
@@ -140,6 +147,7 @@ func InitDb() {
 		Password: config.Database.DbAdminPassword,
 	}
 	MainDb = config.Database.MainDb
+	AvatarDb = config.Users.AvatarDb
 	//Set DB Configuration options
 	err = Connection.SetConfig("couch_httpd_auth",
 		"allow_persistent_cookies",

@@ -50,6 +50,10 @@
 			"Rev": "cb3660f44463dfacda51a0bfdd6b7524c22e2ecb"
 		},
 		{
+			"ImportPath": "github.com/nfnt/resize",
+			"Rev": "dc93e1b98c579d90ee2fa15c1fd6dac34f6e7899"
+		},
+		{
 			"ImportPath": "github.com/rhinoman/couchdb-go",
 			"Rev": "72a71927e70573d2a1557046aea2365c0d275301"
 		},
