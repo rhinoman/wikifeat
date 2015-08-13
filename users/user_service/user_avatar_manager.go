@@ -19,14 +19,18 @@
 package user_service
 
 import (
+	"bytes"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/nfnt/resize"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"image"
+	_ "image/gif"
 	"image/jpeg"
+	_ "image/png"
 	"io"
+	"time"
 )
 
 type UserAvatarManager struct{}
@@ -35,6 +39,11 @@ type UserAvatarManager struct{}
 func (uam *UserAvatarManager) Save(id string, rev string,
 	avatar *UserAvatar, curUser *CurrentUserInfo) (string, error) {
 	theUser := curUser.User
+	nowTime := time.Now().UTC()
+	if rev == "" {
+		avatar.CreatedAt = nowTime
+	}
+	avatar.ModifiedAt = nowTime
 	var auth couchdb.Auth
 	//check for admin
 	if util.HasRole(theUser.Roles, AdminRole(MainDbName())) ||
@@ -65,7 +74,13 @@ func (uam *UserAvatarManager) Delete(id string, curUser *CurrentUserInfo) error 
 		auth = curUser.Auth
 	}
 	avatarDb := Connection.SelectDB(AvatarDbName(), auth)
-	_, err := avatarDb.Delete(id, "")
+	//Fetch the record
+	avatarRecord := new(UserAvatar)
+	_, err := avatarDb.Read(id, avatarRecord, nil)
+	if err != nil {
+		return err
+	}
+	_, err = avatarDb.Delete(id, "")
 	return err
 }
 
@@ -79,26 +94,44 @@ func (uam *UserAvatarManager) SaveImage(id string, rev string, attType string,
 		return "", err
 	}
 	// We need two image sizes, 200px, and a 32px thumbnail
-	largeSize := resize.Resize(200, 0, image, resize.Lanczos3)
+	largeSize := resize.Resize(200, 0, image, resize.Bicubic)
 	lRev, err := uam.saveImage(id, rev, "largeSize", largeSize, auth)
 	if err != nil {
 		return "", err
 	}
-	thumbnail := resize.Resize(32, 0, image, resize.Lanczos3)
+	thumbnail := resize.Thumbnail(32, 0, image, resize.Bicubic)
 	return uam.saveImage(id, lRev, "thumbnail", thumbnail, auth)
 }
 
 //Saves an image to the database
 func (uam *UserAvatarManager) saveImage(id string, rev string, attName string,
 	img image.Image, auth couchdb.Auth) (string, error) {
-	// Create a piped reader
-	pRead, pWrite := io.Pipe()
+	// Create a buffer to hold the encoded jpeg
+	var buf bytes.Buffer
 	// Encode as jpeg
-	err := jpeg.Encode(pWrite, img, nil)
-	err = pWrite.Close()
+	err := jpeg.Encode(&buf, img, &jpeg.Options{Quality: 90})
 	if err != nil {
 		return "", err
 	}
 	db := Connection.SelectDB(AvatarDbName(), auth)
-	return db.SaveAttachment(id, rev, attName, "image/jpeg", pRead)
+	return db.SaveAttachment(id, rev, attName, "image/jpeg", &buf)
+}
+
+//Get an Avatar (Large) Image
+func (uam *UserAvatarManager) GetLargeAvatar(id string,
+	curUser *CurrentUserInfo) (io.ReadCloser, error) {
+	return uam.getImage(id, "largeSize", curUser.Auth)
+}
+
+//Get an Avatar (Thumbnail) Image
+func (uam *UserAvatarManager) GetThumbnailAvatar(id string,
+	curUser *CurrentUserInfo) (io.ReadCloser, error) {
+	return uam.getImage(id, "thumbnail", curUser.Auth)
+}
+
+//Fetch image data from database
+func (uam *UserAvatarManager) getImage(id string, attName string,
+	auth couchdb.Auth) (io.ReadCloser, error) {
+	db := Connection.SelectDB(AvatarDbName(), auth)
+	return db.GetAttachment(id, "", "image/jpeg", attName)
 }

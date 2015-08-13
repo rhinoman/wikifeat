@@ -244,6 +244,8 @@ func setDbSecurity(dbName string) error {
 	validationFunc := "function(newDoc, oldDoc, userCtx){" +
 		"if((userCtx.roles.indexOf('" + WriteRole(dbName) + "') === -1) &&" +
 		"(userCtx.roles.indexOf('" + AdminRole(dbName) + "') === -1) &&" +
+		"(userCtx.roles.indexOf('admin') === -1) &&" +
+		"(userCtx.roles.indexOf('master') === -1) &&" +
 		"(userCtx.roles.indexOf('_admin') === -1)){" +
 		"throw({forbidden: \"Not Authorized\"});" +
 		"}" +

@@ -93,8 +93,9 @@ type Registration struct {
 
 type UserManager struct{}
 
-//Set up -- Create the first (master) user
-//This performs several actions required to set up a new installation
+// Create the first (master) user and perform various set up operations.
+// This functionality was moved to an external script.
+// Do NOT use -- It has been left here to facilitate unit tests only.
 func (um *UserManager) SetUp(registration *Registration) (string, error) {
 	err := um.validateUser(&registration.NewUser)
 	if err != nil {
