@@ -64,7 +64,7 @@ func (uam *UserAvatarManager) Read(id string, avatar *UserAvatar,
 }
 
 //Delete a User Avatar Record
-func (uam *UserAvatarManager) Delete(id string, curUser *CurrentUserInfo) error {
+func (uam *UserAvatarManager) Delete(id string, curUser *CurrentUserInfo) (string, error) {
 	theUser := curUser.User
 	var auth couchdb.Auth
 	if util.HasRole(theUser.Roles, AdminRole(MainDbName())) ||
@@ -76,12 +76,11 @@ func (uam *UserAvatarManager) Delete(id string, curUser *CurrentUserInfo) error 
 	avatarDb := Connection.SelectDB(AvatarDbName(), auth)
 	//Fetch the record
 	avatarRecord := new(UserAvatar)
-	_, err := avatarDb.Read(id, avatarRecord, nil)
+	rev, err := avatarDb.Read(id, avatarRecord, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
-	_, err = avatarDb.Delete(id, "")
-	return err
+	return avatarDb.Delete(id, rev)
 }
 
 //Save a User Avatar Image

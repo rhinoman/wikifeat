@@ -26,6 +26,7 @@ import (
 	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/services"
 	. "github.com/rhinoman/wikifeat/users/user_service"
+	"io/ioutil"
 	"testing"
 )
 
@@ -118,5 +119,39 @@ func TestUserAvatars(t *testing.T) {
 	} else {
 		t.Logf("User Avatar Image Rev: %v", iRev)
 	}
-
+	//Read the Avatar Record
+	readRecord := entities.UserAvatar{}
+	rRev, err := uam.Read("Steven.Smith", &readRecord, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("Read Avatar Record with Revision: %v", rRev)
+	//Read the Avatar Large Image
+	imgData, err := uam.GetLargeAvatar("Steven.Smith", smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	imgBytes, err := ioutil.ReadAll(imgData)
+	imgData.Close()
+	if len(imgBytes) == 0 {
+		t.Error("Image was zero length!")
+	}
+	t.Logf("Read Avatar Large Image with %v bytes", len(imgBytes))
+	//Read the Avatar Thumbnail
+	imgData, err = uam.GetThumbnailAvatar("Steven.Smith", smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	imgBytes, err = ioutil.ReadAll(imgData)
+	imgData.Close()
+	if len(imgBytes) == 0 {
+		t.Error("Image was zero length!")
+	}
+	t.Logf("Read Avatar Thumbnail Image with %v bytes", len(imgBytes))
+	//Delete Avatar Record
+	dRev, err := uam.Delete("Steven.Smith", smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("Delete Avatar with Rev: %v", dRev)
 }
