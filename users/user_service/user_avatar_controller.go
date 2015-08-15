@@ -23,6 +23,7 @@ import (
 	. "github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -47,10 +48,48 @@ type AvatarResponse struct {
 
 func (ac AvatarController) AddRoutes(ws *restful.WebService) {
 	ws.Route(ws.POST(avatarUri).To(ac.create).
+		Doc("Create a new User Avatar Record").
 		Operation("create").
 		Reads(UserAvatar{}).
 		Param(ws.PathParameter("user-id", "User id").DataType("string")).
 		Writes(AvatarResponse{}))
+
+	ws.Route(ws.GET(avatarUri).To(ac.read).
+		Doc("Reads a User Avatar Record").
+		Operation("read").
+		Param(ws.PathParameter("user-id", "User id").DataType("string")).
+		Writes(AvatarResponse{}))
+
+	ws.Route(ws.PUT(avatarUri).To(ac.update).
+		Doc("Updated a User Avatar Record").
+		Operation("update").
+		Param(ws.PathParameter("user-id", "User id").DataType("string")).
+		Param(ws.HeaderParameter("If-Match", "Avatar Revision").DataType("string")).
+		Reads(UserAvatar{}).
+		Writes(AvatarResponse{}))
+
+	ws.Route(ws.DELETE(avatarUri).To(ac.del).
+		Doc("Delete a User Avatar Record").
+		Operation("delete").
+		Param(ws.PathParameter("user-id", "User id").DataType("string")).
+		Writes(BooleanResponse{}))
+
+	ws.Route(ws.POST(avatarUri + "/avatar").
+		Consumes("multipart/form-data").To(ac.saveImage).
+		Operation("saveImage").
+		Param(ws.PathParameter("user-id", "User id").DataType("string")).
+		Param(ws.HeaderParameter("If-Match", "File Revision").DataType("string")).
+		Param(ws.FormParameter("file-data", "The Image File").DataType("string")).
+		Writes(BooleanResponse{}))
+
+	ws.Route(ws.GET(avatarUri + "/avatar").To(ac.getImage).
+		Operation("getAvatar").Produces("image/jpeg").
+		Param(ws.PathParameter("user-id", "User id").DataType("string")))
+
+	ws.Route(ws.GET(avatarUri + "/thumbnail").To(ac.getThumb).
+		Operation("getThumbnail").Produces("image/jpeg").
+		Param(ws.PathParameter("user-id", "User id").DataType("string")))
+
 }
 
 func (ac AvatarController) genAvatarUri(userId string) string {
@@ -83,6 +122,165 @@ func (ac AvatarController) create(request *restful.Request,
 	ar := ac.genRecordResponse(curUser, userId, ua)
 	SetAuth(response, curUser.Auth)
 	response.WriteEntity(ar)
+}
+
+//Read a User Avatar Record
+func (ac AvatarController) read(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	userId := request.PathParameter("user-id")
+	if userId == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	ua := new(UserAvatar)
+	rev, err := new(UserAvatarManager).Read(userId, ua, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	response.AddHeader("ETag", rev)
+	ar := ac.genRecordResponse(curUser, userId, ua)
+	SetAuth(response, curUser.Auth)
+	response.WriteEntity(ar)
+}
+
+//Updates a User Avatar Record
+func (ac AvatarController) update(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	userId := request.PathParameter("user-id")
+	rev := request.HeaderParameter("If-Match")
+	if userId == "" || rev == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	ua := new(UserAvatar)
+	err := request.ReadEntity(ua)
+	if err != nil {
+		WriteServerError(err, response)
+		return
+	}
+	rev, err = new(UserAvatarManager).Save(userId, rev, ua, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	response.AddHeader("ETag", rev)
+	ar := ac.genRecordResponse(curUser, userId, ua)
+	SetAuth(response, curUser.Auth)
+	response.WriteEntity(ar)
+}
+
+//Deletes a User Avatar Record
+func (ac AvatarController) del(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	userId := request.PathParameter("user-id")
+	if userId == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	rev, err := new(UserAvatarManager).Delete(userId, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	SetAuth(response, curUser.Auth)
+	response.WriteEntity(BooleanResponse{Success: true})
+	response.AddHeader("ETag", rev)
+}
+
+//Saves an Avatar Image
+func (ac AvatarController) saveImage(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	//Get the file data
+	imageFile, header, err := request.Request.FormFile("file-data")
+	if err != nil {
+		WriteError(err, response)
+	}
+	userId := request.PathParameter("user-id")
+	rev := request.HeaderParameter("If-Match")
+	if userId == "" || rev == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	attType := header.Header.Get("Content-Type")
+	rev, err = new(UserAvatarManager).SaveImage(userId, rev, attType,
+		imageFile, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	SetAuth(response, curUser.Auth)
+	response.WriteEntity(BooleanResponse{Success: true})
+	response.AddHeader("ETag", rev)
+}
+
+type imageReader func(string, *CurrentUserInfo) (io.ReadCloser, error)
+
+//Get an Avatar Image
+func (ac AvatarController) getAvatar(request *restful.Request,
+	response *restful.Response, uam *UserAvatarManager, ir imageReader) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	userId := request.PathParameter("user-id")
+	if userId == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	ua := UserAvatar{}
+	rev, err := uam.Read(userId, &ua, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	image, err := ir(userId, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	defer image.Close()
+	SetAuth(response, curUser.Auth)
+	response.AddHeader("Content-Type", "image/jpeg")
+	response.AddHeader("ETag", rev)
+	if _, err := io.Copy(response.ResponseWriter, image); err != nil {
+		WriteError(err, response)
+	}
+}
+
+//Get an Avatar Image (large size)
+func (ac AvatarController) getImage(request *restful.Request,
+	response *restful.Response) {
+	uam := new(UserAvatarManager)
+	ac.getAvatar(request, response, uam, uam.GetLargeAvatar)
+}
+
+//Get an Avatar Image (thumb size)
+func (ac AvatarController) getThumb(request *restful.Request,
+	response *restful.Response) {
+	uam := new(UserAvatarManager)
+	ac.getAvatar(request, response, uam, uam.GetThumbnailAvatar)
 }
 
 //Generates a UserAvatar Record Response

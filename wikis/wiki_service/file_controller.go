@@ -89,6 +89,7 @@ func (fc FileController) AddRoutes(ws *restful.WebService) {
 
 	ws.Route(ws.PUT(fileUri + "/{file-id}").To(fc.update).Doc("Updates a file").
 		Operation("update").
+		Reads(wikit.File{}).
 		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
 		Param(ws.PathParameter("file-id", "File identifier").DataType("string")).
 		Param(ws.HeaderParameter("If-Match", "File Revision").DataType("string")).

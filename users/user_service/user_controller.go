@@ -56,6 +56,8 @@ func (uc UsersController) Service() *restful.WebService {
 
 //Define routes
 func (uc UsersController) Register(container *restful.Container) {
+	//avatars is a subcontroller
+	ac := AvatarController{}
 	usersWebService = new(restful.WebService)
 	usersWebService.Filter(LogRequest)
 	usersWebService.
@@ -146,7 +148,9 @@ func (uc UsersController) Register(container *restful.Container) {
 		Param(usersWebService.QueryParameter("numPerPage", "Number of records to return").DataType("integer")).
 		Param(usersWebService.QueryParameter("forResource", "Return users that have of roles associated with a resource").DataType("string")).
 		Writes(UserListResponse{}))
-
+	//Add routes form avatars to the users controller
+	ac.AddRoutes(usersWebService)
+	//Add the users controller to the container
 	container.Add(usersWebService)
 }
 
