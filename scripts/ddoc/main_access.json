@@ -1,0 +1,15 @@
+{
+	"admins":{
+		"names":[],
+		"roles": [
+			"admin",
+			"master"
+		]
+	},
+	"members":{
+		"names":[],
+		"roles":[
+			"all_users"
+		]
+	}
+}

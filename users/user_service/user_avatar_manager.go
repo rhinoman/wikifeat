@@ -20,8 +20,11 @@ package user_service
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/nfnt/resize"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
@@ -30,6 +33,7 @@ import (
 	"image/jpeg"
 	_ "image/png"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -53,7 +57,27 @@ func (uam *UserAvatarManager) Save(id string, rev string,
 		auth = curUser.Auth
 	}
 	avatarDb := Connection.SelectDB(AvatarDbName(), auth)
-	return avatarDb.Save(avatar, id, rev)
+	rev, err := avatarDb.Save(avatar, id, rev)
+	if err != nil {
+		return "", err
+	} else if avatar.UseGravatar && config.Users.EnableGravatars {
+		um := new(UserManager)
+		user := User{}
+		uRev, err := um.Read(id, &user, curUser)
+		if err != nil {
+			return "", err
+		}
+		userMd5 := md5.Sum([]byte(user.Public.Contact.Email))
+		gravatarUrl := "https://www.gravatar.com/avatar/" +
+			hex.EncodeToString(userMd5[:])
+		user.Public.Avatar = gravatarUrl + "?s=200"
+		user.Public.AvatarThumbnail = gravatarUrl + "?s=32"
+		if _, err = um.Update(id, uRev, &user, curUser); err != nil {
+			return "", err
+		}
+	}
+	return rev, err
+
 }
 
 //Read User Avatar Record
@@ -99,7 +123,24 @@ func (uam *UserAvatarManager) SaveImage(id string, rev string, attType string,
 		return "", err
 	}
 	thumbnail := resize.Thumbnail(32, 0, image, resize.Bicubic)
-	return uam.saveImage(id, lRev, "thumbnail", thumbnail, auth)
+	tRev, err := uam.saveImage(id, lRev, "thumbnail", thumbnail, auth)
+	if err != nil {
+		return "", err
+	}
+	um := new(UserManager)
+	user := User{}
+	uRev, err := um.Read(id, &user, curUser)
+	if err != nil {
+		return "", err
+	}
+	theUri := ApiPrefix() + "/users" + avatarUri
+	user.Public.Avatar = strings.Replace(theUri+"/image", "{user-id}", id, 1)
+	user.Public.AvatarThumbnail = strings.Replace(theUri+"/thumbnail", "{user-id}", id, 1)
+	if uRev, err = um.Update(id, uRev, &user, curUser); err != nil {
+		return "", err
+	} else {
+		return tRev, nil
+	}
 }
 
 //Saves an image to the database
@@ -117,15 +158,13 @@ func (uam *UserAvatarManager) saveImage(id string, rev string, attName string,
 }
 
 //Get an Avatar (Large) Image
-func (uam *UserAvatarManager) GetLargeAvatar(id string,
-	curUser *CurrentUserInfo) (io.ReadCloser, error) {
-	return uam.getImage(id, "largeSize", curUser.Auth)
+func (uam *UserAvatarManager) GetLargeAvatar(id string) (io.ReadCloser, error) {
+	return uam.getImage(id, "largeSize", AdminAuth)
 }
 
 //Get an Avatar (Thumbnail) Image
-func (uam *UserAvatarManager) GetThumbnailAvatar(id string,
-	curUser *CurrentUserInfo) (io.ReadCloser, error) {
-	return uam.getImage(id, "thumbnail", curUser.Auth)
+func (uam *UserAvatarManager) GetThumbnailAvatar(id string) (io.ReadCloser, error) {
+	return uam.getImage(id, "thumbnail", AdminAuth)
 }
 
 //Fetch image data from database

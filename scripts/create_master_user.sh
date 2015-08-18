@@ -82,7 +82,7 @@ user_data="{\
   \"_id\":\"org.couchdb.user:$master_username\",\
   \"name\":\"$master_username\",\
   \"type\":\"user\",\
-  \"roles\": [\"master\",\"admin\"],\
+  \"roles\": [\"master\",\"admin\", \"all_users\"],\
   \"password\": \"$master_password\",\
   \"userPublic\": {\"lastName\":\"$last_name\",\"firstName\":\"$first_name\"}\
 }"

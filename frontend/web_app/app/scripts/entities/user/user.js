@@ -47,7 +47,9 @@ define([
                 title: "",
                 contactInfo: {
                     email: ""
-                }
+                },
+                avatar: "",
+                avatarThumbnail: ""
             }
     };
 
@@ -96,6 +98,12 @@ define([
             }
         }
         return false;
+    };
+
+    //Get the img link for the avatar
+    UserModel.prototype.getAvatar = function(){
+        var up = this.get('userPublic');
+        return '<img src="' + up.avatar + '"/>';
     };
 
     //input validation function

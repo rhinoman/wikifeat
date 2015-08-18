@@ -62,8 +62,3 @@ else
 fi
 echo
 
-#Create the user avatar database
-echo "Creating User Avatar Database"
-url=http://$host:$port/user_avatars
-curl -sS -X PUT $url -u $auth 
-

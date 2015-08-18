@@ -49,6 +49,7 @@ type AvatarResponse struct {
 func (ac AvatarController) AddRoutes(ws *restful.WebService) {
 	ws.Route(ws.POST(avatarUri).To(ac.create).
 		Doc("Create a new User Avatar Record").
+		Filter(AuthUser).
 		Operation("create").
 		Reads(UserAvatar{}).
 		Param(ws.PathParameter("user-id", "User id").DataType("string")).
@@ -56,12 +57,14 @@ func (ac AvatarController) AddRoutes(ws *restful.WebService) {
 
 	ws.Route(ws.GET(avatarUri).To(ac.read).
 		Doc("Reads a User Avatar Record").
+		Filter(AuthUser).
 		Operation("read").
 		Param(ws.PathParameter("user-id", "User id").DataType("string")).
 		Writes(AvatarResponse{}))
 
 	ws.Route(ws.PUT(avatarUri).To(ac.update).
 		Doc("Updated a User Avatar Record").
+		Filter(AuthUser).
 		Operation("update").
 		Param(ws.PathParameter("user-id", "User id").DataType("string")).
 		Param(ws.HeaderParameter("If-Match", "Avatar Revision").DataType("string")).
@@ -70,11 +73,14 @@ func (ac AvatarController) AddRoutes(ws *restful.WebService) {
 
 	ws.Route(ws.DELETE(avatarUri).To(ac.del).
 		Doc("Delete a User Avatar Record").
+		Filter(AuthUser).
 		Operation("delete").
 		Param(ws.PathParameter("user-id", "User id").DataType("string")).
 		Writes(BooleanResponse{}))
 
-	ws.Route(ws.POST(avatarUri + "/avatar").
+	ws.Route(ws.POST(avatarUri + "/image").
+		Doc("Saves a User Avatar Image").
+		Filter(AuthUser).
 		Consumes("multipart/form-data").To(ac.saveImage).
 		Operation("saveImage").
 		Param(ws.PathParameter("user-id", "User id").DataType("string")).
@@ -82,18 +88,20 @@ func (ac AvatarController) AddRoutes(ws *restful.WebService) {
 		Param(ws.FormParameter("file-data", "The Image File").DataType("string")).
 		Writes(BooleanResponse{}))
 
-	ws.Route(ws.GET(avatarUri + "/avatar").To(ac.getImage).
+	ws.Route(ws.GET(avatarUri + "/image").To(ac.getImage).
+		Doc("Fetches a User Avatar Image").
 		Operation("getAvatar").Produces("image/jpeg").
 		Param(ws.PathParameter("user-id", "User id").DataType("string")))
 
 	ws.Route(ws.GET(avatarUri + "/thumbnail").To(ac.getThumb).
+		Doc("Fetches a Thumbnail Avatar Image").
 		Operation("getThumbnail").Produces("image/jpeg").
 		Param(ws.PathParameter("user-id", "User id").DataType("string")))
 
 }
 
 func (ac AvatarController) genAvatarUri(userId string) string {
-	theUri := ApiPrefix() + "/users/" + avatarUri + "/avatar"
+	theUri := ApiPrefix() + "/users" + avatarUri
 	return strings.Replace(theUri, "{user-id}", userId, 1)
 }
 
@@ -234,36 +242,23 @@ func (ac AvatarController) saveImage(request *restful.Request,
 	response.AddHeader("ETag", rev)
 }
 
-type imageReader func(string, *CurrentUserInfo) (io.ReadCloser, error)
+type imageReader func(string) (io.ReadCloser, error)
 
 //Get an Avatar Image
 func (ac AvatarController) getAvatar(request *restful.Request,
 	response *restful.Response, uam *UserAvatarManager, ir imageReader) {
-	curUser := GetCurrentUser(request, response)
-	if curUser == nil {
-		Unauthenticated(request, response)
-		return
-	}
 	userId := request.PathParameter("user-id")
 	if userId == "" {
 		WriteBadRequestError(response)
 		return
 	}
-	ua := UserAvatar{}
-	rev, err := uam.Read(userId, &ua, curUser)
-	if err != nil {
-		WriteError(err, response)
-		return
-	}
-	image, err := ir(userId, curUser)
+	image, err := ir(userId)
 	if err != nil {
 		WriteError(err, response)
 		return
 	}
 	defer image.Close()
-	SetAuth(response, curUser.Auth)
 	response.AddHeader("Content-Type", "image/jpeg")
-	response.AddHeader("ETag", rev)
 	if _, err := io.Copy(response.ResponseWriter, image); err != nil {
 		WriteError(err, response)
 	}
@@ -302,12 +297,12 @@ func (ac AvatarController) genAvatarRecordLinks(user *User,
 		util.HasRole(userRoles, MasterRole())
 	write := user.UserName == userId
 	links.Self = &HatLink{Href: uri, Method: "GET"}
-	links.GetLargeAvatar = &HatLink{Href: uri + "/large", Method: "GET"}
+	links.GetLargeAvatar = &HatLink{Href: uri + "/image", Method: "GET"}
 	links.GetThumbnailAvatar = &HatLink{Href: uri + "/thumbnail", Method: "GET"}
 	if admin || write {
 		links.Update = &HatLink{Href: uri, Method: "PUT"}
 		links.Delete = &HatLink{Href: uri, Method: "DELETE"}
-		links.SaveImage = &HatLink{Href: uri + "/content", Method: "PUT"}
+		links.SaveImage = &HatLink{Href: uri + "/image", Method: "PUT"}
 	}
 	return links
 }

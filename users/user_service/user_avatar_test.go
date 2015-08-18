@@ -127,7 +127,7 @@ func TestUserAvatars(t *testing.T) {
 	}
 	t.Logf("Read Avatar Record with Revision: %v", rRev)
 	//Read the Avatar Large Image
-	imgData, err := uam.GetLargeAvatar("Steven.Smith", smithUser())
+	imgData, err := uam.GetLargeAvatar("Steven.Smith")
 	if err != nil {
 		t.Error(err)
 	}
@@ -138,7 +138,7 @@ func TestUserAvatars(t *testing.T) {
 	}
 	t.Logf("Read Avatar Large Image with %v bytes", len(imgBytes))
 	//Read the Avatar Thumbnail
-	imgData, err = uam.GetThumbnailAvatar("Steven.Smith", smithUser())
+	imgData, err = uam.GetThumbnailAvatar("Steven.Smith")
 	if err != nil {
 		t.Error(err)
 	}

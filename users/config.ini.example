@@ -52,3 +52,10 @@ persistentSessions = true
 allowGuestAccess = true
 #Minimum Passowrd length
 minPasswordLength = 6
+
+[Users]
+#If the user has not specified an avatar, should we use gravatars?
+#See http://gravatar.com
+enableGravatars = true
+#The name of the avatar database
+avatarDB = user_avatars

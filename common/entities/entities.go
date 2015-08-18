@@ -32,11 +32,13 @@ type ContactInfo struct {
 
 type UserPublic struct {
 	//Public fields
-	LastName   string      `json:"lastName"`
-	FirstName  string      `json:"firstName"`
-	MiddleName string      `json:"middleName,omitempty"`
-	Title      string      `json:"title,omitempty"`
-	Contact    ContactInfo `json:"contactInfo"`
+	LastName        string      `json:"lastName"`
+	FirstName       string      `json:"firstName"`
+	MiddleName      string      `json:"middleName,omitempty"`
+	Title           string      `json:"title,omitempty"`
+	Contact         ContactInfo `json:"contactInfo"`
+	Avatar          string      `json:"avatar"`
+	AvatarThumbnail string      `json:"avatarThumbnail"`
 }
 
 type User struct {

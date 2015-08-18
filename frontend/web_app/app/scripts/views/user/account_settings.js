@@ -31,10 +31,11 @@ define([
     'views/user/change_password_dialog',
     'text!templates/user/account_settings.html',
     'entities/user/user',
+    'entities/user/user_avatar',
     'md5-js'
 ], function($,_,Marionette,Radio,Bootstrap,EditUserDialog,
             ChangePasswordDialogView,AccountSettingsTemplate,
-            UserModel, MD5){
+            UserModel, UserAvatarModel, MD5){
 
     return Marionette.ItemView.extend({
         className: "account-settings-view",
@@ -65,10 +66,13 @@ define([
                 var fullName = userPublic.firstName + " " + userPublic.lastName;
                 var title = userPublic.title;
                 var email = userPublic.contactInfo.email;
-                var eh = MD5(email);
-                this.$("#pictureWrapper").html(
-                    '<img src="https://www.gravatar.com/avatar/' + eh + '?s=200"/>'
-                );
+                //var eh = MD5(email);
+                var avatar = new UserAvatarModel({},{userId: this.model.id});
+                //this.$("#pictureWrapper").html(
+                //    '<img src="https://www.gravatar.com/avatar/' + eh + '?s=200"/>'
+                //);
+                this.$("#pictureWrapper").html(this.model.getAvatar());
+
                 this.$("#nameField").html(fullName);
                 this.$("#userNameField").html('<span class="glyphicon glyphicon-user"></span>&nbsp;' +
                     this.model.get("name"));

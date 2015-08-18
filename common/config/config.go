@@ -78,7 +78,6 @@ var ServiceRegistry struct {
 
 var Users struct {
 	EnableGravatars bool
-	DisableAvatars  bool
 	AvatarDb        string
 }
 
@@ -110,7 +109,6 @@ func LoadDefaults() {
 	Auth.MinPasswordLength = 6
 	Users.AvatarDb = "avatar_ut"
 	Users.EnableGravatars = true
-	Users.DisableAvatars = false
 }
 
 // Load config values from file
@@ -142,12 +140,9 @@ func LoadConfig(filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	userSection, err := config.Section("Users")
-	if err != nil {
-		log.Fatal(err)
-	}
 	//Optional sections
 	frontendSection, err := config.Section("Frontend")
+	userSection, err := config.Section("Users")
 	searchSection, err := config.Section("Search")
 	setServiceConfig(serviceSection)
 	if frontendSection != nil {
@@ -156,11 +151,13 @@ func LoadConfig(filename string) {
 	if searchSection != nil {
 		SetSearchConfig(searchSection)
 	}
+	if userSection != nil {
+		setUsersConfig(userSection)
+	}
 	setDbConfig(dbSection)
 	setLogConfig(logSection)
 	setAuthConfig(authSection)
 	setRegistryConfig(registrySection)
-	setUsersConfig(userSection)
 }
 
 // Load Service configuration options
@@ -320,12 +317,6 @@ func setUsersConfig(userSection *configparser.Section) {
 				Users.EnableGravatars = true
 			} else {
 				Users.EnableGravatars = false
-			}
-		case "disableAvatars":
-			if value == "true" {
-				Users.DisableAvatars = true
-			} else {
-				Users.DisableAvatars = false
 			}
 		case "avatarDB":
 			Users.AvatarDb = value

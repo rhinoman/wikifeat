@@ -1,0 +1,4 @@
+{
+	"_id": "_design/_auth",
+	"validate_doc_update": "function(newDoc, oldDoc, userCtx){if((userCtx.roles.indexOf(\"admin\")===-1)&&(userCtx.roles.indexOf(\"master\")===-1)&&(userCtx.roles.indexOf(\"_admin\")===-1)&&(oldDoc._id !== newDoc._id)&&(userCtx.name !== newDoc._id)){throw({forbidden:\"Not authorized\"});}}"
+}
