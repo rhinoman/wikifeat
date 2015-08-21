@@ -20,11 +20,8 @@ package user_service
 
 import (
 	"bytes"
-	"crypto/md5"
-	"encoding/hex"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/nfnt/resize"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
@@ -57,27 +54,7 @@ func (uam *UserAvatarManager) Save(id string, rev string,
 		auth = curUser.Auth
 	}
 	avatarDb := Connection.SelectDB(AvatarDbName(), auth)
-	rev, err := avatarDb.Save(avatar, id, rev)
-	if err != nil {
-		return "", err
-	} else if avatar.UseGravatar && config.Users.EnableGravatars {
-		um := new(UserManager)
-		user := User{}
-		uRev, err := um.Read(id, &user, curUser)
-		if err != nil {
-			return "", err
-		}
-		userMd5 := md5.Sum([]byte(user.Public.Contact.Email))
-		gravatarUrl := "https://www.gravatar.com/avatar/" +
-			hex.EncodeToString(userMd5[:])
-		user.Public.Avatar = gravatarUrl + "?s=200"
-		user.Public.AvatarThumbnail = gravatarUrl + "?s=32"
-		if _, err = um.Update(id, uRev, &user, curUser); err != nil {
-			return "", err
-		}
-	}
-	return rev, err
-
+	return avatarDb.Save(avatar, id, rev)
 }
 
 //Read User Avatar Record

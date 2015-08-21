@@ -55,7 +55,7 @@ type User struct {
 
 type UserAvatar struct {
 	UserName    string                `json:"_id"`
-	UseGravatar bool                  `json:"use_gravatar"`
+	UseGravatar bool                  `json:"useGravatar"`
 	CreatedAt   time.Time             `json:"createdAt,omitempty"`
 	ModifiedAt  time.Time             `json:"modifiedAt,omitempty"`
 	Attachments map[string]Attachment `json:"_attachments,omitempty"`

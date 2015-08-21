@@ -29,13 +29,16 @@ define([
     'bootstrap',
     'views/user/edit_user_dialog',
     'views/user/change_password_dialog',
+    'views/user/edit_user_avatar',
+    'views/main/error_dialog',
     'text!templates/user/account_settings.html',
     'entities/user/user',
     'entities/user/user_avatar',
-    'md5-js'
+    'entities/error'
 ], function($,_,Marionette,Radio,Bootstrap,EditUserDialog,
-            ChangePasswordDialogView,AccountSettingsTemplate,
-            UserModel, UserAvatarModel, MD5){
+            ChangePasswordDialogView,EditUserAvatarView,
+            ErrorDialog, AccountSettingsTemplate, UserModel,
+            UserAvatarModel, ErrorModel){
 
     return Marionette.ItemView.extend({
         className: "account-settings-view",
@@ -43,7 +46,8 @@ define([
         template: _.template(AccountSettingsTemplate),
         events: {
             'click #editProfileButton': 'editProfile',
-            'click #changePasswordButton': 'changePassword'
+            'click #changePasswordButton': 'changePassword',
+            'click #changePictureButton': 'changePicture'
         },
 
         initialize: function(){
@@ -58,6 +62,24 @@ define([
         changePassword: function(event){
             var cpv = new ChangePasswordDialogView({model: this.model});
             Radio.channel('main').trigger('show:dialog', cpv);
+        },
+
+        changePicture: function(event){
+            Radio.channel('userManager').request('get:avatar', this.model.id)
+                .done(function(response){
+                    if(typeof response === 'undefined')    {
+                        var errorDialog = new ErrorDialog({
+                            model: new ErrorModel({
+                                errorTitle: "Error loading avatar",
+                                errorMessage: "Could not load avatar"
+                            })
+                        });
+                        Radio.channel('main').trigger('show:dialog', errorDialog);
+                    } else {
+                        var euv = new EditUserAvatarView({model: response});
+                        Radio.channel('main').trigger('show:dialog', euv);
+                    }
+                });
         },
 
         onRender: function(){

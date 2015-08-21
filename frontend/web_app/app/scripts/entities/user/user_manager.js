@@ -26,9 +26,10 @@ define([
     'marionette',
     'entities/base_manager',
     'entities/user/user',
-    'entities/user/users'
+    'entities/user/users',
+    'entities/user/user_avatar'
 ], function($,_,Backbone,Marionette,BaseManager,
-            UserModel,UserCollection){
+            UserModel,UserCollection,UserAvatarModel){
 
     //Constructor
     var UserManager = function(){
@@ -79,6 +80,7 @@ define([
         return this.fetchDeferred(memberCollection, {});
     };
 
+    //Grant a User Role
     UserManager.prototype.grantRole = function(userModel, resourceType,
                                                resourceId, accessType){
         var roleRequest = new RoleRequest;
@@ -91,6 +93,7 @@ define([
         return this.saveEntity(roleRequest);
     };
 
+    //Revoke a User Role
     UserManager.prototype.revokeRole = function(userModel, resourceType,
                                                 resourceId, accessType){
         var roleRequest = new RoleRequest;
@@ -103,6 +106,7 @@ define([
         return this.saveEntity(roleRequest);
     };
 
+    //Change a User's password
     UserManager.prototype.changePassword = function(userModel, oldPassword, newPassword){
         var cpr = new ChangePasswordRequest({
             id: userModel.id,
@@ -112,6 +116,12 @@ define([
         cpr.url = userModel.url + "/change_password";
         cpr.revision = userModel.revision;
         return this.saveEntity(cpr);
+    };
+
+    //Retrieve a User Avatar Record
+    UserManager.prototype.getAvatar = function(id){
+        var avatarModel = new UserAvatarModel({id: id});
+        return this.fetchDeferred(avatarModel);
     };
 
     return UserManager;

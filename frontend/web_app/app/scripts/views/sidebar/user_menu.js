@@ -54,7 +54,7 @@ define([
         /* Account Settings Menu */
         accountSettings: function(event){
             event.preventDefault();
-            //TODO: Actually implement this
+            Radio.channel('sidebar').trigger('active:link', event.currentTarget);
             Radio.channel('user').trigger('user:accountSettings');
         },
 

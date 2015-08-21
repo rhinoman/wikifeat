@@ -77,8 +77,7 @@ var ServiceRegistry struct {
 }
 
 var Users struct {
-	EnableGravatars bool
-	AvatarDb        string
+	AvatarDb string
 }
 
 // Initialize Default values
@@ -108,7 +107,6 @@ func LoadDefaults() {
 	Auth.AllowGuest = true
 	Auth.MinPasswordLength = 6
 	Users.AvatarDb = "avatar_ut"
-	Users.EnableGravatars = true
 }
 
 // Load config values from file
@@ -312,12 +310,6 @@ func setRegistryConfig(registrySection *configparser.Section) {
 func setUsersConfig(userSection *configparser.Section) {
 	for key, value := range userSection.Options() {
 		switch key {
-		case "enableGravatars":
-			if value == "true" {
-				Users.EnableGravatars = true
-			} else {
-				Users.EnableGravatars = false
-			}
 		case "avatarDB":
 			Users.AvatarDb = value
 		}

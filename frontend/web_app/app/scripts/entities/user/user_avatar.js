@@ -29,25 +29,36 @@ define([
     //contructor
     function UserAvatarModel(data, options){
         options = options || {};
-        if (options.hasOwnProperty("userId")){
-            this.userId = options.userId;
-        } else {
-            this.userId = "";
-        }
         BaseModel.call(this, "avatar_record", data, options);
     }
 
     UserAvatarModel.prototype = Object.create(BaseModel.prototype);
 
     UserAvatarModel.prototype.urlRoot = function(){
-        return "/api/v1/users/" + this.userId + "/avatar"
-    };
-
-    UserAvatarModel.prototype.defaults = {
-        "use_gravatar" : false
+        return "/api/v1/users/" + this.get('id') + "/avatar"
     };
 
     UserAvatarModel.prototype.idAttribute = "_id";
+
+    UserAvatarModel.prototype.uploadContent = function(formData){
+        var defer = $.Deferred();
+        var self = this;
+        $.ajax({
+            url: this.url + "/image",
+            type: "POST",
+            beforeSend: function(request){
+                request.setRequestHeader("If-Match", self.revision);
+            },
+            data: formData,
+            processData: false,
+            contentType: false
+        }).done(function(response){
+            defer.resolve(response);
+        }).fail(function(response){
+            defer.resolve(undefined);
+        });
+        return defer.promise();
+    };
 
     return UserAvatarModel;
 

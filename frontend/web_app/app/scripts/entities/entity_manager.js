@@ -76,6 +76,14 @@ define([
         return userManager.getWikiMemberList(wikiModel);
     });
 
+    userChannel.reply("get:avatar", function(id){
+        return userManager.getAvatar(id);
+    });
+
+    userChannel.reply("save:avatar", function(avatarModel){
+        return userManager.saveEntity(avatarModel);
+    });
+
     //-------End User Manager stuff
     //-------Wiki Manager Stuff
 

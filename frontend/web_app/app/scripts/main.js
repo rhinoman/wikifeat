@@ -36,9 +36,7 @@ require.config({
         moment: 'vendor/moment/moment',
         wikifeat: 'vendor/wikifeat-api/wikifeat-api',
         'markdown-converter': 'vendor/wikifeat-pagedown/Markdown.Converter',
-        'markdown': 'vendor/wikifeat-pagedown/Markdown.Editor',
-        'cyrpto-js': 'vendor/crypto-js/core',
-        'md5-js': 'vendor/crypto-js/md5'
+        'markdown': 'vendor/wikifeat-pagedown/Markdown.Editor'
     },
     shim: {
         bootstrap: {

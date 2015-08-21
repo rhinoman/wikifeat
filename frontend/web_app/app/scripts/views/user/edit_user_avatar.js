@@ -23,13 +23,12 @@ define([
     'underscore',
     'marionette',
     'backbone.radio',
-    'backbone.stickit',
     'entities/user/user_avatar',
     'bootstrap',
     'views/main/alert',
     'text!templates/user/edit_avatar_dialog.html'
 
-], function($,_,Marionette,Radio,Stickit,
+], function($,_,Marionette,Radio,
             UserAvatarModel,Bootstrap,AlertView,
             EditAvatarDialogTemplate){
 
@@ -37,23 +36,80 @@ define([
         id: "edit-avatar-dialog",
         model: UserAvatarModel,
         template: _.template(EditAvatarDialogTemplate),
-        bindings: {
-
-        },
         events: {
+            'change #file-data': 'updateFileSelect',
+            'submit form': 'submitForm',
+            'click #saveButton' : function(){$('#theSubmit').trigger('click')}
 
         },
 
         onRender: function(){
             if(typeof this.model !== 'undefined'){
-                this.stickit();
                 this.$("#editAvatarModal").modal();
             }
         },
 
-        onClose: function(){
-            this.unstickit();
-        }
+        updateFileSelect: function(event){
+            var filename = $(event.currentTarget).val().replace("C:\\fakepath\\","");
+            this.$("#fileNameDisplay").html(filename);
+        },
+
+        submitForm: function(event){
+            event.preventDefault();
+            var self = this;
+            //First, save the avatar record
+            Radio.channel('userManager').request('save:avatar', this.model)
+                .done(function(response){
+                    if(response.hasOwnProperty('error')){
+                        var error = {};
+                        if(response.error.status === 400){
+                            error.serverError = "Invalid Request";
+                            self.showError(self.model, error);
+                        } else {
+                            error.serverError = "Server Error.  Please try again.";
+                            self.showError(self.model, error);
+                        }
+                    } else {
+                        var file = $("#file-data").val();
+                        if(typeof file !== 'undefined' && file !== ""){
+                            //Now we upload the file itself.
+                            var formData = new FormData();
+                            var input = document.getElementById("file-data");
+                            formData.append('file-data', input.files[0]);
+                            self.model.uploadContent(formData).done(function (response){
+                                if(typeof response === 'undefined'){
+                                    var error = {};
+                                    error.serverError = "could not upload file";
+                                    self.showError(self.model, error);
+                                } else {
+                                    self.model.fetch();
+                                    self.model.trigger('change');
+                                    self.$("#cancelButton").trigger('click');
+                                }
+                            });
+                        }
+                    }
+                });
+        },
+
+        showError: function(model, error){
+            var alertText = 'Please correct the following errors: <ul id="error_list">';
+
+            for (var property in error){
+                if (error.hasOwnProperty(property)){
+                    alertText += "<li>" + error[property] + "</li>"
+                }
+            }
+            alertText += "</ul>";
+            var alertView = new AlertView({
+                el: $("#alertBox"),
+                alertType: 'alert-danger',
+                alertMessage: alertText
+            });
+            alertView.render();
+        },
+
+        onClose: function(){}
     });
 
 });

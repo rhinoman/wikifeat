@@ -29,7 +29,6 @@
     "requirejs": "latest",
     "requirejs-text": "latest",
     "jquery-cookie": "~1.4.1",
-    "moment": "~2.9.0",
-    "crypto-js": "~3.1"
+    "moment": "~2.9.0"
   }
 }
