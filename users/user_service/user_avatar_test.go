@@ -95,8 +95,7 @@ func TestUserAvatars(t *testing.T) {
 	}
 	//Now, create a User Avatar Record
 	uar := entities.UserAvatar{
-		UserName:    "Steven.Smith",
-		UseGravatar: false,
+		UserName: "Steven.Smith",
 	}
 	aRev, err := uam.Save("Steven.Smith", "", &uar, smithUser())
 	if err != nil {

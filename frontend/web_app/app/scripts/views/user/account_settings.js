@@ -52,6 +52,8 @@ define([
 
         initialize: function(){
             this.model.on('change', this.render, this);
+            this.model.on('reset', this.render, this);
+            this.model.on('sync', this.render, this);
         },
 
         editProfile: function(event){
@@ -65,6 +67,7 @@ define([
         },
 
         changePicture: function(event){
+            var self = this;
             Radio.channel('userManager').request('get:avatar', this.model.id)
                 .done(function(response){
                     if(typeof response === 'undefined')    {
@@ -76,7 +79,11 @@ define([
                         });
                         Radio.channel('main').trigger('show:dialog', errorDialog);
                     } else {
-                        var euv = new EditUserAvatarView({model: response});
+                        self.avatarModel = response;
+                        self.avatarModel.listenToOnce(self.avatarModel, 'newImage', self.render);
+                        var euv = new EditUserAvatarView({
+                            model: self.avatarModel,
+                            userModel: self.model});
                         Radio.channel('main').trigger('show:dialog', euv);
                     }
                 });
@@ -88,19 +95,14 @@ define([
                 var fullName = userPublic.firstName + " " + userPublic.lastName;
                 var title = userPublic.title;
                 var email = userPublic.contactInfo.email;
-                //var eh = MD5(email);
-                var avatar = new UserAvatarModel({},{userId: this.model.id});
-                //this.$("#pictureWrapper").html(
-                //    '<img src="https://www.gravatar.com/avatar/' + eh + '?s=200"/>'
-                //);
                 this.$("#pictureWrapper").html(this.model.getAvatar());
-
                 this.$("#nameField").html(fullName);
                 this.$("#userNameField").html('<span class="glyphicon glyphicon-user"></span>&nbsp;' +
                     this.model.get("name"));
                 this.$("#emailField").html('<span class="glyphicon glyphicon-envelope"></span>&nbsp;' +
                     '<a href="mailto:' + email + '">' + email + '</a>');
                 this.$("#titleField").html('<span class="glyphicon glyphicon-briefcase"></span>&nbsp;' + title);
+
             }
         },
 

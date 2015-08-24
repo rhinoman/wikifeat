@@ -390,6 +390,14 @@ body {
 .sidebar .currentSelection {
   background: #222;
 }
+.sidebar #userMenuLink div#currentUserThumb {
+  height: 32px;
+  display: inline;
+}
+.sidebar #userMenuLink div#userNameText {
+  height: 32px;
+  display: inline;
+}
 
 .form-control {
   border-radius: 0;

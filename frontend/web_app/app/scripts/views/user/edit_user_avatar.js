@@ -42,6 +42,14 @@ define([
             'click #saveButton' : function(){$('#theSubmit').trigger('click')}
 
         },
+        userModel: null,
+
+        initialize: function(options){
+            options = options || {};
+            if(options.hasOwnProperty('userModel')){
+                this.userModel = options.userModel;
+            }
+        },
 
         onRender: function(){
             if(typeof this.model !== 'undefined'){
@@ -82,8 +90,7 @@ define([
                                     error.serverError = "could not upload file";
                                     self.showError(self.model, error);
                                 } else {
-                                    self.model.fetch();
-                                    self.model.trigger('change');
+                                    self.model.trigger('newImage');
                                     self.$("#cancelButton").trigger('click');
                                 }
                             });

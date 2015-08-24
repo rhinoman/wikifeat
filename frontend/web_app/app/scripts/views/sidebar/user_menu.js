@@ -68,6 +68,7 @@ define([
         onRender: function(){
             if(typeof this.model !== 'undefined') {
                 this.stickit();
+                this.$("#currentUserThumb").html(this.model.getAvatarThumbnail());
             }
         },
 

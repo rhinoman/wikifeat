@@ -39,7 +39,6 @@ type UserAvatarManager struct{}
 //Save User Avatar Record
 func (uam *UserAvatarManager) Save(id string, rev string,
 	avatar *UserAvatar, curUser *CurrentUserInfo) (string, error) {
-	theUser := curUser.User
 	nowTime := time.Now().UTC()
 	if rev == "" {
 		avatar.CreatedAt = nowTime
@@ -47,8 +46,8 @@ func (uam *UserAvatarManager) Save(id string, rev string,
 	avatar.ModifiedAt = nowTime
 	var auth couchdb.Auth
 	//check for admin
-	if util.HasRole(theUser.Roles, AdminRole(MainDbName())) ||
-		util.HasRole(theUser.Roles, MasterRole()) {
+	if util.HasRole(curUser.Roles, AdminRole(MainDbName())) ||
+		util.HasRole(curUser.Roles, MasterRole()) {
 		auth = AdminAuth
 	} else {
 		auth = curUser.Auth
@@ -61,7 +60,21 @@ func (uam *UserAvatarManager) Save(id string, rev string,
 func (uam *UserAvatarManager) Read(id string, avatar *UserAvatar,
 	curUser *CurrentUserInfo) (string, error) {
 	avatarDb := Connection.SelectDB(AvatarDbName(), curUser.Auth)
-	return avatarDb.Read(id, avatar, nil)
+	rev, err := avatarDb.Read(id, avatar, nil)
+	if err != nil && strings.Contains(err.Error(), ":404:") {
+		//No avatar exists, so create it.
+		//We need the Admin user for this
+		avatarAdminDb := Connection.SelectDB(AvatarDbName(), AdminAuth)
+		nowTime := time.Now().UTC()
+		avatar := UserAvatar{
+			UserName:   id,
+			CreatedAt:  nowTime,
+			ModifiedAt: nowTime,
+		}
+		return avatarAdminDb.Save(&avatar, id, "")
+	} else {
+		return rev, err
+	}
 }
 
 //Delete a User Avatar Record
@@ -99,7 +112,7 @@ func (uam *UserAvatarManager) SaveImage(id string, rev string, attType string,
 	if err != nil {
 		return "", err
 	}
-	thumbnail := resize.Thumbnail(32, 0, image, resize.Bicubic)
+	thumbnail := resize.Thumbnail(32, 32, image, resize.Bicubic)
 	tRev, err := uam.saveImage(id, lRev, "thumbnail", thumbnail, auth)
 	if err != nil {
 		return "", err

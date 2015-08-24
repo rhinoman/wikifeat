@@ -48,8 +48,8 @@ define([
                 contactInfo: {
                     email: ""
                 },
-                avatar: "",
-                avatarThumbnail: ""
+                avatar: "/app/resource/img/default_avatar.jpg",
+                avatarThumbnail: "/app/resource/img/default_avatar_thumb.jpg"
             }
     };
 
@@ -103,9 +103,22 @@ define([
     //Get the img link for the avatar
     UserModel.prototype.getAvatar = function(){
         var up = this.get('userPublic');
-        return '<img src="' + up.avatar + '"/>';
+        var d = new Date();
+        if(up.avatar === ""){
+            up.avatar = "/app/resource/img/default_avatar.jpg?_=" + d.getTime();
+        }
+        return '<img class="avatar" src="' + up.avatar + '?_=' + d.getTime() +'"/>';
     };
 
+    //Get the img link for the avatar Thumbnail
+    UserModel.prototype.getAvatarThumbnail = function(){
+        var up = this.get('userPublic');
+        var d = new Date();
+        if(up.avatarThumbnail === ""){
+            up.avatarThumbnail = "/app/resource/img/default_avatar.jpg?_=" + d.getTime();
+        }
+        return '<img class="avatar" src="' + up.avatarThumbnail + '?_=' + d.getTime() +'"/>';
+    };
     //input validation function
     UserModel.prototype.validate = function(attrs, options) {
         var errors = {};

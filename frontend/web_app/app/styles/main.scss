@@ -45,6 +45,16 @@ body{
   .currentSelection{
     background: #222;
   }
+  #userMenuLink{
+    div#currentUserThumb{
+      height: 32px;
+      display:inline;
+    }
+    div#userNameText{
+      height: 32px;
+      display:inline;
+    }
+  }
 }
 
 //Override Bootstrap
@@ -73,6 +83,15 @@ button.primary-color-btn{
 //div.alert{
 //  display: none;
 //}
+
+Default avatar images
+img.avatar{
+//  width:200px;
+//  height:200px;
+//  .placeholder {
+//    background-image: url('/app/resource/img/default_avatar.jpg');
+//  }
+}
 
 div.modal{
   div.modal-dialog{
