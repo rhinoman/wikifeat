@@ -115,7 +115,7 @@ define([
         var up = this.get('userPublic');
         var d = new Date();
         if(up.avatarThumbnail === ""){
-            up.avatarThumbnail = "/app/resource/img/default_avatar.jpg?_=" + d.getTime();
+            up.avatarThumbnail = "/app/resource/img/default_avatar_thumb.jpg?_=" + d.getTime();
         }
         return '<img class="avatar" src="' + up.avatarThumbnail + '?_=' + d.getTime() +'"/>';
     };

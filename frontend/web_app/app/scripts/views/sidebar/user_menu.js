@@ -38,10 +38,11 @@ define([
         model: UserModel,
         bindings: {
             '#userNameText': {
-                observe: 'userPublic',
-                onGet: function(data){
-                    return data.firstName + " " + data.lastName;
-                }
+                observe: 'name',
+                //observe: 'userPublic',
+                //onGet: function(data){
+                //    return data.firstName + " " + data.lastName;
+                //}
             }
         },
         events: {

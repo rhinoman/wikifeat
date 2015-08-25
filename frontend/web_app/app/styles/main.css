@@ -390,12 +390,13 @@ body {
 .sidebar .currentSelection {
   background: #222;
 }
-.sidebar #userMenuLink div#currentUserThumb {
-  height: 32px;
+.sidebar #userMenuLink {
+  display: block;
+}
+.sidebar #userMenuLink span#currentUserThumb {
   display: inline;
 }
-.sidebar #userMenuLink div#userNameText {
-  height: 32px;
+.sidebar #userMenuLink span#userNameText {
   display: inline;
 }
 

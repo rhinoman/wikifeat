@@ -46,12 +46,11 @@ body{
     background: #222;
   }
   #userMenuLink{
-    div#currentUserThumb{
-      height: 32px;
+    display: block;
+    span#currentUserThumb{
       display:inline;
     }
-    div#userNameText{
-      height: 32px;
+    span#userNameText{
       display:inline;
     }
   }

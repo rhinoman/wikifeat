@@ -25,11 +25,12 @@ define([
     'backbone.radio',
     'backbone.stickit',
     'entities/wiki/page',
+    'entities/user/user',
     'views/page/child_index',
     'views/page/page_tools',
     'text!templates/page/page_layout.html',
 ], function($,_,Marionette,Moment,Radio,Stickit,
-            PageModel,ChildIndexView,
+            PageModel,UserModel,ChildIndexView,
             PageToolMenu,ShowPageTemplate){
     'use strict';
 
@@ -136,6 +137,13 @@ define([
                     'The latest version is <a href="#" id="viewCurrentPageLink">here</a>.</p>');
                     revNotice.css("display","block");
                 }
+                //Draw the editor avatar
+                Radio.channel('userManager').request('get:user', this.model.get('editor'))
+                    .done(function(editorUser){
+                        if(typeof editorUser !== 'undefined') {
+                            self.$("span#editorAvatarThumb").html(editorUser.getAvatarThumbnail());
+                        }
+                    });
                 //Now draw the alertBox
                 this.$el.prepend('<div id="alertBox"></div>');
             }
