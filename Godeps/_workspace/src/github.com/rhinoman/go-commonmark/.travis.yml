@@ -2,6 +2,7 @@
 language: go
 go:
  - 1.4
+ - 1.5
 before_install:
  - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
  - sudo apt-get update -qq

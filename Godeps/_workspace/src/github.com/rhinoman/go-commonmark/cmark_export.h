@@ -23,14 +23,8 @@
 
 #ifndef CMARK_DEPRECATED
 #  define CMARK_DEPRECATED __attribute__ ((__deprecated__))
-#endif
-
-#ifndef CMARK_DEPRECATED_EXPORT
-#  define CMARK_DEPRECATED_EXPORT CMARK_EXPORT CMARK_DEPRECATED
-#endif
-
-#ifndef CMARK_DEPRECATED_NO_EXPORT
-#  define CMARK_DEPRECATED_NO_EXPORT CMARK_NO_EXPORT CMARK_DEPRECATED
+#  define CMARK_DEPRECATED_EXPORT CMARK_EXPORT __attribute__ ((__deprecated__))
+#  define CMARK_DEPRECATED_NO_EXPORT CMARK_NO_EXPORT __attribute__ ((__deprecated__))
 #endif
 
 #define DEFINE_NO_DEPRECATED 0

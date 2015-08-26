@@ -59,8 +59,8 @@
 		},
 		{
 			"ImportPath": "github.com/rhinoman/go-commonmark",
-			"Comment": "0.18.3-5-g80bd6c3",
-			"Rev": "80bd6c32ee452a3fc309840aa055b911be235ea4"
+			"Comment": "0.18.3-7-g205c04e",
+			"Rev": "205c04e228a7bc0060ef30440ff8980525eb19e8"
 		},
 		{
 			"ImportPath": "github.com/rhinoman/go-slugification",
