@@ -28,10 +28,11 @@ define([
     'entities/user/user',
     'views/page/child_index',
     'views/page/page_tools',
+    'views/user/user_info_dialog',
     'text!templates/page/page_layout.html',
 ], function($,_,Marionette,Moment,Radio,Stickit,
             PageModel,UserModel,ChildIndexView,
-            PageToolMenu,ShowPageTemplate){
+            PageToolMenu,UserInfoDialog,ShowPageTemplate){
     'use strict';
 
     return Marionette.LayoutView.extend({
@@ -39,6 +40,7 @@ define([
         template: _.template(ShowPageTemplate),
         model: PageModel,
         wikiModel: null,
+        editorModel: null,
         oldRevision: false,
         pageChildren: 7,
         viewMode: 'formatted',
@@ -62,6 +64,7 @@ define([
         },
         events: {
             'click a#viewCurrentPageLink': 'showCurrentPage',
+            'click a#editorName': 'showEditorInfo',
             'click a.page-content-mode-link' : 'changeViewMode'
         },
 
@@ -94,6 +97,12 @@ define([
             event.preventDefault();
             Radio.channel('page').trigger('show:page',
                 this.model.get("owning_page"), this.wikiModel)
+        },
+
+        showEditorInfo: function(event){
+            event.preventDefault();
+            var editorInfoDialog = new UserInfoDialog({model: this.editorModel});
+            Radio.channel('main').trigger('show:dialog', editorInfoDialog);
         },
 
         /* on render callback */
@@ -141,6 +150,7 @@ define([
                 Radio.channel('userManager').request('get:user', this.model.get('editor'))
                     .done(function(editorUser){
                         if(typeof editorUser !== 'undefined') {
+                            self.editorModel = editorUser;
                             self.$("span#editorAvatarThumb").html(editorUser.getAvatarThumbnail());
                         }
                     });

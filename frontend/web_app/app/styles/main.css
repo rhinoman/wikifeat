@@ -185,6 +185,11 @@ form#editPageForm {
   min-height: 8in;
 }
 
+.profile-item {
+  font-size: 125%;
+  line-height: 100%;
+}
+
 .account-settings-view #profileArea button#editProfileButton {
   border: none;
   float: right;
@@ -192,13 +197,15 @@ form#editPageForm {
 .account-settings-view #profileArea h2#nameField {
   margin-top: 0;
 }
-.account-settings-view #profileArea .profile-item {
-  font-size: 125%;
-  line-height: 100%;
-}
 .account-settings-view #pictureWrapper {
   max-width: 200px;
   max-height: 200px;
+  padding: 10px;
+}
+
+div#userInfoModal .avatar-wrapper {
+  width: 220px;
+  height: 220px;
   padding: 10px;
 }
 

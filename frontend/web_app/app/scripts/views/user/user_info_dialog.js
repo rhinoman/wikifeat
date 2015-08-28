@@ -24,14 +24,60 @@ define([
     'underscore',
     'marionette',
     'backbone.radio',
+    'backbone.stickit',
     'bootstrap',
-    'entities/user/user'
-], function($,_,Marionette,Radio,Bootstrap,
-            UserModel){
+    'entities/user/user',
+    'text!templates/user/user_info_dialog.html'
+], function($,_,Marionette,Radio,Stickit,Bootstrap,
+            UserModel,UserInfoTemplate){
 
     return Marionette.ItemView.extend({
         className: "user-info-dialog",
-        model: UserModel
+        model: UserModel,
+        template: _.template(UserInfoTemplate),
+        bindings: {
+            '#userInfoTitle':{
+                observe: 'name'
+            },
+            '#userFullName':{
+                observe: 'userPublic',
+                updateModel:false,
+                onGet: function(data){
+                    return data.firstName + " " + data.lastName;
+                }
+            },
+            '#email':{
+                observe: 'userPublic',
+                updateModel:false,
+                onGet: function(data){
+                    return data.contactInfo.email;
+                }
+            },
+            '#userTitle':{
+                observe: 'userPublic',
+                updateModel:false,
+                onGet: function(data){
+                    return data.title;
+                }
+            }
+
+        },
+
+
+        onRender: function(){
+            if(this.model !== 'undefined'){
+                var up = this.model.get('userPublic');
+                this.$("#userInfoModal").modal();
+                this.$("#pictureWrapper").html(this.model.getAvatar());
+                this.$('#email').attr('href', 'mailto:' + up.contactInfo.email);
+                this.stickit();
+            }
+
+        },
+
+        onClose: function(){
+            this.unstickit();
+        }
     });
 
 });
