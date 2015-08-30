@@ -43,6 +43,7 @@ cp -R ../scripts/ddoc ${BUILD_DIR}/scripts
 cp -p ../scripts/setup_users.sh ${BUILD_DIR}/scripts
 cp -p ../scripts/create_master_user.sh ${BUILD_DIR}/scripts
 cp -p ../scripts/setup.sh ${BUILD_DIR}/scripts
+cp -p ../scripts/get_rev.sh ${BUILD_DIR}/scripts
 # Now make a tarball
 mkdir ../dist
 echo "Creating ${TARNAME}"
