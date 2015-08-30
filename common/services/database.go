@@ -220,7 +220,7 @@ func DisableGuest() error {
 
 func CreateGuestUser() error {
 	_, err := Connection.AddUser("guest", "guest",
-		[]string{ReadRole(MainDbName())}, AdminAuth)
+		[]string{AllUsersRole(), ReadRole(MainDbName())}, AdminAuth)
 	return err
 }
 

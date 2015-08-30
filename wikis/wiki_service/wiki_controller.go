@@ -164,14 +164,20 @@ func (wc WikisController) index(request *restful.Request,
 			pageNum = ln
 		}
 	}
-	memberOnly, err := strconv.ParseBool(request.QueryParameter("memberOnly"))
-	if err != nil {
-		log.Printf("Error: %v", err)
-		WriteIllegalRequestError(response)
-		return
+	var memberOnly bool = false
+	memberOnlyString := request.QueryParameter("memberOnly")
+	if memberOnlyString != "" {
+		var err error
+		memberOnly, err = strconv.ParseBool(memberOnlyString)
+		if err != nil {
+			log.Printf("Error: %v", err)
+			WriteIllegalRequestError(response)
+			return
+		}
+
 	}
 	wlr := WikiListResponse{}
-	err = new(WikiManager).GetWikiList(pageNum, limit, memberOnly,
+	err := new(WikiManager).GetWikiList(pageNum, limit, memberOnly,
 		&wlr, curUser)
 	if err != nil {
 		WriteError(err, response)

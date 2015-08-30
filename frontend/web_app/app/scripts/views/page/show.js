@@ -151,6 +151,7 @@ define([
                     .done(function(editorUser){
                         if(typeof editorUser !== 'undefined') {
                             self.editorModel = editorUser;
+                            self.editorModel.set('name',self.model.get('editor'));
                             self.$("span#editorAvatarThumb").html(editorUser.getAvatarThumbnail());
                         }
                     });

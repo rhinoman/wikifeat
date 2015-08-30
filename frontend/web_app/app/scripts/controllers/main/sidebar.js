@@ -44,7 +44,8 @@ define([
     var SideBarController = Marionette.Controller.extend({
         drawSideBar: function(){
             //Get the current user data
-            userChannel.request('get:currentUser').done(function(data){
+            var currentUser = userChannel.request('get:currentUser');
+            currentUser.done(function(data){
                 var userMenuView;
                 if(data.get('name') === 'guest'){
                     userMenuView = new GuestUserMenuView();
@@ -56,16 +57,16 @@ define([
                     var adminMenuView = new AdminMenuView();
                     sideBarLayout.adminMenuRegion.show(adminMenuView);
                 }
+                //Get our wiki list
+                wikiChannel.request('get:memberWikiList', data).done(function(data){
+                    if(typeof data !== 'undefined') {
+                        wikiCollection.reset(data.models);
+                        var wikiListView = new WikiListView({collection: wikiCollection});
+                        sideBarLayout.wikiListRegion.show(wikiListView);
+                    }
+                });
+            });
 
-            });
-            //Get our wiki list
-            wikiChannel.request('get:memberWikiList').done(function(data){
-                if(typeof data !== 'undefined') {
-                    wikiCollection.reset(data.models);
-                    var wikiListView = new WikiListView({collection: wikiCollection});
-                    sideBarLayout.wikiListRegion.show(wikiListView);
-                }
-            });
             sideBarLayout.logoRegion.show(logoView);
             console.log("Creating Sidebar");
         },

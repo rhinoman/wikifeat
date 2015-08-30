@@ -385,7 +385,10 @@ func (um *UserManager) Logout(sessionToken string) error {
 //Get list of users
 func (um *UserManager) GetUserList(pageNum int, numPerPage int,
 	ulr *UserListQueryResponse, curUser *CurrentUserInfo) error {
-	//Turns out non-admins need to view a list of users, too.
+	//You have to be some sort of admin to do this
+	if !util.IsAnyAdmin(curUser.User.Roles) {
+		return NotAdminError()
+	}
 	params := url.Values{}
 	if numPerPage != 0 {
 		params.Add("limit", strconv.Itoa(numPerPage))

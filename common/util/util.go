@@ -42,6 +42,18 @@ func HasRole(roles []string, role string) bool {
 	return ContainsString(role, roles)
 }
 
+// Check if this user is an admin of anything.
+// Either a site admin, or a wiki admin returns true
+func IsAnyAdmin(roles []string) bool {
+	for _, str := range roles {
+		if str == "admin" || str == "master" ||
+			strings.Contains(str, ":admin") {
+			return true
+		}
+	}
+	return false
+}
+
 func Retry(maxTries int, f func() error) error {
 	numTries := 0
 	return doRetry(numTries, maxTries, f)
