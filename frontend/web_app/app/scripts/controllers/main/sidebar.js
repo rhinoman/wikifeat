@@ -29,10 +29,12 @@ define([
     'views/sidebar/guest_user_menu',
     'views/sidebar/admin_menu',
     'views/sidebar/wiki_list',
-    'entities/wiki/wikis'
+    'entities/wiki/wikis',
+    'entities/user/user'
 ], function($,_,Marionette,Radio,SidebarLayout,
             LogoView,UserMenuView,GuestUserMenuView,
-            AdminMenuView,WikiListView,WikiCollection){
+            AdminMenuView,WikiListView,WikiCollection,
+            UserModel){
 
     //Data channels
     var userChannel = Radio.channel('userManager');
@@ -47,6 +49,17 @@ define([
             var currentUser = userChannel.request('get:currentUser');
             currentUser.done(function(data){
                 var userMenuView;
+                if(typeof data === 'undefined') {
+                    //Well, something went wrong
+                    //This often happens if we have a stale session hanging around.
+                    //Destroy the bad session:
+                    $.ajax({
+                        url: "/api/v1/users/login",
+                        type: "DELETE"
+                    });
+                    data = new UserModel({id: 'guest'});
+                    data.set('name', 'guest');
+                }
                 if(data.get('name') === 'guest'){
                     userMenuView = new GuestUserMenuView();
                 } else {
