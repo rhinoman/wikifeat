@@ -73,7 +73,9 @@ define([
                 Radio.channel('userManager').request('grant:role',
                     this.model, 'main', '', 'admin')
                     .done(function(response){
-                        if(typeof response !== 'undefined' && response.get('success') === true){
+                        if(typeof response !== 'undefined' &&
+                            !response.hasOwnProperty('error') &&
+                            response.get('success') === true){
                             var roles = self.model.get("roles") || [];
                             self.triggerMethod('admin:enabled');
                             roles.push('admin');

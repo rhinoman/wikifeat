@@ -283,14 +283,24 @@ func resourceDbName(rr *RoleRequest) string {
 func (um *UserManager) GrantRole(id string,
 	grantRequest *RoleRequest,
 	curUser *CurrentUserInfo) (string, error) {
+
+	newRole := grantRequest.roleString()
 	//Who am I?
 	theUser := curUser.User
 	//Make sure user is an admin of the resource being requested
 	resourceDbName := resourceDbName(grantRequest)
 	if !util.HasRole(theUser.Roles, AdminRole(MainDbName())) &&
+		!util.HasRole(theUser.Roles, MasterRole()) &&
 		!util.HasRole(theUser.Roles, AdminRole(resourceDbName)) {
 		//Not an admin
 		return "", NotAdminError()
+	}
+	//Are we trying to grant the site admin role?
+	//If so, curUser must be a master user
+	if newRole == AdminRole(MainDbName()) &&
+		!util.HasRole(theUser.Roles, MasterRole()) {
+		return "", NotAdminError()
+
 	}
 	//Fetch the user
 	userDb := Connection.SelectDB(UserDbName, AdminAuth)
@@ -304,7 +314,6 @@ func (um *UserManager) GrantRole(id string,
 		return "", BadRequestError()
 	}
 	//All is well, grant the role
-	newRole := grantRequest.roleString()
 	rev, err = Connection.GrantRole(id, newRole, AdminAuth)
 	if err != nil {
 		return "", err
