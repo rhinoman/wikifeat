@@ -41,6 +41,7 @@ var client *etcd.Client
 var etcdPrefix = "/wikifeat"
 var UsersLocation = etcdPrefix + "/services/users/"
 var WikisLocation = etcdPrefix + "/services/wikis/"
+var NotificationsLocation = etcdPrefix + "/services/notifications/"
 var FrontEndLocation = etcdPrefix + "/services/frontend/"
 
 func protocolString() string {
@@ -118,10 +119,23 @@ func fetchServiceLists() {
 			wikiNodes = nodes
 		}
 	}
+	notificationNodes := []*etcd.Node{}
+	resp, err = client.Get(NotificationsLocation, false, false)
+	if err != nil {
+		log.Println("Unable to fetch Notifications Service list from etcd!")
+	} else {
+		if nodes, err := processResponse(resp); err != nil {
+			log.Println("Error fetching notificaiton services: " + err.Error())
+		} else {
+			notificationNodes = nodes
+		}
+
+	}
 	serviceCache.Lock()
 	defer serviceCache.Unlock()
 	serviceCache.m["users"] = userNodes
 	serviceCache.m["wikis"] = wikiNodes
+	serviceCache.m["notifications"] = notificationNodes
 }
 
 //Read nodes from an etcd response
@@ -144,27 +158,14 @@ func getEndpointFromNode(node *etcd.Node) string {
 func GetServiceLocation(serviceName string) (string, error) {
 	serviceCache.RLock()
 	defer serviceCache.RUnlock()
-	switch serviceName {
-	case "users":
-		if max := len(serviceCache.m["users"]); max == 0 {
-			return "", errors.New("No User services listed!")
-		} else {
-			index := 0
-			if max > 1 {
-				index = random.Intn(max)
-			}
-			return getEndpointFromNode(serviceCache.m["users"][index]), nil
+	if max := len(serviceCache.m[serviceName]); max == 0 {
+		return "", errors.New("No " + serviceName + " services listed!")
+	} else {
+		index := 0
+		if max > 1 {
+			index = random.Intn(max)
 		}
-	case "wikis":
-		if max := len(serviceCache.m["wikis"]); max == 0 {
-			return "", errors.New("No Wiki services listed!")
-		} else {
-			index := 0
-			if max > 1 {
-				index = random.Intn(max)
-			}
-			return getEndpointFromNode(serviceCache.m["wikis"][index]), nil
-		}
+		return getEndpointFromNode(serviceCache.m[serviceName][index]), nil
 	}
 	return "", nil
 }

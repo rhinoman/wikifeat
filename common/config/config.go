@@ -80,6 +80,15 @@ var Users struct {
 	AvatarDb string
 }
 
+var Notifications struct {
+	TemplateDir      string
+	UseHtmlTemplates bool
+	SmtpServer       string
+	SmtpPort         int
+	SmtpUser         string
+	SmtpPassword     string
+}
+
 // Initialize Default values
 func LoadDefaults() {
 	Service.DomainName = "127.0.0.1"
@@ -107,6 +116,12 @@ func LoadDefaults() {
 	Auth.AllowGuest = true
 	Auth.MinPasswordLength = 6
 	Users.AvatarDb = "avatar_ut"
+	Notifications.TemplateDir = "templates"
+	Notifications.UseHtmlTemplates = true
+	Notifications.SmtpServer = "localhost"
+	Notifications.SmtpPort = 587
+	Notifications.SmtpUser = "user"
+	Notifications.SmtpPassword = "password"
 }
 
 // Load config values from file
@@ -142,6 +157,7 @@ func LoadConfig(filename string) {
 	frontendSection, err := config.Section("Frontend")
 	userSection, err := config.Section("Users")
 	searchSection, err := config.Section("Search")
+	notifSection, err := config.Section("Notifications")
 	setServiceConfig(serviceSection)
 	if frontendSection != nil {
 		SetFrontendConfig(frontendSection)
@@ -151,6 +167,9 @@ func LoadConfig(filename string) {
 	}
 	if userSection != nil {
 		setUsersConfig(userSection)
+	}
+	if notifSection != nil {
+		setNotificationConfig(notifSection)
 	}
 	setDbConfig(dbSection)
 	setLogConfig(logSection)
@@ -173,11 +192,7 @@ func setServiceConfig(serverSection *configparser.Section) {
 		case "apiVersion":
 			Service.ApiVersion = value
 		case "useSSL":
-			if value == "true" {
-				Service.UseSSL = true
-			} else {
-				Service.UseSSL = false
-			}
+			Service.UseSSL = stringToBool(value)
 		case "sslCertFile":
 			Service.SSLCertFile = value
 		case "sslKeyFile":
@@ -219,11 +234,7 @@ func setDbConfig(dbSection *configparser.Section) {
 		case "dbPort":
 			Database.DbPort = value
 		case "useSSL":
-			if value == "true" {
-				Database.UseSSL = true
-			} else {
-				Database.UseSSL = false
-			}
+			Database.UseSSL = stringToBool(value)
 		case "dbAdminUser":
 			Database.DbAdminUser = value
 		case "dbAdminPassword":
@@ -232,6 +243,26 @@ func setDbConfig(dbSection *configparser.Section) {
 			Database.DbTimeout = value
 		case "mainDb":
 			Database.MainDb = value
+		}
+	}
+}
+
+//Load Notification configuration options
+func setNotificationConfig(notifSection *configparser.Section) {
+	for key, value := range notifSection.Options() {
+		switch key {
+		case "templateDirectory":
+			Notifications.TemplateDir = value
+		case "useHtmlTemplates":
+			Notifications.UseHtmlTemplates = stringToBool(value)
+		case "smtpServer":
+			Notifications.SmtpServer = value
+		case "smtpPort":
+			setIntVal(value, &Notifications.SmtpPort)
+		case "smtpUser":
+			Notifications.SmtpUser = value
+		case "smtpPassword":
+			Notifications.SmtpPassword = value
 		}
 	}
 }
@@ -251,6 +282,14 @@ func setUint64Val(str string, to *uint64) {
 		log.Fatal(err)
 	} else {
 		*to = i
+	}
+}
+
+func stringToBool(str string) bool {
+	if str == "true" {
+		return true
+	} else {
+		return false
 	}
 }
 
@@ -277,17 +316,9 @@ func setAuthConfig(authSection *configparser.Section) {
 		case "sessionTimeout":
 			setIntVal(value, &Auth.SessionTimeout)
 		case "persistentSessions":
-			if value == "true" {
-				Auth.PersistentSessions = true
-			} else {
-				Auth.PersistentSessions = false
-			}
+			Auth.PersistentSessions = stringToBool(value)
 		case "allowGuestAccess":
-			if value == "true" {
-				Auth.AllowGuest = true
-			} else {
-				Auth.AllowGuest = false
-			}
+			Auth.AllowGuest = stringToBool(value)
 		case "minPasswordLength":
 			setIntVal(value, &Auth.MinPasswordLength)
 		}

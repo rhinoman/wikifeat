@@ -1,0 +1,7 @@
+Dear {{index .Data "user"}},
+
+This is a message.  You should read it.  Your balance of {{index .Data "amount"}} dogecoins is due.
+
+Sincerely,
+
+Us
