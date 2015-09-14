@@ -17,3 +17,80 @@
  */
 
 package notification_service
+
+import (
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
+	. "github.com/rhinoman/wikifeat/common/entities"
+	. "github.com/rhinoman/wikifeat/common/services"
+	//"log"
+)
+
+type NotificationsController struct{}
+
+func (nc NotificationsController) notificationUri() string {
+	return ApiPrefix() + "/notifications"
+}
+
+var notificationsWebService *restful.WebService
+
+func (nc NotificationsController) Service() *restful.WebService {
+	return notificationsWebService
+}
+
+//Define routes
+func (nc NotificationsController) Register(container *restful.Container) {
+	notificationsWebService := new(restful.WebService)
+	notificationsWebService.Filter(LogRequest).
+		Filter(AuthUser).
+		ApiVersion(ApiVersion()).
+		Path(nc.notificationUri()).
+		Doc("Send Notifications").
+		Consumes(restful.MIME_JSON).
+		Produces(restful.MIME_JSON)
+
+	notificationsWebService.Route(notificationsWebService.POST("{notification-id}/send").
+		To(nc.send).
+		Operation("send").
+		Param(notificationsWebService.PathParameter("notification-id",
+		"Notification Template").DataType("string")).
+		Reads(NotificationRequest{}).
+		Writes(BooleanResponse{}))
+
+	//Add the notifications controller to the container
+	container.Add(notificationsWebService)
+}
+
+func (nc NotificationsController) genNotifUri(notifId string) string {
+	return nc.notificationUri() + "/" + notifId
+}
+
+func (nc NotificationsController) send(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	notificationId := request.PathParameter("notification-id")
+	nr := new(NotificationRequest)
+	err := request.ReadEntity(nr)
+	if err != nil || !nc.ValidateNotificationRequest(nr) {
+		WriteBadRequestError(response)
+		return
+	}
+	err = new(NotificationManager).Send(notificationId, nr, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	SetAuth(response, curUser.Auth)
+	response.WriteEntity(BooleanResponse{Success: true})
+}
+
+func (nc NotificationsController) ValidateNotificationRequest(nr *NotificationRequest) bool {
+	if nr.To == "" || nr.Subject == "" || nr.Data == nil {
+		return false
+	} else {
+		return true
+	}
+}

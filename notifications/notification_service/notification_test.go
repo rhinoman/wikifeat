@@ -28,9 +28,10 @@ import (
 var nm = new(notification_service.NotificationManager)
 
 type TemplateData struct {
-	To   string
-	From string
-	Data map[string]string
+	To      string
+	From    string
+	Subject string
+	Data    map[string]string
 }
 
 func setup() {
@@ -41,8 +42,9 @@ func setup() {
 func TestLoadTemplate(t *testing.T) {
 	setup()
 	data := TemplateData{
-		To:   "them@otherplace.com",
-		From: "us@ourplace.com",
+		To:      "them@otherplace.com",
+		From:    "us@ourplace.com",
+		Subject: "The Thing",
 		Data: map[string]string{
 			"user":   "Dude",
 			"amount": "Fifty Gazillion",

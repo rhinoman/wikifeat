@@ -24,7 +24,11 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/registry"
+	"github.com/rhinoman/wikifeat/common/services"
+	"github.com/rhinoman/wikifeat/notifications/notification_service"
 	"log"
+	"net/http"
 )
 
 func main() {
@@ -44,5 +48,19 @@ func main() {
 	wsContainer.Router(restful.CurlyRouter{})
 	//Enable Gzip
 	wsContainer.EnableContentEncoding(true)
-
+	//Register the notifications controller
+	nc := notification_service.NotificationsController{}
+	nc.Register(wsContainer)
+	services.InitDb()
+	//Register with the service registry
+	registry.Init("Notifications", registry.NotificationsLocation)
+	httpAddr := ":" + config.Service.Port
+	if config.Service.UseSSL == true {
+		certFile := config.Service.SSLCertFile
+		keyFile := config.Service.SSLKeyFile
+		log.Fatal(http.ListenAndServeTLS(httpAddr,
+			certFile, keyFile, wsContainer))
+	} else {
+		log.Fatal(http.ListenAndServe(httpAddr, wsContainer))
+	}
 }

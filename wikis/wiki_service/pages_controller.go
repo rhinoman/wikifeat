@@ -200,6 +200,7 @@ func (pc PagesController) childIndex(request *restful.Request,
 	curUser := GetCurrentUser(request, response)
 	if curUser == nil {
 		Unauthenticated(request, response)
+		return
 	}
 	wikiId := request.PathParameter("wiki-id")
 	pageId := request.PathParameter("page-id")

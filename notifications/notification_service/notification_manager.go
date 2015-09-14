@@ -28,6 +28,7 @@ import (
 	"github.com/rhinoman/wikifeat/common/util"
 	"gopkg.in/gomail.v2"
 	htemplate "html/template"
+	"log"
 	"path/filepath"
 	"text/template"
 )
@@ -59,6 +60,7 @@ func (nm *NotificationManager) Send(template string,
 	}
 	if config.Notifications.UseHtmlTemplates {
 		htmlTemplate, err = nm.LoadHtmlTemplate(template)
+		log.Printf("Error loading HTML Template: %v", err)
 	}
 	//Create the email message
 	m := gomail.NewMessage()
@@ -66,16 +68,18 @@ func (nm *NotificationManager) Send(template string,
 	m.SetHeader("To", nReq.To)
 	m.SetHeader("Subject", nReq.Subject)
 	//Render the templates
-	var plainText *bytes.Buffer
-	var html *bytes.Buffer
-	err = plainTemplate.Execute(plainText, nReq.Data)
+	var plainText bytes.Buffer
+	var html bytes.Buffer
+	err = plainTemplate.Execute(&plainText, *nReq)
 	if err != nil {
 		return err
 	}
 	m.SetBody("text/plain", plainText.String())
 	if htmlTemplate != nil {
-		if err = htmlTemplate.Execute(html, nReq.Data); err != nil {
+		if err = htmlTemplate.Execute(&html, *nReq); err == nil {
 			m.AddAlternative("text/html", html.String())
+		} else {
+			log.Printf("Error executing HTML Template: %v", err)
 		}
 	}
 	d := gomail.NewPlainDialer(config.Notifications.SmtpServer,

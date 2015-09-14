@@ -199,7 +199,7 @@ func (wc WikisController) create(request *restful.Request,
 	theWiki := new(WikiRecord)
 	err := request.ReadEntity(theWiki)
 	if err != nil {
-		WriteServerError(err, response)
+		WriteBadRequestError(response)
 		return
 	}
 	wikiId := GenUuid()
