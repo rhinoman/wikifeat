@@ -258,6 +258,12 @@ func TestUsers(t *testing.T) {
 				t.Logf("Response: %v", userList)
 			})
 		})
+		Convey("When a user password reset is requested", func() {
+			err := um.RequestPasswordReset("Steven.Smith")
+			Convey("The error should indicate no notifcation services are present", func() {
+				So(err.Error(), ShouldEqual, "No notifications services listed!")
+			})
+		})
 		Convey("When the user is deleted", func() {
 			rev, err := um.Delete("Sally.Smith", smithUser())
 			Convey("The revision should be set and the error should be nil", func() {

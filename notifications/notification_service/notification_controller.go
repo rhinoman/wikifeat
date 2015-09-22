@@ -41,7 +41,6 @@ func (nc NotificationsController) Service() *restful.WebService {
 func (nc NotificationsController) Register(container *restful.Container) {
 	notificationsWebService := new(restful.WebService)
 	notificationsWebService.Filter(LogRequest).
-		Filter(AuthUser).
 		ApiVersion(ApiVersion()).
 		Path(nc.notificationUri()).
 		Doc("Send Notifications").
@@ -66,11 +65,6 @@ func (nc NotificationsController) genNotifUri(notifId string) string {
 
 func (nc NotificationsController) send(request *restful.Request,
 	response *restful.Response) {
-	curUser := GetCurrentUser(request, response)
-	if curUser == nil {
-		Unauthenticated(request, response)
-		return
-	}
 	notificationId := request.PathParameter("notification-id")
 	nr := new(NotificationRequest)
 	err := request.ReadEntity(nr)
@@ -78,12 +72,11 @@ func (nc NotificationsController) send(request *restful.Request,
 		WriteBadRequestError(response)
 		return
 	}
-	err = new(NotificationManager).Send(notificationId, nr, curUser)
+	err = new(NotificationManager).Send(notificationId, nr)
 	if err != nil {
 		WriteError(err, response)
 		return
 	}
-	SetAuth(response, curUser.Auth)
 	response.WriteEntity(BooleanResponse{Success: true})
 }
 

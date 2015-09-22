@@ -87,6 +87,7 @@ var Notifications struct {
 	SmtpPort         int
 	SmtpUser         string
 	SmtpPassword     string
+	FromEmail        string
 }
 
 // Initialize Default values
@@ -122,6 +123,7 @@ func LoadDefaults() {
 	Notifications.SmtpPort = 587
 	Notifications.SmtpUser = "user"
 	Notifications.SmtpPassword = "password"
+	Notifications.FromEmail = "admin@localhost"
 }
 
 // Load config values from file
@@ -263,6 +265,8 @@ func setNotificationConfig(notifSection *configparser.Section) {
 			Notifications.SmtpUser = value
 		case "smtpPassword":
 			Notifications.SmtpPassword = value
+		case "fromEmail":
+			Notifications.FromEmail = value
 		}
 	}
 }

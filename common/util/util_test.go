@@ -43,3 +43,11 @@ func TestBadArrayParam(t *testing.T) {
 	}
 	t.Logf("Error: %v", err)
 }
+
+func TestGenToken(t *testing.T) {
+	tok := GenToken()
+	if tok == "" {
+		t.Fail()
+	}
+	t.Logf("Token: %v", tok)
+}

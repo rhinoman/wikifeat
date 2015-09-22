@@ -25,9 +25,11 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/entities"
+	"github.com/rhinoman/wikifeat/common/registry"
 	. "github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"log"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -379,6 +381,69 @@ func (um *UserManager) Read(id string, user *User,
 			return rev, nil
 		}
 	}
+}
+
+//Request a password reset (forgot password, etc).
+func (um *UserManager) RequestPasswordReset(id string) error {
+	//Read the user
+	user := User{}
+	userDb := Connection.SelectDB(UserDbName, AdminAuth)
+	rev, err := userDb.Read(UserPrefix+id, &user, nil)
+	if err != nil {
+		return err
+	}
+	//Generate a token
+	tok := util.GenToken()
+	//Set token expiration time
+	nowTime := time.Now().UTC()
+	//Tokens are good for 4 hours
+	hours := time.Duration(4) * time.Hour
+	expireTime := nowTime.Add(hours)
+	user.PassResetToken.Token = tok
+	user.PassResetToken.Expires = expireTime
+	//Now save the user
+	rev, err = um.Update(id, rev, &user, GetAdminUser())
+	if err != nil {
+		return err
+	}
+	//Now we need to send an email to the user containing our token
+	notifEndpoint, err := registry.GetServiceLocation("notifications")
+	if err != nil {
+		return err
+	}
+	frontEndpoint, err := registry.GetServiceLocation("frontend")
+	if err != nil {
+		return err
+	}
+	nr := NotificationRequest{
+		From:    config.Notifications.FromEmail,
+		To:      user.Public.Contact.Email,
+		Subject: "Reset Password Request",
+		Data: map[string]string{
+			"user": user.Public.FirstName,
+			"url": frontEndpoint + "/app/users/" + id +
+				"/reset_password?token=" + tok,
+		},
+	}
+	nrJson, _, err := util.EncodeJsonData(&nr)
+	if err != nil {
+		return err
+	}
+	//Assemble the request
+	reqUrl := notifEndpoint + "/api/v1/notifications/reset_password/send"
+	client := &http.Client{}
+	request, err := http.NewRequest("POST", reqUrl, nrJson)
+	if err != nil {
+		return err
+	}
+	request.Header.Add("Content-Type", "application/json")
+	resp, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
 
 //Login a user and create a new session

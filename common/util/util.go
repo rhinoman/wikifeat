@@ -18,10 +18,15 @@
 package util
 
 import (
+	"bytes"
 	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha1"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"strings"
 	"time"
 )
@@ -101,4 +106,23 @@ func GenHashString(data string) string {
 	mac := hmac.New(sha1.New, []byte(now.String()))
 	mac.Write([]byte(data))
 	return hex.EncodeToString(mac.Sum(nil))
+}
+
+//Generates a random token
+func GenToken() string {
+	b := make([]byte, 16)
+	rand.Read(b)
+	return fmt.Sprintf("%x", b)
+}
+
+//Encodes a struct into json and returns an io.Reader
+func EncodeJsonData(data interface{}) (io.Reader, int, error) {
+	if data == nil {
+		return nil, 0, nil
+	}
+	if buf, err := json.Marshal(&data); err != nil {
+		return nil, 0, err
+	} else {
+		return bytes.NewReader(buf), len(buf), nil
+	}
 }

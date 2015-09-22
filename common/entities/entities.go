@@ -42,15 +42,21 @@ type UserPublic struct {
 }
 
 type User struct {
-	Id         string    `json:"id"`
-	UserName   string    `json:"name"`
-	Password   string    `json:"password,omitempty"`
-	Roles      []string  `json:"roles"`
-	Type       string    `json:"type"`
-	CreatedAt  time.Time `json:"createdAt,omitempty"`
-	ModifiedAt time.Time `json:"modifiedAt,omitempty"`
+	Id             string      `json:"id"`
+	UserName       string      `json:"name"`
+	Password       string      `json:"password,omitempty"`
+	Roles          []string    `json:"roles"`
+	Type           string      `json:"type"`
+	CreatedAt      time.Time   `json:"createdAt,omitempty"`
+	ModifiedAt     time.Time   `json:"modifiedAt,omitempty"`
+	PassResetToken ActionToken `json:"password_reset,omitempty"`
 	//Public fields
 	Public UserPublic `json:"userPublic,omitempty"`
+}
+
+type ActionToken struct {
+	Token   string    `json:"token"`
+	Expires time.Time `json:"expires"`
 }
 
 type UserAvatar struct {
@@ -72,6 +78,14 @@ type CurrentUserInfo struct {
 	Auth  couchdb.Auth
 	Roles []string
 	User  *User
+}
+
+//Notificaiton request for the Notification Service
+type NotificationRequest struct {
+	From    string            `json:"from_email,omitempty"`
+	To      string            `json:"to_email"`
+	Subject string            `json:"subject"`
+	Data    map[string]string `json:"data"`
 }
 
 //WikiRecord entries go in the main database

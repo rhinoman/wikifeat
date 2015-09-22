@@ -64,3 +64,4 @@ smtpServer = localhost
 smtpPort = 587
 smtpUser = user
 smtpPassword = password
+fromEmail = admin@localhost

@@ -94,48 +94,40 @@ func updateServiceCache() {
 	}
 }
 
+func getServiceNodes(serviceLocation string) ([]*etcd.Node, error) {
+	if resp, err := client.Get(serviceLocation, false, false); err != nil {
+		return nil, err
+	} else {
+		return processResponse(resp)
+	}
+
+}
+
 // Loads the latest services from Etcd
 func fetchServiceLists() {
 	// First, fetch the core services
-	userNodes := []*etcd.Node{}
-	resp, err := client.Get(UsersLocation, false, false)
+	userNodes, err := getServiceNodes(UsersLocation)
 	if err != nil {
-		log.Println("Unable to fetch Users Service list from etcd!")
-	} else {
-		if nodes, err := processResponse(resp); err != nil {
-			log.Println("Error fetching user services: " + err.Error())
-		} else {
-			userNodes = nodes
-		}
+		log.Println("Error fetching user services: " + err.Error())
 	}
-	wikiNodes := []*etcd.Node{}
-	resp, err = client.Get(WikisLocation, false, false)
+	wikiNodes, err := getServiceNodes(WikisLocation)
 	if err != nil {
-		log.Println("Unable to fetch Wikis Service list from etcd!")
-	} else {
-		if nodes, err := processResponse(resp); err != nil {
-			log.Println("Error fetching wiki services: " + err.Error())
-		} else {
-			wikiNodes = nodes
-		}
+		log.Println("Error fetching wiki services: " + err.Error())
 	}
-	notificationNodes := []*etcd.Node{}
-	resp, err = client.Get(NotificationsLocation, false, false)
+	notificationNodes, err := getServiceNodes(NotificationsLocation)
 	if err != nil {
-		log.Println("Unable to fetch Notifications Service list from etcd!")
-	} else {
-		if nodes, err := processResponse(resp); err != nil {
-			log.Println("Error fetching notificaiton services: " + err.Error())
-		} else {
-			notificationNodes = nodes
-		}
-
+		log.Println("Error fetching notificaiton services: " + err.Error())
+	}
+	frontendNodes, err := getServiceNodes(FrontEndLocation)
+	if err != nil {
+		log.Println("Error fetching frontend services: " + err.Error())
 	}
 	serviceCache.Lock()
 	defer serviceCache.Unlock()
 	serviceCache.m["users"] = userNodes
 	serviceCache.m["wikis"] = wikiNodes
 	serviceCache.m["notifications"] = notificationNodes
+	serviceCache.m["frontend"] = frontendNodes
 }
 
 //Read nodes from an etcd response

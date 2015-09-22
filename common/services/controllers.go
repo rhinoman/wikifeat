@@ -275,3 +275,14 @@ func WriteBadRequestError(response *restful.Response) {
 	log.Printf("400: Bad Request")
 	response.WriteErrorString(http.StatusBadRequest, "Bad Request")
 }
+
+//Returns the Admin Credentials as a CurrentUserInfo
+func GetAdminUser() *CurrentUserInfo {
+	return &CurrentUserInfo{
+		Auth:  AdminAuth,
+		Roles: []string{"admin"},
+		User: &User{
+			Roles: []string{"admin"},
+		},
+	}
+}

@@ -109,6 +109,13 @@ func (uc UsersController) Register(container *restful.Container) {
 		Reads(ChangePasswordRequest{}).
 		Writes(BooleanResponse{}))
 
+	usersWebService.Route(usersWebService.PUT("/{user-id}/request_reset").
+		To(uc.requestPasswordReset).
+		Doc("Reset a user's password (forgot, etc.)").
+		Operation("resetPassword").
+		Param(usersWebService.PathParameter("user-id", "User Name").DataType("string")).
+		Writes(BooleanResponse{}))
+
 	usersWebService.Route(usersWebService.GET("/{user-id}").To(uc.read).
 		Filter(AuthUser).
 		Doc("Gets a User").
@@ -348,6 +355,23 @@ func (uc UsersController) changePassword(request *restful.Request,
 	response.AddHeader("ETag", rev)
 	SetAuth(response, curUser.Auth)
 	response.WriteEntity(BooleanResponse{Success: true})
+}
+
+//Reset password reset (Forgot, etc.)
+func (uc UsersController) requestPasswordReset(request *restful.Request,
+	response *restful.Response) {
+	userId := request.PathParameter("user-id")
+	if userId == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	err := new(UserManager).RequestPasswordReset(userId)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	br := BooleanResponse{Success: true}
+	response.WriteEntity(br)
 }
 
 //Delete a User

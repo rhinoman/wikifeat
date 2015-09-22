@@ -24,8 +24,6 @@ import (
 	"bytes"
 	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/entities"
-	. "github.com/rhinoman/wikifeat/common/services"
-	"github.com/rhinoman/wikifeat/common/util"
 	"gopkg.in/gomail.v2"
 	htemplate "html/template"
 	"log"
@@ -33,25 +31,11 @@ import (
 	"text/template"
 )
 
-type NotificationRequest struct {
-	From    string            `json:"from_email,omitempty"`
-	To      string            `json:"to_email"`
-	Subject string            `json:"subject"`
-	Data    map[string]string `json:"data"`
-}
-
 type NotificationManager struct{}
 
 func (nm *NotificationManager) Send(template string,
-	nReq *NotificationRequest, curUser *CurrentUserInfo) error {
-	theUser := curUser.User
-	//Verify user is authorized to send emails
-	mainDb := MainDbName()
-	if !util.HasRole(theUser.Roles, AdminRole(mainDb)) &&
-		!util.HasRole(theUser.Roles, MasterRole()) {
-		return NotAdminError()
-	}
-	//TODO: Validate Email Addresses!
+	nReq *NotificationRequest) error {
+	//TODO: Validate Email Addresses?
 	//Create the templates
 	var htmlTemplate *htemplate.Template = nil
 	plainTemplate, err := nm.LoadPlaintextTemplate(template)
@@ -60,7 +44,9 @@ func (nm *NotificationManager) Send(template string,
 	}
 	if config.Notifications.UseHtmlTemplates {
 		htmlTemplate, err = nm.LoadHtmlTemplate(template)
-		log.Printf("Error loading HTML Template: %v", err)
+		if err != nil {
+			log.Printf("Error loading HTML Template: %v", err)
+		}
 	}
 	//Create the email message
 	m := gomail.NewMessage()
