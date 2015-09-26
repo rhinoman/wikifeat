@@ -19,7 +19,7 @@
       <label for="inputEmail" class="sr-only">Username</label>
       <div class="input-group">
         <span class="input-group-addon glyphicon glyphicon-user" id="user-icon"></span>
-        <input type="text" id="inputEmail" class="form-control" placeholder="user@example.com" required autofocus>
+        <input type="text" id="inputEmail" class="form-control" placeholder="user" required autofocus>
       </div>
       <label for="inputPassword" class="sr-only">Password</label>
       <div class="input-group">
@@ -29,7 +29,7 @@
       <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
     </form>
     <div class="link-box">
-      <a href="/forgot_password.html">Forgot Password?</a>
+      <a href="/forgot_password">Forgot Password?</a>
     </div>
     </div>
   </div>
@@ -45,7 +45,6 @@
     $("div#alertBox").css("display", "none");
     $("#loginForm").on("submit", function(event){
       event.preventDefault();
-      console.log("I be submitted");
       var loginCredentials = {
         name: $("#inputEmail").val(),
         password: $("#inputPassword").val()

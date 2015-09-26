@@ -66,6 +66,11 @@ type ChangePasswordRequest struct {
 	NewPassword string `json:"new_password"`
 }
 
+type ResetTokenRequest struct {
+	Token       string `json:"token"`
+	NewPassword string `json:"new_password"`
+}
+
 func (rr *RoleRequest) roleString() string {
 	if rr.ResourceType == "main" && rr.AccessType == "admin" {
 		return "admin"
@@ -217,6 +222,7 @@ func (um *UserManager) Update(id string, rev string, updatedUser *User,
 	readUser["modifiedAt"] = nowTime
 	readUser["userPublic"] = updatedUser.Public
 	readUser["userName"] = updatedUser.UserName
+	readUser["password_reset"] = updatedUser.PassResetToken
 	//And save the updated user
 	uRev, err := userDb.Save(&readUser, namestring, rev)
 	if err != nil {
@@ -272,6 +278,33 @@ func (um *UserManager) ChangePassword(id string, rev string,
 	}
 	return uRev, nil
 
+}
+
+func (um *UserManager) ResetPassword(id string, tr *ResetTokenRequest) error {
+	//Read the user
+	user := User{}
+	userDb := Connection.SelectDB(UserDbName, AdminAuth)
+	rev, err := userDb.Read(UserPrefix+id, &user, nil)
+	if err != nil {
+		return err
+	}
+	//Check the token
+	tok := user.PassResetToken.Token
+	expireTime := user.PassResetToken.Expires
+	nowTime := time.Now().UTC()
+	if tok != tr.Token || nowTime.After(expireTime) {
+		return errors.New("[Error]:400: This token is invalid or expired.")
+	}
+	cpr := ChangePasswordRequest{NewPassword: tr.NewPassword}
+	rev, err = um.ChangePassword(id, rev, &cpr, GetAdminUser())
+	if err != nil {
+		return err
+	}
+	//Now, expire the token
+	user.PassResetToken.Token = ""
+	user.PassResetToken.Expires = nowTime
+	_, err = um.Update(id, rev, &user, GetAdminUser())
+	return err
 }
 
 func resourceDbName(rr *RoleRequest) string {
@@ -402,6 +435,7 @@ func (um *UserManager) RequestPasswordReset(id string) error {
 	user.PassResetToken.Token = tok
 	user.PassResetToken.Expires = expireTime
 	//Now save the user
+	log.Println("Saving reset token to user document")
 	rev, err = um.Update(id, rev, &user, GetAdminUser())
 	if err != nil {
 		return err
@@ -421,8 +455,8 @@ func (um *UserManager) RequestPasswordReset(id string) error {
 		Subject: "Reset Password Request",
 		Data: map[string]string{
 			"user": user.Public.FirstName,
-			"url": frontEndpoint + "/app/users/" + id +
-				"/reset_password?token=" + tok,
+			"url": frontEndpoint + "/reset_password?user=" + id +
+				"&token=" + tok,
 		},
 	}
 	nrJson, _, err := util.EncodeJsonData(&nr)

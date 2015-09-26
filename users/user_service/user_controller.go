@@ -111,9 +111,17 @@ func (uc UsersController) Register(container *restful.Container) {
 
 	usersWebService.Route(usersWebService.PUT("/{user-id}/request_reset").
 		To(uc.requestPasswordReset).
-		Doc("Reset a user's password (forgot, etc.)").
+		Doc("Request a password reset (forgot, etc.)").
+		Operation("resetPasswordRequest").
+		Param(usersWebService.PathParameter("user-id", "User Name").DataType("string")).
+		Writes(BooleanResponse{}))
+
+	usersWebService.Route(usersWebService.PUT("/{user-id}/reset_password").
+		To(uc.resetPassword).
+		Doc("Resets a users' password").
 		Operation("resetPassword").
 		Param(usersWebService.PathParameter("user-id", "User Name").DataType("string")).
+		Reads(ResetTokenRequest{}).
 		Writes(BooleanResponse{}))
 
 	usersWebService.Route(usersWebService.GET("/{user-id}").To(uc.read).
@@ -357,7 +365,7 @@ func (uc UsersController) changePassword(request *restful.Request,
 	response.WriteEntity(BooleanResponse{Success: true})
 }
 
-//Reset password reset (Forgot, etc.)
+//Request password reset (Forgot, etc.)
 func (uc UsersController) requestPasswordReset(request *restful.Request,
 	response *restful.Response) {
 	userId := request.PathParameter("user-id")
@@ -372,6 +380,28 @@ func (uc UsersController) requestPasswordReset(request *restful.Request,
 	}
 	br := BooleanResponse{Success: true}
 	response.WriteEntity(br)
+}
+
+//Resets password
+func (uc UsersController) resetPassword(request *restful.Request,
+	response *restful.Response) {
+	userId := request.PathParameter("user-id")
+	if userId == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	tr := new(ResetTokenRequest)
+	err := request.ReadEntity(tr)
+	if err != nil {
+		WriteServerError(err, response)
+		return
+	}
+	err = new(UserManager).ResetPassword(userId, tr)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	response.WriteEntity(BooleanResponse{Success: true})
 }
 
 //Delete a User

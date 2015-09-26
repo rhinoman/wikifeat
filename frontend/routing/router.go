@@ -42,7 +42,12 @@ func Start() {
 	webAppDir = config.Frontend.WebAppDir
 	finishIndex()
 	r := mux.NewRouter()
+	// Serve the login page
 	r.HandleFunc("/login", getLogin).Methods("GET")
+	// Serve the forgot password page
+	r.HandleFunc("/forgot_password", getForgotPassword).Methods("GET")
+	// Serve the rest password page
+	r.HandleFunc("/reset_password", getResetPassword).Methods("GET")
 	// Serve the Main app
 	r.StrictSlash(true).HandleFunc("/app", getAppRoot)
 	// Fetch the location of the homepage
@@ -146,6 +151,22 @@ func getLogin(w http.ResponseWriter, r *http.Request) {
 	location := path.Join(webAppDir, "login.html")
 	LogRequest(r)
 	log.Printf("Serving login page from %s", location)
+	http.ServeFile(w, r, location)
+}
+
+// Serve up the forgot password page
+func getForgotPassword(w http.ResponseWriter, r *http.Request) {
+	location := path.Join(webAppDir, "forgot_password.html")
+	LogRequest(r)
+	log.Printf("Serving Forgot Password page from %s", location)
+	http.ServeFile(w, r, location)
+}
+
+// Serve up the reset password page
+func getResetPassword(w http.ResponseWriter, r *http.Request) {
+	location := path.Join(webAppDir, "reset_password.html")
+	LogRequest(r)
+	log.Printf("Serving Reset Password page from %s", location)
 	http.ServeFile(w, r, location)
 }
 
