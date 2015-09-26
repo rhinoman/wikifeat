@@ -84,6 +84,7 @@ var Notifications struct {
 	TemplateDir      string
 	UseHtmlTemplates bool
 	SmtpServer       string
+	UseSSL           bool
 	SmtpPort         int
 	SmtpUser         string
 	SmtpPassword     string
@@ -120,6 +121,7 @@ func LoadDefaults() {
 	Notifications.TemplateDir = "templates"
 	Notifications.UseHtmlTemplates = true
 	Notifications.SmtpServer = "localhost"
+	Notifications.UseSSL = false
 	Notifications.SmtpPort = 587
 	Notifications.SmtpUser = "user"
 	Notifications.SmtpPassword = "password"
@@ -259,6 +261,8 @@ func setNotificationConfig(notifSection *configparser.Section) {
 			Notifications.UseHtmlTemplates = stringToBool(value)
 		case "smtpServer":
 			Notifications.SmtpServer = value
+		case "useSSL":
+			Notifications.UseSSL = stringToBool(value)
 		case "smtpPort":
 			setIntVal(value, &Notifications.SmtpPort)
 		case "smtpUser":

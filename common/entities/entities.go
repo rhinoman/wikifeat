@@ -82,7 +82,6 @@ type CurrentUserInfo struct {
 
 //Notificaiton request for the Notification Service
 type NotificationRequest struct {
-	From    string            `json:"from_email,omitempty"`
 	To      string            `json:"to_email"`
 	Subject string            `json:"subject"`
 	Data    map[string]string `json:"data"`

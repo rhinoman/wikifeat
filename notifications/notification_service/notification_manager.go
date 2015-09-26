@@ -50,7 +50,7 @@ func (nm *NotificationManager) Send(template string,
 	}
 	//Create the email message
 	m := gomail.NewMessage()
-	m.SetHeader("From", nReq.From)
+	m.SetHeader("From", config.Notifications.FromEmail)
 	m.SetHeader("To", nReq.To)
 	m.SetHeader("Subject", nReq.Subject)
 	//Render the templates
@@ -72,6 +72,7 @@ func (nm *NotificationManager) Send(template string,
 		config.Notifications.SmtpPort,
 		config.Notifications.SmtpUser,
 		config.Notifications.SmtpPassword)
+	d.SSL = config.Notifications.UseSSL
 	return d.DialAndSend(m)
 }
 

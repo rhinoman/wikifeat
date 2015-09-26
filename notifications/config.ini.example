@@ -61,6 +61,9 @@ templateDirectory = templates
 useHtmlTemplates = true
 #The following settings are for your SMTP server
 smtpServer = localhost
+# SSL should normally be false, as you ought to be using STARTTLS
+# But if you need SSL (normally port 465)...
+useSSL = false
 smtpPort = 587
 smtpUser = user
 smtpPassword = password

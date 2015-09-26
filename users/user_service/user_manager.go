@@ -450,7 +450,6 @@ func (um *UserManager) RequestPasswordReset(id string) error {
 		return err
 	}
 	nr := NotificationRequest{
-		From:    config.Notifications.FromEmail,
 		To:      user.Public.Contact.Email,
 		Subject: "Reset Password Request",
 		Data: map[string]string{
