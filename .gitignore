@@ -65,6 +65,7 @@ default.etcd/
 users/users
 wikis/wikis
 frontend/frontend
+notifications/notifications
 build/
 dist/
 *.log
