@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/rhinoman/wikifeat",
-	"GoVersion": "go1.4.2",
+	"GoVersion": "go1.5",
 	"Packages": [
 		"./..."
 	],
@@ -82,6 +82,11 @@
 		{
 			"ImportPath": "golang.org/x/net/html",
 			"Rev": "84ba27dd5b2d8135e9da1395277f2c9333a2ffda"
+		},
+		{
+			"ImportPath": "gopkg.in/gomail.v2",
+			"Comment": "2.0.0-2-gb1e5552",
+			"Rev": "b1e55520bf557d8a614f1e1f493ce892c1b5e97e"
 		},
 		{
 			"ImportPath": "gopkg.in/natefinch/lumberjack.v2",
