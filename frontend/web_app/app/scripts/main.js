@@ -55,7 +55,6 @@ require.config({
             exports: 'Markdown'
         }
     },
-    enforceDefine: true,
     map: {
         '*': {
             'backbone.wreqr': 'backbone.radio'

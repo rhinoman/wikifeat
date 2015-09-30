@@ -28,11 +28,14 @@ define([
     'entities/user/user',
     'views/page/child_index',
     'views/page/page_tools',
+    'views/page/raw_content',
+    'views/page/formatted_content',
     'views/user/user_info_dialog',
     'text!templates/page/page_layout.html',
 ], function($,_,Marionette,Moment,Radio,Stickit,
             PageModel,UserModel,ChildIndexView,
-            PageToolMenu,UserInfoDialog,ShowPageTemplate){
+            PageToolMenu,RawContentView,FormattedContentView,
+            UserInfoDialog,ShowPageTemplate){
     'use strict';
 
     return Marionette.LayoutView.extend({
@@ -44,7 +47,6 @@ define([
         oldRevision: false,
         pageChildren: 7,
         viewMode: 'formatted',
-        pluginsStarted: $.Deferred(),
         regions: {
             pageToolMenuRegion: "#pageTools",
             pageContentRegion: "#pageContent",
@@ -80,7 +82,6 @@ define([
                         .request('get:page:children', this.model.id, this.wikiModel.id);
                 }
             }
-            this.pluginsStarted = Radio.channel('plugin').request('get:pluginsStarted');
         },
 
         changeViewMode: function(event){
@@ -111,18 +112,14 @@ define([
             if(typeof this.model !== 'undefined'){
                 this.stickit();
                 if(this.viewMode === 'formatted'){
-                    this.$("div#pageContent").html(this.model.get("content").formatted);
+                    this.pageContentRegion.show(new FormattedContentView({model: this.model}));
                     this.$("div#pageViewFormat").html(
                         '<a href="#" class="page-content-mode-link">' +
                         '<span class="glyphicon glyphicon-eye-open"></span>' +
                         '&nbsp;View Raw</a>');
-                    $.when(this.pluginsStarted).done(function(){
-                        self.loadContentPlugins();
-                    });
+
                 } else {
-                    this.$("div#pageContent").html(
-                        '<div class="raw-view-box"><textarea disabled>' +
-                        this.model.get("content").raw + '</textarea></div>');
+                    this.pageContentRegion.show(new RawContentView({model: this.model}));
                     this.$("div#pageViewFormat").html(
                         '<a href="#" class="page-content-mode-link">' +
                         '<span class="glyphicon glyphicon-eye-open"></span>' +
@@ -157,29 +154,15 @@ define([
                     });
                 //Now draw the alertBox
                 this.$el.prepend('<div id="alertBox"></div>');
+
             }
         },
 
-        loadContentPlugins: function(){
-            var contentFields = this.$("#pageContent").find("[data-plugin]");
-            _.each(contentFields, function(field){
-                var pluginName = $(field).data('plugin');
-                var resourceId = $(field).data('id');
-                console.log("PLUGIN: " + pluginName + ", ID: " + resourceId);
-                var pg = window[pluginName];
-                if(typeof pg !== 'undefined') {
-                    try {
-                        var contentView = pg.getContentView(field, resourceId);
-                        contentView.render();
-                    }
-                    catch(e){ //Bad Plugin! Bad!
-                        console.log(e);
-                    }
-                } else {
-                    console.log("Plugin " + pluginName + " is undefined");
-                }
-            });
+        onShow: function(){
+
         },
+
+
 
         drawChildIndex: function(response){
             this.$("div#childIndex").show();

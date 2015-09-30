@@ -58,6 +58,9 @@ define([
                     var mainScript = models[i].get("mainScript");
                     var ns = models[i].id;
                     var callback = _.partial(self.startPlugin, ns, pl, i, _);
+                    //require(["/app/plugin/" + ns + "/resource/" + mainScript], function(){
+                    //    callback();
+                    //});
                     $.getScript("/app/plugin/" + ns + "/resource/" + mainScript)
                         .done(callback)
                         .fail(function(jqxhr, settings, exception){
