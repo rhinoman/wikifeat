@@ -5,20 +5,6 @@ require.config({
 	packages: [],
 });
 
-/*var OpenLayers = {
-
-    start: function(){
-        require(['ol-app'], function(OLApp){
-            OLApp.start();
-        });
-    },
-    getContentView: function(el, contentId){
-        return require(['ol-app'], function(OLApp){
-	    return OLApp.getContentView(el, contentId);
-	});
-    }
-};*/
-
 var OpenLayers = {
 
     start: function(){

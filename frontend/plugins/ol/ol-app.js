@@ -8,7 +8,6 @@ define(['jquery',
 	var OLApp = new Backbone.Marionette.Application();
 
 	OLApp.on("start", function() {
-		Wikifeat.addMenuItem("OLMenu", new OLMenuView());
 		console.log("The OpenLayers plugin has started.");
 	});
 
