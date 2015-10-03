@@ -22,8 +22,9 @@ package registry
 import (
 	"errors"
 	"fmt"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/coreos/go-etcd/etcd"
 	"github.com/rhinoman/wikifeat/common/config"
+	etcd "github.com/rhinoman/wikifeat/common/registry/Godeps/_workspace/src/github.com/coreos/etcd/client"
+	"github.com/rhinoman/wikifeat/common/registry/Godeps/_workspace/src/golang.org/x/net/context"
 	"log"
 	"math/rand"
 	"sync"
@@ -38,11 +39,14 @@ var serviceCache = struct {
 var random = rand.New(rand.NewSource(time.Now().Unix()))
 
 var client *etcd.Client
+var kapi etcd.KeysAPI
 var etcdPrefix = "/wikifeat"
 var UsersLocation = etcdPrefix + "/services/users/"
 var WikisLocation = etcdPrefix + "/services/wikis/"
 var NotificationsLocation = etcdPrefix + "/services/notifications/"
 var FrontEndLocation = etcdPrefix + "/services/frontend/"
+var PluginsLocation = etcdPrefix + "/plugins/"
+var ttl time.Duration
 
 func protocolString() string {
 	if config.Service.UseSSL {
@@ -59,12 +63,21 @@ func hostUrl() string {
 
 func Init(serviceName, registryLocation string) error {
 	log.Print("Initializing registry connection.")
-	machines := []string{config.Service.RegistryLocation}
 	nodeId := config.Service.NodeId
-	ttl := config.ServiceRegistry.EntryTTL
-	client = etcd.NewClient(machines)
+	ttl = time.Duration(config.ServiceRegistry.EntryTTL) * time.Second
+	cfg := etcd.Config{
+		Endpoints: []string{config.Service.RegistryLocation},
+		Transport: etcd.DefaultTransport,
+	}
+	client, err := etcd.New(cfg)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	kapi = etcd.NewKeysAPI(client)
 	log.Print("Registering " + serviceName + " Service node at " + hostUrl())
-	if _, err := client.Set(registryLocation+nodeId, hostUrl(), ttl); err != nil {
+	if _, err := kapi.Set(context.Background(), registryLocation+nodeId, hostUrl(),
+		&etcd.SetOptions{TTL: ttl}); err != nil {
 		fmt.Println(err)
 		log.Fatal(err)
 		return err
@@ -76,11 +89,11 @@ func Init(serviceName, registryLocation string) error {
 }
 
 func sendHeartbeat(registryLocation string) {
-	ttl := config.ServiceRegistry.EntryTTL
 	nodeId := config.Service.NodeId
 	for {
-		time.Sleep(time.Duration(ttl/2) * time.Second)
-		if _, err := client.Set(registryLocation+nodeId, hostUrl(), ttl); err != nil {
+		time.Sleep(time.Duration(config.ServiceRegistry.EntryTTL/2) * time.Second)
+		if _, err := kapi.Set(context.Background(), registryLocation+nodeId,
+			hostUrl(), &etcd.SetOptions{TTL: ttl}); err != nil {
 			log.Print("Can't send Heartbeat to registry! - " + err.Error())
 		}
 	}
@@ -95,7 +108,9 @@ func updateServiceCache() {
 }
 
 func getServiceNodes(serviceLocation string) ([]*etcd.Node, error) {
-	if resp, err := client.Get(serviceLocation, false, false); err != nil {
+	ctx, _ := context.WithTimeout(context.Background(), 7*time.Second)
+	if resp, err := kapi.Get(ctx, serviceLocation,
+		&etcd.GetOptions{Recursive: true}); err != nil {
 		return nil, err
 	} else {
 		return processResponse(resp)

@@ -1,0 +1,33 @@
+{
+	"ImportPath": "github.com/rhinoman/wikifeat/common/registry",
+	"GoVersion": "go1.5",
+	"Deps": [
+		{
+			"ImportPath": "github.com/alyu/configparser",
+			"Rev": "ec4ca64c5c3e8c0156cacdba6e69b9f521cdd1ae"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/client",
+			"Comment": "v2.2.0-136-g036ea58",
+			"Rev": "036ea58a7784327749aa27c6226e52bde845295c"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/pathutil",
+			"Comment": "v2.2.0-136-g036ea58",
+			"Rev": "036ea58a7784327749aa27c6226e52bde845295c"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/types",
+			"Comment": "v2.2.0-136-g036ea58",
+			"Rev": "036ea58a7784327749aa27c6226e52bde845295c"
+		},
+		{
+			"ImportPath": "github.com/ugorji/go/codec",
+			"Rev": "2cb41eb350bb803298e42218d78a525daca640a5"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "84ba27dd5b2d8135e9da1395277f2c9333a2ffda"
+		}
+	]
+}

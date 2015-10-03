@@ -65,9 +65,12 @@ func Start() {
 	// Handle API requests
 	ar := r.PathPrefix("/api/" + config.Service.ApiVersion).Subrouter()
 	handleApiRoutes(ar)
-	// Handle Plugin requests
+	// Handle Plugin requests for frontend resources
 	pr := r.PathPrefix("/app/plugin").Subrouter()
 	handlePluginRoutes(pr)
+	// Backend Plugin requests
+	bpr := r.PathPrefix("/plugin").Subrouter()
+	handlePluginBackendRoutes(bpr)
 	log.Print("Starting HTTP router")
 	if config.Service.UseSSL {
 		certFile := config.Service.SSLCertFile

@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/daaku/go.httpgzip"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/gorilla/mux"
+	//	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/frontend/fserv"
 	"net/http"
 )
@@ -30,12 +31,22 @@ type PluginListResponse struct {
 	EnabledPlugins []fserv.PluginData `json:"enabledPlugins"`
 }
 
-// Route stuff
+// Plugin "Resources" -- static files and such
 func handlePluginRoutes(pr *mux.Router) {
 	pr.StrictSlash(true).HandleFunc("/", getPluginList).Methods("GET")
 	pr.PathPrefix("/{plugin-name}/resource/").
 		Methods("GET").
 		HandlerFunc(servePluginResource)
+}
+
+// Backend plugin routes
+func handlePluginBackendRoutes(pr *mux.Router) {
+	pr.PathPrefix("/{plugin-name}/").HandlerFunc(pluginHandler)
+}
+
+func pluginHandler(w http.ResponseWriter, r *http.Request) {
+	//pathVars := mux.Vars(r)
+	//pluginName := pathVars["plugin-name"]
 }
 
 // Returns the list of all enabled plugins
@@ -57,7 +68,7 @@ func getPluginList(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonList)
 }
 
-// Serves a file from a plugin's directory
+// Serves a file from a plugin's resource directory
 func servePluginResource(w http.ResponseWriter, r *http.Request) {
 	LogRequest(r)
 	pathVars := mux.Vars(r)
