@@ -22,19 +22,22 @@ package registry
 import (
 	"errors"
 	"fmt"
+	etcd "github.com/coreos/etcd/client"
 	"github.com/rhinoman/wikifeat/common/config"
-	etcd "github.com/rhinoman/wikifeat/common/registry/Godeps/_workspace/src/github.com/coreos/etcd/client"
-	"github.com/rhinoman/wikifeat/common/registry/Godeps/_workspace/src/golang.org/x/net/context"
+	"golang.org/x/net/context"
 	"log"
 	"math/rand"
 	"sync"
 	"time"
 )
 
-var serviceCache = struct {
+type nodeCache struct {
 	sync.RWMutex
 	m map[string][]*etcd.Node
-}{m: make(map[string][]*etcd.Node)}
+}
+
+var serviceCache = nodeCache{m: make(map[string][]*etcd.Node)}
+var pluginCache = nodeCache{m: make(map[string][]*etcd.Node)}
 
 var random = rand.New(rand.NewSource(time.Now().Unix()))
 
@@ -83,6 +86,7 @@ func Init(serviceName, registryLocation string) error {
 		return err
 	}
 	fetchServiceLists()
+	fetchPluginNodes()
 	go sendHeartbeat(registryLocation)
 	go updateServiceCache()
 	return nil
@@ -104,6 +108,7 @@ func updateServiceCache() {
 	for {
 		time.Sleep(time.Duration(cri) * time.Second)
 		fetchServiceLists()
+		fetchPluginNodes()
 	}
 }
 
@@ -116,6 +121,24 @@ func getServiceNodes(serviceLocation string) ([]*etcd.Node, error) {
 		return processResponse(resp)
 	}
 
+}
+
+//Reads 'plugin' services from the service registry
+func fetchPluginNodes() {
+	ppn, err := getServiceNodes(PluginsLocation)
+	if err != nil {
+		//Need to avoid spamming the logs if you have no plugins installed
+		//log.Println("Error fetching plugin nodes: " + err.Error())
+	}
+	pluginMap := make(map[string][]*etcd.Node)
+	for _, node := range ppn {
+		if node.Dir {
+			pluginMap[node.Key] = node.Nodes
+		}
+	}
+	for pk, pv := range pluginMap {
+		pluginCache.m[pk] = pv
+	}
 }
 
 // Loads the latest services from Etcd
@@ -173,6 +196,22 @@ func GetServiceLocation(serviceName string) (string, error) {
 			index = random.Intn(max)
 		}
 		return getEndpointFromNode(serviceCache.m[serviceName][index]), nil
+	}
+	return "", nil
+}
+
+//Get a plugin node for use
+func GetPluginLocation(pluginName string) (string, error) {
+	pluginCache.RLock()
+	defer pluginCache.RUnlock()
+	if max := len(pluginCache.m[pluginName]); max == 0 {
+		return "", errors.New("No " + pluginName + " plugins listed!")
+	} else {
+		index := 0
+		if max > 1 {
+			index = random.Intn(max)
+		}
+		return getEndpointFromNode(pluginCache.m[pluginName][index]), nil
 	}
 	return "", nil
 }

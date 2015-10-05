@@ -10,19 +10,14 @@
 			"Rev": "ec4ca64c5c3e8c0156cacdba6e69b9f521cdd1ae"
 		},
 		{
-			"ImportPath": "github.com/coreos/etcd/etcdserver/etcdhttp/httptypes",
-			"Comment": "v2.0.4-405-g3aa7a31",
-			"Rev": "3aa7a317719446a4b19dcb4cdd1568e474aaf507"
+			"ImportPath": "github.com/coreos/etcd/pkg/pathutil",
+			"Comment": "v2.2.0-156-g8c0db94",
+			"Rev": "8c0db94fef82fbac3a89bb7bd1fef3eaa1dfb0fb"
 		},
 		{
 			"ImportPath": "github.com/coreos/etcd/pkg/types",
-			"Comment": "v2.0.4-405-g3aa7a31",
-			"Rev": "3aa7a317719446a4b19dcb4cdd1568e474aaf507"
-		},
-		{
-			"ImportPath": "github.com/coreos/go-etcd/etcd",
-			"Comment": "v0.4.6-14-g6c0c031",
-			"Rev": "6c0c031546a10bafb185c792b0b05cf7dccd2754"
+			"Comment": "v2.2.0-156-g8c0db94",
+			"Rev": "8c0db94fef82fbac3a89bb7bd1fef3eaa1dfb0fb"
 		},
 		{
 			"ImportPath": "github.com/daaku/go.httpgzip",
@@ -78,6 +73,10 @@
 		{
 			"ImportPath": "github.com/twinj/uuid",
 			"Rev": "4d772442af203e27723acc7d1eea6c93cd319c57"
+		},
+		{
+			"ImportPath": "github.com/ugorji/go/codec",
+			"Rev": "2cb41eb350bb803298e42218d78a525daca640a5"
 		},
 		{
 			"ImportPath": "golang.org/x/net/html",
