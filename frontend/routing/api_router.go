@@ -23,8 +23,6 @@ import (
 	"github.com/rhinoman/wikifeat/common/registry"
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 )
 
 func handleApiRoutes(ar *mux.Router) {
@@ -48,17 +46,4 @@ func wikiHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		reverseProxy(endpoint, w, r)
 	}
-}
-
-func reverseProxy(endpoint string,
-	w http.ResponseWriter,
-	r *http.Request) {
-	target, err := url.Parse(endpoint)
-	if err != nil {
-		//I have no idea
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	rp := httputil.NewSingleHostReverseProxy(target)
-	rp.ServeHTTP(w, r)
 }

@@ -30,6 +30,8 @@ import (
 	"github.com/rhinoman/wikifeat/frontend/fserv"
 	"log"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"os"
 	"path"
 )
@@ -194,6 +196,20 @@ func AuthUser(r *http.Request) (*entities.CurrentUserInfo, error) {
 		User: userInfo,
 	}
 	return cui, nil
+}
+
+// Proxy request to service node
+func reverseProxy(endpoint string,
+	w http.ResponseWriter,
+	r *http.Request) {
+	target, err := url.Parse(endpoint)
+	if err != nil {
+		//I have no idea
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	rp := httputil.NewSingleHostReverseProxy(target)
+	rp.ServeHTTP(w, r)
 }
 
 // Log a request

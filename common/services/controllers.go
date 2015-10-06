@@ -66,6 +66,10 @@ func ApiPrefix() string {
 	return "/api/" + ApiVersion()
 }
 
+func PluginPrefix() string {
+	return "/plugin"
+}
+
 //Create usual links for an index
 func GenIndexLinks(userRoles []string, dbName string, uri string) HatLinks {
 	links := HatLinks{}

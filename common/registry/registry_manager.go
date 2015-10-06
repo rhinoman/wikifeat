@@ -27,6 +27,7 @@ import (
 	"golang.org/x/net/context"
 	"log"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 )
@@ -48,7 +49,7 @@ var UsersLocation = etcdPrefix + "/services/users/"
 var WikisLocation = etcdPrefix + "/services/wikis/"
 var NotificationsLocation = etcdPrefix + "/services/notifications/"
 var FrontEndLocation = etcdPrefix + "/services/frontend/"
-var PluginsLocation = etcdPrefix + "/plugins/"
+var PluginsLocation = etcdPrefix + "/plugin/"
 var ttl time.Duration
 
 func protocolString() string {
@@ -130,14 +131,12 @@ func fetchPluginNodes() {
 		//Need to avoid spamming the logs if you have no plugins installed
 		//log.Println("Error fetching plugin nodes: " + err.Error())
 	}
-	pluginMap := make(map[string][]*etcd.Node)
 	for _, node := range ppn {
 		if node.Dir {
-			pluginMap[node.Key] = node.Nodes
+			splitKey := strings.Split(node.Key, "/")
+			pluginName := splitKey[len(splitKey)-1]
+			pluginCache.m[pluginName] = node.Nodes
 		}
-	}
-	for pk, pv := range pluginMap {
-		pluginCache.m[pk] = pv
 	}
 }
 

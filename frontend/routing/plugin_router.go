@@ -22,8 +22,9 @@ import (
 	"encoding/json"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/daaku/go.httpgzip"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/gorilla/mux"
-	//	"github.com/rhinoman/wikifeat/common/registry"
+	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/frontend/fserv"
+	"log"
 	"net/http"
 )
 
@@ -41,12 +42,19 @@ func handlePluginRoutes(pr *mux.Router) {
 
 // Backend plugin routes
 func handlePluginBackendRoutes(pr *mux.Router) {
-	pr.PathPrefix("/{plugin-name}/").HandlerFunc(pluginHandler)
+	pr.PathPrefix("/{plugin-name}").HandlerFunc(pluginHandler)
 }
 
+// Forward a request to the appropriate plugin
 func pluginHandler(w http.ResponseWriter, r *http.Request) {
-	//pathVars := mux.Vars(r)
-	//pluginName := pathVars["plugin-name"]
+	pathVars := mux.Vars(r)
+	pluginName := pathVars["plugin-name"]
+	if endpoint, err := registry.GetPluginLocation(pluginName); err != nil {
+		log.Println("No available Plugin Node for: " + pluginName)
+		w.WriteHeader(http.StatusServiceUnavailable)
+	} else {
+		reverseProxy(endpoint, w, r)
+	}
 }
 
 // Returns the list of all enabled plugins
