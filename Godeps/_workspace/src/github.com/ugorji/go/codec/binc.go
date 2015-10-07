@@ -5,7 +5,6 @@ package codec
 
 import (
 	"math"
-	"reflect"
 	"time"
 )
 
@@ -70,15 +69,7 @@ func (e *bincEncDriver) IsBuiltinType(rt uintptr) bool {
 
 func (e *bincEncDriver) EncodeBuiltin(rt uintptr, v interface{}) {
 	if rt == timeTypId {
-		var bs []byte
-		switch x := v.(type) {
-		case time.Time:
-			bs = encodeTime(x)
-		case *time.Time:
-			bs = encodeTime(*x)
-		default:
-			e.e.errorf("binc error encoding builtin: expect time.Time, received %T", v)
-		}
+		bs := encodeTime(v.(time.Time))
 		e.w.writen1(bincVdTimestamp<<4 | uint8(len(bs)))
 		e.w.writeb(bs)
 	}
@@ -904,10 +895,6 @@ func (h *BincHandle) newEncDriver(e *Encoder) encDriver {
 
 func (h *BincHandle) newDecDriver(d *Decoder) decDriver {
 	return &bincDecDriver{d: d, r: d.r, h: h, br: d.bytes}
-}
-
-func (h *BincHandle) SetBytesExt(rt reflect.Type, tag uint64, ext BytesExt) (err error) {
-	return h.SetExt(rt, tag, &setExtWrapper{b: ext})
 }
 
 var _ decDriver = (*bincDecDriver)(nil)

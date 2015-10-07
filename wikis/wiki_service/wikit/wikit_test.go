@@ -20,8 +20,8 @@ package wikit_test
 import (
 	"bytes"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-wikis/wiki_service/wikit"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
+	. "github.com/rhinoman/wikifeat/wikis/wiki_service/wikit"
 	"io/ioutil"
 	"strconv"
 	"testing"

@@ -162,10 +162,19 @@ func (_ fastpathT) {{ .MethodNamePfx "Enc" false }}V(v []{{ .Elem }}, checkNil b
 		return
 	}
 	ee.EncodeArrayStart(len(v))
-	for _, v2 := range v {
-		{{ encmd .Elem "v2"}}
+	if e.be {
+		for _, v2 := range v {
+			{{ encmd .Elem "v2"}}
+		}
+	} else {
+		for j, v2 := range v {
+			if j > 0 {
+				ee.EncodeArrayEntrySeparator()
+			}
+			{{ encmd .Elem "v2"}}
+		}
+		ee.EncodeArrayEnd()
 	}
-	ee.EncodeEnd()
 }
 
 {{end}}{{end}}{{end}}
@@ -183,15 +192,32 @@ func (_ fastpathT) {{ .MethodNamePfx "Enc" false }}V(v map[{{ .MapKey }}]{{ .Ele
 	}
 	ee.EncodeMapStart(len(v))
 	{{if eq .MapKey "string"}}asSymbols := e.h.AsSymbols&AsSymbolMapStringKeysFlag != 0{{end}}
-	for k2, v2 := range v {
-		{{if eq .MapKey "string"}}if asSymbols {
-			ee.EncodeSymbol(k2)
-		} else {
-			ee.EncodeString(c_UTF8, k2)
-		}{{else}}{{ encmd .MapKey "k2"}}{{end}}
-		{{ encmd .Elem "v2"}}
+	if e.be {
+		for k2, v2 := range v {
+			{{if eq .MapKey "string"}}if asSymbols {
+				ee.EncodeSymbol(k2)
+			} else {
+				ee.EncodeString(c_UTF8, k2)
+			}{{else}}{{ encmd .MapKey "k2"}}{{end}}
+			{{ encmd .Elem "v2"}}
+		}
+	} else {
+		j := 0
+		for k2, v2 := range v {
+			if j > 0 {
+				ee.EncodeMapEntrySeparator()
+			}
+			{{if eq .MapKey "string"}}if asSymbols {
+				ee.EncodeSymbol(k2)
+			} else {
+				ee.EncodeString(c_UTF8, k2)
+			}{{else}}{{ encmd .MapKey "k2"}}{{end}}
+			ee.EncodeMapKVSeparator()
+			{{ encmd .Elem "v2"}}
+			j++
+		}
+		ee.EncodeMapEnd()
 	}
-	ee.EncodeEnd()
 }
 
 {{end}}{{end}}{{end}}
@@ -314,6 +340,9 @@ func (_ fastpathT) {{ .MethodNamePfx "Dec" false }}V(v []{{ .Elem }}, checkNil b
 					d.arrayCannotExpand(len(v), j+1)
 				}
 			} 
+			if j > 0 {
+				slh.Sep(j)
+			}
 			if j < len(v) { // all checks done. cannot go past len.
 				{{ if eq .Elem "interface{}" }}d.decode(&v[j])
 				{{ else }}v[j] = {{ decmd .Elem }}{{ end }}
@@ -389,11 +418,15 @@ func (_ fastpathT) {{ .MethodNamePfx "Dec" false }}V(v map[{{ .MapKey }}]{{ .Ele
 		}
 	} else if containerLen < 0 {
 		for j := 0; !dd.CheckBreak(); j++ {
+			if j > 0 {
+				dd.ReadMapEntrySeparator()
+			}
 			{{ if eq .MapKey "interface{}" }}var mk interface{}
 			d.decode(&mk)
 			if bv, bok := mk.([]byte); bok {
 				mk = string(bv) // maps cannot have []byte as key. switch to string.
 			}{{ else }}mk := {{ decmd .MapKey }}{{ end }}
+			dd.ReadMapKVSeparator()
 			mv := v[mk]
 			{{ if eq .Elem "interface{}" }}d.decode(&mv)
 			{{ else }}mv = {{ decmd .Elem }}{{ end }}
@@ -401,7 +434,7 @@ func (_ fastpathT) {{ .MethodNamePfx "Dec" false }}V(v map[{{ .MapKey }}]{{ .Ele
 				v[mk] = mv
 			}
 		}
-		dd.ReadEnd()
+		dd.ReadMapEnd()
 	}
 	return v, changed
 }

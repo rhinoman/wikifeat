@@ -19,7 +19,7 @@
 package notification_service_test
 
 import (
-	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/config"
 	"github.com/rhinoman/wikifeat/notifications/notification_service"
 	"os"
 	"testing"

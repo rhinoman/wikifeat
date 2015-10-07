@@ -10,6 +10,11 @@
 			"Rev": "ec4ca64c5c3e8c0156cacdba6e69b9f521cdd1ae"
 		},
 		{
+			"ImportPath": "github.com/coreos/etcd/client",
+			"Comment": "v2.2.0-156-g8c0db94",
+			"Rev": "8c0db94fef82fbac3a89bb7bd1fef3eaa1dfb0fb"
+		},
+		{
 			"ImportPath": "github.com/coreos/etcd/pkg/pathutil",
 			"Comment": "v2.2.0-156-g8c0db94",
 			"Rev": "8c0db94fef82fbac3a89bb7bd1fef3eaa1dfb0fb"
@@ -62,8 +67,24 @@
 			"Rev": "74a9aac4722d946d4dfc1a9ff41edd8c47122eb6"
 		},
 		{
-			"ImportPath": "github.com/rhinoman/wikifeat-wikis/wiki_service/wikit",
-			"Rev": "72efff929fa353867d853146683e28dde4da52de"
+			"ImportPath": "github.com/rhinoman/wikifeat-common/config",
+			"Rev": "76daa56af762a149882e933b976405839bb86fc6"
+		},
+		{
+			"ImportPath": "github.com/rhinoman/wikifeat-common/entities",
+			"Rev": "76daa56af762a149882e933b976405839bb86fc6"
+		},
+		{
+			"ImportPath": "github.com/rhinoman/wikifeat-common/registry",
+			"Rev": "76daa56af762a149882e933b976405839bb86fc6"
+		},
+		{
+			"ImportPath": "github.com/rhinoman/wikifeat-common/services",
+			"Rev": "76daa56af762a149882e933b976405839bb86fc6"
+		},
+		{
+			"ImportPath": "github.com/rhinoman/wikifeat-common/util",
+			"Rev": "76daa56af762a149882e933b976405839bb86fc6"
 		},
 		{
 			"ImportPath": "github.com/smartystreets/goconvey/convey",
@@ -77,6 +98,10 @@
 		{
 			"ImportPath": "github.com/ugorji/go/codec",
 			"Rev": "2cb41eb350bb803298e42218d78a525daca640a5"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "84ba27dd5b2d8135e9da1395277f2c9333a2ffda"
 		},
 		{
 			"ImportPath": "golang.org/x/net/html",

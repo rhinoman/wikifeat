@@ -20,9 +20,8 @@ package notification_service
 
 import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
-	. "github.com/rhinoman/wikifeat/common/entities"
-	. "github.com/rhinoman/wikifeat/common/services"
-	//"log"
+	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/entities"
+	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/services"
 )
 
 type NotificationsController struct{}

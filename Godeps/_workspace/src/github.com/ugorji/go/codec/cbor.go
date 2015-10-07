@@ -3,10 +3,7 @@
 
 package codec
 
-import (
-	"math"
-	"reflect"
-)
+import "math"
 
 const (
 	cborMajorUint byte = iota
@@ -161,11 +158,7 @@ func (e *cborEncDriver) EncodeSymbol(v string) {
 }
 
 func (e *cborEncDriver) EncodeStringBytes(c charEncoding, v []byte) {
-	if c == c_RAW {
-		e.encLen(cborBaseBytes, len(v))
-	} else {
-		e.encLen(cborBaseString, len(v))
-	}
+	e.encLen(cborBaseBytes, len(v))
 	e.w.writeb(v)
 }
 
@@ -567,10 +560,6 @@ func (h *CborHandle) newEncDriver(e *Encoder) encDriver {
 
 func (h *CborHandle) newDecDriver(d *Decoder) decDriver {
 	return &cborDecDriver{d: d, r: d.r, h: h, br: d.bytes}
-}
-
-func (h *CborHandle) SetInterfaceExt(rt reflect.Type, tag uint64, ext InterfaceExt) (err error) {
-	return h.SetExt(rt, tag, &setExtWrapper{i: ext})
 }
 
 var _ decDriver = (*cborDecDriver)(nil)

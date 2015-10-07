@@ -3,10 +3,7 @@
 
 package codec
 
-import (
-	"math"
-	"reflect"
-)
+import "math"
 
 const (
 	_               uint8 = iota
@@ -502,10 +499,6 @@ func (h *SimpleHandle) newEncDriver(e *Encoder) encDriver {
 
 func (h *SimpleHandle) newDecDriver(d *Decoder) decDriver {
 	return &simpleDecDriver{d: d, r: d.r, h: h, br: d.bytes}
-}
-
-func (h *SimpleHandle) SetBytesExt(rt reflect.Type, tag uint64, ext BytesExt) (err error) {
-	return h.SetExt(rt, tag, &setExtWrapper{b: ext})
 }
 
 var _ decDriver = (*simpleDecDriver)(nil)

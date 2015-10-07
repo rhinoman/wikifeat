@@ -22,7 +22,7 @@ import (
 	"encoding/json"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/daaku/go.httpgzip"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/gorilla/mux"
-	"github.com/rhinoman/wikifeat/common/registry"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/registry"
 	"github.com/rhinoman/wikifeat/frontend/fserv"
 	"log"
 	"net/http"
