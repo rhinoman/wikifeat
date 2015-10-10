@@ -56,6 +56,8 @@ func (nm *NotificationManager) Send(template string,
 	//Render the templates
 	var plainText bytes.Buffer
 	var html bytes.Buffer
+	//Set the mainSiteUrl in the data object before feeding it to the template
+	nReq.Data["_mainSiteUrl"] = config.Notifications.MainSiteUrl
 	err = plainTemplate.Execute(&plainText, *nReq)
 	if err != nil {
 		return err

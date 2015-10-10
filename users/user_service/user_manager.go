@@ -445,16 +445,12 @@ func (um *UserManager) RequestPasswordReset(id string) error {
 	if err != nil {
 		return err
 	}
-	frontEndpoint, err := registry.GetServiceLocation("frontend")
-	if err != nil {
-		return err
-	}
 	nr := NotificationRequest{
 		To:      user.Public.Contact.Email,
 		Subject: "Reset Password Request",
 		Data: map[string]string{
 			"user": user.Public.FirstName,
-			"url": frontEndpoint + "/reset_password?user=" + id +
+			"uri": "/reset_password?user=" + id +
 				"&token=" + tok,
 		},
 	}

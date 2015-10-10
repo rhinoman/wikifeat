@@ -59,6 +59,9 @@ templateDirectory = templates
 # to send multipart text and html emails
 # If false, sends notifications as plain-text only
 useHtmlTemplates = true
+# Main URL for wikifeat site
+# This is used for hyperlinks in various templates
+mainSiteUrl = http://localhost:8081
 #The following settings are for your SMTP server
 smtpServer = localhost
 # SSL should normally be false, as you ought to be using STARTTLS
