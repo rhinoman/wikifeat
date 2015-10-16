@@ -1,31 +1,14 @@
 <div class="rawPageContent" id="pageContent">
-    <form id="editPageForm">
-        <div id="alertBox"></div>
-        <div class="form-group" id="title-input-group">
-            <label for="inputTitle" class="control-label">Page Title:</label>
-            <input type="text" class="form-control" id="inputTitle" placeholder="Page Title">
-        </div>
-        <div class="form-group">
-            <label for="wmd-input" class="control-label">Content:</label>
-            <div class="wmd-panel">
-                <div id="wmd-button-bar"></div>
-                <textarea id="wmd-input" class="form-control wmd-input" rows="12"></textarea>
-            </div>
-        </div>
-        <div class="form-group">
-            <button type="submit"
-                    class="page-publish-button btn btn-default btn-lg">
-                <span class="glyphicon glyphicon-cloud-upload"></span>
-                &nbsp;Publish
-            </button>
-            <button class="page-cancel-button btn btn-default btn-lg">
-                <span class="glyphicon glyphicon-remove"></span>
-                &nbsp;Cancel
-            </button>
-        </div>
-
-        <hr>
-
-        <div id="wmd-preview" class="wmd-panel wmd-preview"></div>
-    </form>
+    <div id="alertBox"></div>
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="active">
+            <a href="#" id="editLink">
+                <span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</a>
+        </li>
+        <li role="presentation">
+            <a href="#" id="previewLink">
+                <span class="glyphicon glyphicon-eye-open"></span>&nbsp;Preview</a>
+        </li>
+    </ul>
+    <div id="editorContent"></div>
 </div>

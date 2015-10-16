@@ -1,0 +1,4461 @@
+
+<h1>CommonMark</h1>
+<p>CommonMark is a rationalized version of Markdown syntax,
+with a <a href="http://spec.commonmark.org/0.13/">spec</a> and BSD3-licensed reference
+implementations in C and JavaScript.</p>
+<p><a href="http://spec.commonmark.org/dingus.html">Try it now!</a></p>
+<h2>The implementations</h2>
+<p>The C implementation provides both a shared library (<code>libcmark</code>) and a
+standalone program <code>cmark</code> that converts CommonMark to HTML.  It is
+written in standard C99 and has no library dependencies.  The parser is
+very fast (see <a href="benchmarks.md">benchmarks</a>).</p>
+<p>It is easy to use <code>libcmark</code> in python, lua, ruby, and other dynamic
+languages: see the <code>wrappers/</code> subdirectory for some simple examples.</p>
+<p>The JavaScript implementation provides both an NPM package and a
+single JavaScript file, with no dependencies, that can be linked into
+an HTML page. For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<p><strong>A note on security:</strong>
+Neither implementation attempts to sanitize link attributes or
+raw HTML.  If you use these libraries in applications that accept
+untrusted user input, you must run the output through an HTML
+sanitizer to protect against
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting">XSS attacks</a>.</p>
+<h2>Installing (C)</h2>
+<p>Building the C program (<code>cmark</code>) and shared library (<code>libcmark</code>)
+requires <a href="http://www.cmake.org/download/">cmake</a>.  If you modify <code>scanners.re</code>, then you will also
+need <a href="http://re2c.org">re2c</a>, which is used to generate <code>scanners.c</code> from
+<code>scanners.re</code>.  We have included a pre-generated <code>scanners.c</code> in
+the repository to reduce build dependencies.</p>
+<p>If you have GNU make, you can simply <code>make</code>, <code>make test</code>, and <code>make install</code>.  This calls <a href="http://www.cmake.org/download/">cmake</a> to create a <code>Makefile</code> in the <code>build</code>
+directory, then uses that <code>Makefile</code> to create the executable and
+library.  The binaries can be found in <code>build/src</code>.</p>
+<p>For a more portable method, you can use <a href="http://www.cmake.org/download/">cmake</a> manually. <a href="http://www.cmake.org/download/">cmake</a> knows
+how to create build environments for many build systems.  For example,
+on FreeBSD:</p>
+<pre><code>mkdir build
+cd build
+cmake ..  # optionally: -DCMAKE_INSTALL_PREFIX=path
+make      # executable will be created as build/src/cmark
+make test
+make install
+</code></pre>
+<p>Or, to create Xcode project files on OSX:</p>
+<pre><code>mkdir build
+cd build
+cmake -G Xcode ..
+make
+make test
+make install
+</code></pre>
+<p>The GNU Makefile also provides a few other targets for developers.
+To run a benchmark:</p>
+<pre><code>make bench
+</code></pre>
+<p>To run a &quot;fuzz test&quot; against ten long randomly generated inputs:</p>
+<pre><code>make fuzztest
+</code></pre>
+<p>To run a test for memory leaks using <code>valgrind</code>:</p>
+<pre><code>make leakcheck
+</code></pre>
+<p>To reformat source code using <code>astyle</code>:</p>
+<pre><code>make astyle
+</code></pre>
+<p>To make a release tarball and zip archive:</p>
+<pre><code>make archive
+</code></pre>
+<h2>Compiling for Windows</h2>
+<p>To compile with MSVC and NMAKE:</p>
+<pre><code>nmake
+</code></pre>
+<p>You can cross-compile a Windows binary and dll on linux if you have the
+<code>mingw32</code> compiler:</p>
+<pre><code>make mingw
+</code></pre>
+<p>The binaries will be in <code>build-mingw/windows/bin</code>.</p>
+<h2>Installing (JavaScript)</h2>
+<p>The JavaScript library can be installed through <code>npm</code>:</p>
+<pre><code>npm install commonmark
+</code></pre>
+<p>This includes a command-line converter called <code>commonmark</code>.</p>
+<p>If you want to use it in a client application, you can fetch
+a pre-built copy of <code>commonmark.js</code> from
+<a href="http://spec.commonmark.org/js/commonmark.js">http://spec.commonmark.org/js/commonmark.js</a>.</p>
+<p>For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<h2>The spec</h2>
+<p><a href="http://spec.commonmark.org/0.13/">The spec</a> contains over 500 embedded examples which serve as conformance
+tests. To run the tests using an executable <code>$PROG</code>:</p>
+<pre><code>python3 test/spec_tests.py --program $PROG
+</code></pre>
+<p>If you want to extract the raw test data from the spec without
+actually running the tests, you can do:</p>
+<pre><code>python3 test/spec_tests.py --dump-tests
+</code></pre>
+<p>and you'll get all the tests in JSON format.</p>
+<p>The source of <a href="http://spec.commonmark.org/0.13/">the spec</a> is <code>spec.txt</code>.  This is basically a Markdown
+file, with code examples written in a shorthand form:</p>
+<pre><code>.
+Markdown source
+.
+expected HTML output
+.
+</code></pre>
+<p>To build an HTML version of the spec, do <code>make spec.html</code>.  To build a
+PDF version, do <code>make spec.pdf</code>.  (Creating a PDF requires <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>
+and a LaTeX installation.  Creating the HTML version requires only
+<code>libcmark</code> and <code>python3</code>.)</p>
+<p>The spec is written from the point of view of the human writer, not
+the computer reader.  It is not an algorithm---an English translation of
+a computer program---but a declarative description of what counts as a block
+quote, a code block, and each of the other structural elements that can
+make up a Markdown document.</p>
+<p>Because John Gruber's <a href="http://daringfireball.net/projects/markdown/syntax">canonical syntax
+description</a> leaves
+many aspects of the syntax undetermined, writing a precise spec requires
+making a large number of decisions, many of them somewhat arbitrary.
+In making them, we have appealed to existing conventions and
+considerations of simplicity, readability, expressive power, and
+consistency.  We have tried to ensure that &quot;normal&quot; documents in the many
+incompatible existing implementations of Markdown will render, as far as
+possible, as their authors intended.  And we have tried to make the rules
+for different elements work together harmoniously.  In places where
+different decisions could have been made (for example, the rules
+governing list indentation), we have explained the rationale for
+my choices.  In a few cases, we have departed slightly from the canonical
+syntax description, in ways that we think further the goals of Markdown
+as stated in that description.</p>
+<p>For the most part, we have limited ourselves to the basic elements
+described in Gruber's canonical syntax description, eschewing extensions
+like footnotes and definition lists.  It is important to get the core
+right before considering such things. However, we have included a visible
+syntax for line breaks and fenced code blocks.</p>
+<h2>Differences from original Markdown</h2>
+<p>There are only a few places where this spec says things that contradict
+the canonical syntax description:</p>
+<ul>
+<li>
+<p>It allows all punctuation symbols to be backslash-escaped,
+not just the symbols with special meanings in Markdown. We found
+that it was just too hard to remember which symbols could be
+escaped.</p>
+</li>
+<li>
+<p>It introduces an alternative syntax for hard line
+breaks, a backslash at the end of the line, supplementing the
+two-spaces-at-the-end-of-line rule. This is motivated by persistent
+complaints about the “invisible” nature of the two-space rule.</p>
+</li>
+<li>
+<p>Link syntax has been made a bit more predictable (in a
+backwards-compatible way). For example, <code>Markdown.pl</code> allows single
+quotes around a title in inline links, but not in reference links.
+This kind of difference is really hard for users to remember, so the
+spec allows single quotes in both contexts.</p>
+</li>
+<li>
+<p>The rule for HTML blocks differs, though in most real cases it
+shouldn't make a difference. (See the section on HTML Blocks
+for details.) The spec's proposal makes it easy to include Markdown
+inside HTML block-level tags, if you want to, but also allows you to
+exclude this. It is also makes parsing much easier, avoiding
+expensive backtracking.</p>
+</li>
+<li>
+<p>It does not collapse adjacent bird-track blocks into a single
+blockquote:</p>
+<pre><code>&gt; this is two
+
+&gt; blockquotes
+
+&gt; this is a single
+&gt;
+&gt; blockquote with two paragraphs
+</code></pre>
+</li>
+<li>
+<p>Rules for content in lists differ in a few respects, though (as with
+HTML blocks), most lists in existing documents should render as
+intended. There is some discussion of the choice points and
+differences in the subsection of List Items entitled Motivation.
+We think that the spec's proposal does better than any existing
+implementation in rendering lists the way a human writer or reader
+would intuitively understand them. (We could give numerous examples
+of perfectly natural looking lists that nearly every existing
+implementation flubs up.)</p>
+</li>
+<li>
+<p>The spec stipulates that two blank lines break out of all list
+contexts.  This is an attempt to deal with issues that often come up
+when someone wants to have two adjacent lists, or a list followed by
+an indented code block.</p>
+</li>
+<li>
+<p>Changing bullet characters, or changing from bullets to numbers or
+vice versa, starts a new list. We think that is almost always going
+to be the writer's intent.</p>
+</li>
+<li>
+<p>The number that begins an ordered list item may be followed by
+either <code>.</code> or <code>)</code>. Changing the delimiter style starts a new
+list.</p>
+</li>
+<li>
+<p>The start number of an ordered list is significant.</p>
+</li>
+<li>
+<p>Fenced code blocks are supported, delimited by either
+backticks (<code>```</code> or tildes (<code>~~~</code>).</p>
+</li>
+</ul>
+<h2>Contributing</h2>
+<p>There is a <a href="http://talk.commonmark.org">forum for discussing
+CommonMark</a>; you should use it instead of
+github issues for questions and possibly open-ended discussions.
+Use the <a href="http://github.com/jgm/CommonMark/issues">github issue tracker</a>
+only for simple, clear, actionable issues.</p>
+<h2>Authors</h2>
+<p>The spec was written by John MacFarlane, drawing on</p>
+<ul>
+<li>his experience writing and maintaining Markdown implementations in several
+languages, including the first Markdown parser not based on regular
+expression substitutions (<a href="http://github.com/jgm/pandoc">pandoc</a>) and
+the first markdown parsers based on PEG grammars
+(<a href="http://github.com/jgm/peg-markdown">peg-markdown</a>,
+<a href="http://github.com/jgm/lunamark">lunamark</a>)</li>
+<li>a detailed examination of the differences between existing Markdown
+implementations using <a href="http://johnmacfarlane.net/babelmark2/">BabelMark 2</a>,
+and</li>
+<li>extensive discussions with David Greenspan, Jeff Atwood, Vicent
+Marti, Neil Williams, and Benjamin Dumke-von der Ehe.</li>
+</ul>
+<p>John MacFarlane was also responsible for the original versions of the
+C and JavaScript implementations.  The block parsing algorithm was
+worked out together with David Greenspan.  Vicent Marti
+optimized the C implementation for performance, increasing its speed
+tenfold.  Kārlis Gaņģis helped work out a better parsing algorithm
+for links and emphasis, eliminating several worst-case performance
+issues.  Nick Wellnhofer contributed many improvements, including
+most of the C library's API and its test harness.  Vitaly Puzrin
+has offered much good advice about the JavaScript implementation.</p>
+<h1>CommonMark</h1>
+<p>CommonMark is a rationalized version of Markdown syntax,
+with a <a href="http://spec.commonmark.org/0.13/">spec</a> and BSD3-licensed reference
+implementations in C and JavaScript.</p>
+<p><a href="http://spec.commonmark.org/dingus.html">Try it now!</a></p>
+<h2>The implementations</h2>
+<p>The C implementation provides both a shared library (<code>libcmark</code>) and a
+standalone program <code>cmark</code> that converts CommonMark to HTML.  It is
+written in standard C99 and has no library dependencies.  The parser is
+very fast (see <a href="benchmarks.md">benchmarks</a>).</p>
+<p>It is easy to use <code>libcmark</code> in python, lua, ruby, and other dynamic
+languages: see the <code>wrappers/</code> subdirectory for some simple examples.</p>
+<p>The JavaScript implementation provides both an NPM package and a
+single JavaScript file, with no dependencies, that can be linked into
+an HTML page. For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<p><strong>A note on security:</strong>
+Neither implementation attempts to sanitize link attributes or
+raw HTML.  If you use these libraries in applications that accept
+untrusted user input, you must run the output through an HTML
+sanitizer to protect against
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting">XSS attacks</a>.</p>
+<h2>Installing (C)</h2>
+<p>Building the C program (<code>cmark</code>) and shared library (<code>libcmark</code>)
+requires <a href="http://www.cmake.org/download/">cmake</a>.  If you modify <code>scanners.re</code>, then you will also
+need <a href="http://re2c.org">re2c</a>, which is used to generate <code>scanners.c</code> from
+<code>scanners.re</code>.  We have included a pre-generated <code>scanners.c</code> in
+the repository to reduce build dependencies.</p>
+<p>If you have GNU make, you can simply <code>make</code>, <code>make test</code>, and <code>make install</code>.  This calls <a href="http://www.cmake.org/download/">cmake</a> to create a <code>Makefile</code> in the <code>build</code>
+directory, then uses that <code>Makefile</code> to create the executable and
+library.  The binaries can be found in <code>build/src</code>.</p>
+<p>For a more portable method, you can use <a href="http://www.cmake.org/download/">cmake</a> manually. <a href="http://www.cmake.org/download/">cmake</a> knows
+how to create build environments for many build systems.  For example,
+on FreeBSD:</p>
+<pre><code>mkdir build
+cd build
+cmake ..  # optionally: -DCMAKE_INSTALL_PREFIX=path
+make      # executable will be created as build/src/cmark
+make test
+make install
+</code></pre>
+<p>Or, to create Xcode project files on OSX:</p>
+<pre><code>mkdir build
+cd build
+cmake -G Xcode ..
+make
+make test
+make install
+</code></pre>
+<p>The GNU Makefile also provides a few other targets for developers.
+To run a benchmark:</p>
+<pre><code>make bench
+</code></pre>
+<p>To run a &quot;fuzz test&quot; against ten long randomly generated inputs:</p>
+<pre><code>make fuzztest
+</code></pre>
+<p>To run a test for memory leaks using <code>valgrind</code>:</p>
+<pre><code>make leakcheck
+</code></pre>
+<p>To reformat source code using <code>astyle</code>:</p>
+<pre><code>make astyle
+</code></pre>
+<p>To make a release tarball and zip archive:</p>
+<pre><code>make archive
+</code></pre>
+<h2>Compiling for Windows</h2>
+<p>To compile with MSVC and NMAKE:</p>
+<pre><code>nmake
+</code></pre>
+<p>You can cross-compile a Windows binary and dll on linux if you have the
+<code>mingw32</code> compiler:</p>
+<pre><code>make mingw
+</code></pre>
+<p>The binaries will be in <code>build-mingw/windows/bin</code>.</p>
+<h2>Installing (JavaScript)</h2>
+<p>The JavaScript library can be installed through <code>npm</code>:</p>
+<pre><code>npm install commonmark
+</code></pre>
+<p>This includes a command-line converter called <code>commonmark</code>.</p>
+<p>If you want to use it in a client application, you can fetch
+a pre-built copy of <code>commonmark.js</code> from
+<a href="http://spec.commonmark.org/js/commonmark.js">http://spec.commonmark.org/js/commonmark.js</a>.</p>
+<p>For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<h2>The spec</h2>
+<p><a href="http://spec.commonmark.org/0.13/">The spec</a> contains over 500 embedded examples which serve as conformance
+tests. To run the tests using an executable <code>$PROG</code>:</p>
+<pre><code>python3 test/spec_tests.py --program $PROG
+</code></pre>
+<p>If you want to extract the raw test data from the spec without
+actually running the tests, you can do:</p>
+<pre><code>python3 test/spec_tests.py --dump-tests
+</code></pre>
+<p>and you'll get all the tests in JSON format.</p>
+<p>The source of <a href="http://spec.commonmark.org/0.13/">the spec</a> is <code>spec.txt</code>.  This is basically a Markdown
+file, with code examples written in a shorthand form:</p>
+<pre><code>.
+Markdown source
+.
+expected HTML output
+.
+</code></pre>
+<p>To build an HTML version of the spec, do <code>make spec.html</code>.  To build a
+PDF version, do <code>make spec.pdf</code>.  (Creating a PDF requires <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>
+and a LaTeX installation.  Creating the HTML version requires only
+<code>libcmark</code> and <code>python3</code>.)</p>
+<p>The spec is written from the point of view of the human writer, not
+the computer reader.  It is not an algorithm---an English translation of
+a computer program---but a declarative description of what counts as a block
+quote, a code block, and each of the other structural elements that can
+make up a Markdown document.</p>
+<p>Because John Gruber's <a href="http://daringfireball.net/projects/markdown/syntax">canonical syntax
+description</a> leaves
+many aspects of the syntax undetermined, writing a precise spec requires
+making a large number of decisions, many of them somewhat arbitrary.
+In making them, we have appealed to existing conventions and
+considerations of simplicity, readability, expressive power, and
+consistency.  We have tried to ensure that &quot;normal&quot; documents in the many
+incompatible existing implementations of Markdown will render, as far as
+possible, as their authors intended.  And we have tried to make the rules
+for different elements work together harmoniously.  In places where
+different decisions could have been made (for example, the rules
+governing list indentation), we have explained the rationale for
+my choices.  In a few cases, we have departed slightly from the canonical
+syntax description, in ways that we think further the goals of Markdown
+as stated in that description.</p>
+<p>For the most part, we have limited ourselves to the basic elements
+described in Gruber's canonical syntax description, eschewing extensions
+like footnotes and definition lists.  It is important to get the core
+right before considering such things. However, we have included a visible
+syntax for line breaks and fenced code blocks.</p>
+<h2>Differences from original Markdown</h2>
+<p>There are only a few places where this spec says things that contradict
+the canonical syntax description:</p>
+<ul>
+<li>
+<p>It allows all punctuation symbols to be backslash-escaped,
+not just the symbols with special meanings in Markdown. We found
+that it was just too hard to remember which symbols could be
+escaped.</p>
+</li>
+<li>
+<p>It introduces an alternative syntax for hard line
+breaks, a backslash at the end of the line, supplementing the
+two-spaces-at-the-end-of-line rule. This is motivated by persistent
+complaints about the “invisible” nature of the two-space rule.</p>
+</li>
+<li>
+<p>Link syntax has been made a bit more predictable (in a
+backwards-compatible way). For example, <code>Markdown.pl</code> allows single
+quotes around a title in inline links, but not in reference links.
+This kind of difference is really hard for users to remember, so the
+spec allows single quotes in both contexts.</p>
+</li>
+<li>
+<p>The rule for HTML blocks differs, though in most real cases it
+shouldn't make a difference. (See the section on HTML Blocks
+for details.) The spec's proposal makes it easy to include Markdown
+inside HTML block-level tags, if you want to, but also allows you to
+exclude this. It is also makes parsing much easier, avoiding
+expensive backtracking.</p>
+</li>
+<li>
+<p>It does not collapse adjacent bird-track blocks into a single
+blockquote:</p>
+<pre><code>&gt; this is two
+
+&gt; blockquotes
+
+&gt; this is a single
+&gt;
+&gt; blockquote with two paragraphs
+</code></pre>
+</li>
+<li>
+<p>Rules for content in lists differ in a few respects, though (as with
+HTML blocks), most lists in existing documents should render as
+intended. There is some discussion of the choice points and
+differences in the subsection of List Items entitled Motivation.
+We think that the spec's proposal does better than any existing
+implementation in rendering lists the way a human writer or reader
+would intuitively understand them. (We could give numerous examples
+of perfectly natural looking lists that nearly every existing
+implementation flubs up.)</p>
+</li>
+<li>
+<p>The spec stipulates that two blank lines break out of all list
+contexts.  This is an attempt to deal with issues that often come up
+when someone wants to have two adjacent lists, or a list followed by
+an indented code block.</p>
+</li>
+<li>
+<p>Changing bullet characters, or changing from bullets to numbers or
+vice versa, starts a new list. We think that is almost always going
+to be the writer's intent.</p>
+</li>
+<li>
+<p>The number that begins an ordered list item may be followed by
+either <code>.</code> or <code>)</code>. Changing the delimiter style starts a new
+list.</p>
+</li>
+<li>
+<p>The start number of an ordered list is significant.</p>
+</li>
+<li>
+<p>Fenced code blocks are supported, delimited by either
+backticks (<code>```</code> or tildes (<code>~~~</code>).</p>
+</li>
+</ul>
+<h2>Contributing</h2>
+<p>There is a <a href="http://talk.commonmark.org">forum for discussing
+CommonMark</a>; you should use it instead of
+github issues for questions and possibly open-ended discussions.
+Use the <a href="http://github.com/jgm/CommonMark/issues">github issue tracker</a>
+only for simple, clear, actionable issues.</p>
+<h2>Authors</h2>
+<p>The spec was written by John MacFarlane, drawing on</p>
+<ul>
+<li>his experience writing and maintaining Markdown implementations in several
+languages, including the first Markdown parser not based on regular
+expression substitutions (<a href="http://github.com/jgm/pandoc">pandoc</a>) and
+the first markdown parsers based on PEG grammars
+(<a href="http://github.com/jgm/peg-markdown">peg-markdown</a>,
+<a href="http://github.com/jgm/lunamark">lunamark</a>)</li>
+<li>a detailed examination of the differences between existing Markdown
+implementations using <a href="http://johnmacfarlane.net/babelmark2/">BabelMark 2</a>,
+and</li>
+<li>extensive discussions with David Greenspan, Jeff Atwood, Vicent
+Marti, Neil Williams, and Benjamin Dumke-von der Ehe.</li>
+</ul>
+<p>John MacFarlane was also responsible for the original versions of the
+C and JavaScript implementations.  The block parsing algorithm was
+worked out together with David Greenspan.  Vicent Marti
+optimized the C implementation for performance, increasing its speed
+tenfold.  Kārlis Gaņģis helped work out a better parsing algorithm
+for links and emphasis, eliminating several worst-case performance
+issues.  Nick Wellnhofer contributed many improvements, including
+most of the C library's API and its test harness.  Vitaly Puzrin
+has offered much good advice about the JavaScript implementation.</p>
+<h1>CommonMark</h1>
+<p>CommonMark is a rationalized version of Markdown syntax,
+with a <a href="http://spec.commonmark.org/0.13/">spec</a> and BSD3-licensed reference
+implementations in C and JavaScript.</p>
+<p><a href="http://spec.commonmark.org/dingus.html">Try it now!</a></p>
+<h2>The implementations</h2>
+<p>The C implementation provides both a shared library (<code>libcmark</code>) and a
+standalone program <code>cmark</code> that converts CommonMark to HTML.  It is
+written in standard C99 and has no library dependencies.  The parser is
+very fast (see <a href="benchmarks.md">benchmarks</a>).</p>
+<p>It is easy to use <code>libcmark</code> in python, lua, ruby, and other dynamic
+languages: see the <code>wrappers/</code> subdirectory for some simple examples.</p>
+<p>The JavaScript implementation provides both an NPM package and a
+single JavaScript file, with no dependencies, that can be linked into
+an HTML page. For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<p><strong>A note on security:</strong>
+Neither implementation attempts to sanitize link attributes or
+raw HTML.  If you use these libraries in applications that accept
+untrusted user input, you must run the output through an HTML
+sanitizer to protect against
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting">XSS attacks</a>.</p>
+<h2>Installing (C)</h2>
+<p>Building the C program (<code>cmark</code>) and shared library (<code>libcmark</code>)
+requires <a href="http://www.cmake.org/download/">cmake</a>.  If you modify <code>scanners.re</code>, then you will also
+need <a href="http://re2c.org">re2c</a>, which is used to generate <code>scanners.c</code> from
+<code>scanners.re</code>.  We have included a pre-generated <code>scanners.c</code> in
+the repository to reduce build dependencies.</p>
+<p>If you have GNU make, you can simply <code>make</code>, <code>make test</code>, and <code>make install</code>.  This calls <a href="http://www.cmake.org/download/">cmake</a> to create a <code>Makefile</code> in the <code>build</code>
+directory, then uses that <code>Makefile</code> to create the executable and
+library.  The binaries can be found in <code>build/src</code>.</p>
+<p>For a more portable method, you can use <a href="http://www.cmake.org/download/">cmake</a> manually. <a href="http://www.cmake.org/download/">cmake</a> knows
+how to create build environments for many build systems.  For example,
+on FreeBSD:</p>
+<pre><code>mkdir build
+cd build
+cmake ..  # optionally: -DCMAKE_INSTALL_PREFIX=path
+make      # executable will be created as build/src/cmark
+make test
+make install
+</code></pre>
+<p>Or, to create Xcode project files on OSX:</p>
+<pre><code>mkdir build
+cd build
+cmake -G Xcode ..
+make
+make test
+make install
+</code></pre>
+<p>The GNU Makefile also provides a few other targets for developers.
+To run a benchmark:</p>
+<pre><code>make bench
+</code></pre>
+<p>To run a &quot;fuzz test&quot; against ten long randomly generated inputs:</p>
+<pre><code>make fuzztest
+</code></pre>
+<p>To run a test for memory leaks using <code>valgrind</code>:</p>
+<pre><code>make leakcheck
+</code></pre>
+<p>To reformat source code using <code>astyle</code>:</p>
+<pre><code>make astyle
+</code></pre>
+<p>To make a release tarball and zip archive:</p>
+<pre><code>make archive
+</code></pre>
+<h2>Compiling for Windows</h2>
+<p>To compile with MSVC and NMAKE:</p>
+<pre><code>nmake
+</code></pre>
+<p>You can cross-compile a Windows binary and dll on linux if you have the
+<code>mingw32</code> compiler:</p>
+<pre><code>make mingw
+</code></pre>
+<p>The binaries will be in <code>build-mingw/windows/bin</code>.</p>
+<h2>Installing (JavaScript)</h2>
+<p>The JavaScript library can be installed through <code>npm</code>:</p>
+<pre><code>npm install commonmark
+</code></pre>
+<p>This includes a command-line converter called <code>commonmark</code>.</p>
+<p>If you want to use it in a client application, you can fetch
+a pre-built copy of <code>commonmark.js</code> from
+<a href="http://spec.commonmark.org/js/commonmark.js">http://spec.commonmark.org/js/commonmark.js</a>.</p>
+<p>For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<h2>The spec</h2>
+<p><a href="http://spec.commonmark.org/0.13/">The spec</a> contains over 500 embedded examples which serve as conformance
+tests. To run the tests using an executable <code>$PROG</code>:</p>
+<pre><code>python3 test/spec_tests.py --program $PROG
+</code></pre>
+<p>If you want to extract the raw test data from the spec without
+actually running the tests, you can do:</p>
+<pre><code>python3 test/spec_tests.py --dump-tests
+</code></pre>
+<p>and you'll get all the tests in JSON format.</p>
+<p>The source of <a href="http://spec.commonmark.org/0.13/">the spec</a> is <code>spec.txt</code>.  This is basically a Markdown
+file, with code examples written in a shorthand form:</p>
+<pre><code>.
+Markdown source
+.
+expected HTML output
+.
+</code></pre>
+<p>To build an HTML version of the spec, do <code>make spec.html</code>.  To build a
+PDF version, do <code>make spec.pdf</code>.  (Creating a PDF requires <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>
+and a LaTeX installation.  Creating the HTML version requires only
+<code>libcmark</code> and <code>python3</code>.)</p>
+<p>The spec is written from the point of view of the human writer, not
+the computer reader.  It is not an algorithm---an English translation of
+a computer program---but a declarative description of what counts as a block
+quote, a code block, and each of the other structural elements that can
+make up a Markdown document.</p>
+<p>Because John Gruber's <a href="http://daringfireball.net/projects/markdown/syntax">canonical syntax
+description</a> leaves
+many aspects of the syntax undetermined, writing a precise spec requires
+making a large number of decisions, many of them somewhat arbitrary.
+In making them, we have appealed to existing conventions and
+considerations of simplicity, readability, expressive power, and
+consistency.  We have tried to ensure that &quot;normal&quot; documents in the many
+incompatible existing implementations of Markdown will render, as far as
+possible, as their authors intended.  And we have tried to make the rules
+for different elements work together harmoniously.  In places where
+different decisions could have been made (for example, the rules
+governing list indentation), we have explained the rationale for
+my choices.  In a few cases, we have departed slightly from the canonical
+syntax description, in ways that we think further the goals of Markdown
+as stated in that description.</p>
+<p>For the most part, we have limited ourselves to the basic elements
+described in Gruber's canonical syntax description, eschewing extensions
+like footnotes and definition lists.  It is important to get the core
+right before considering such things. However, we have included a visible
+syntax for line breaks and fenced code blocks.</p>
+<h2>Differences from original Markdown</h2>
+<p>There are only a few places where this spec says things that contradict
+the canonical syntax description:</p>
+<ul>
+<li>
+<p>It allows all punctuation symbols to be backslash-escaped,
+not just the symbols with special meanings in Markdown. We found
+that it was just too hard to remember which symbols could be
+escaped.</p>
+</li>
+<li>
+<p>It introduces an alternative syntax for hard line
+breaks, a backslash at the end of the line, supplementing the
+two-spaces-at-the-end-of-line rule. This is motivated by persistent
+complaints about the “invisible” nature of the two-space rule.</p>
+</li>
+<li>
+<p>Link syntax has been made a bit more predictable (in a
+backwards-compatible way). For example, <code>Markdown.pl</code> allows single
+quotes around a title in inline links, but not in reference links.
+This kind of difference is really hard for users to remember, so the
+spec allows single quotes in both contexts.</p>
+</li>
+<li>
+<p>The rule for HTML blocks differs, though in most real cases it
+shouldn't make a difference. (See the section on HTML Blocks
+for details.) The spec's proposal makes it easy to include Markdown
+inside HTML block-level tags, if you want to, but also allows you to
+exclude this. It is also makes parsing much easier, avoiding
+expensive backtracking.</p>
+</li>
+<li>
+<p>It does not collapse adjacent bird-track blocks into a single
+blockquote:</p>
+<pre><code>&gt; this is two
+
+&gt; blockquotes
+
+&gt; this is a single
+&gt;
+&gt; blockquote with two paragraphs
+</code></pre>
+</li>
+<li>
+<p>Rules for content in lists differ in a few respects, though (as with
+HTML blocks), most lists in existing documents should render as
+intended. There is some discussion of the choice points and
+differences in the subsection of List Items entitled Motivation.
+We think that the spec's proposal does better than any existing
+implementation in rendering lists the way a human writer or reader
+would intuitively understand them. (We could give numerous examples
+of perfectly natural looking lists that nearly every existing
+implementation flubs up.)</p>
+</li>
+<li>
+<p>The spec stipulates that two blank lines break out of all list
+contexts.  This is an attempt to deal with issues that often come up
+when someone wants to have two adjacent lists, or a list followed by
+an indented code block.</p>
+</li>
+<li>
+<p>Changing bullet characters, or changing from bullets to numbers or
+vice versa, starts a new list. We think that is almost always going
+to be the writer's intent.</p>
+</li>
+<li>
+<p>The number that begins an ordered list item may be followed by
+either <code>.</code> or <code>)</code>. Changing the delimiter style starts a new
+list.</p>
+</li>
+<li>
+<p>The start number of an ordered list is significant.</p>
+</li>
+<li>
+<p>Fenced code blocks are supported, delimited by either
+backticks (<code>```</code> or tildes (<code>~~~</code>).</p>
+</li>
+</ul>
+<h2>Contributing</h2>
+<p>There is a <a href="http://talk.commonmark.org">forum for discussing
+CommonMark</a>; you should use it instead of
+github issues for questions and possibly open-ended discussions.
+Use the <a href="http://github.com/jgm/CommonMark/issues">github issue tracker</a>
+only for simple, clear, actionable issues.</p>
+<h2>Authors</h2>
+<p>The spec was written by John MacFarlane, drawing on</p>
+<ul>
+<li>his experience writing and maintaining Markdown implementations in several
+languages, including the first Markdown parser not based on regular
+expression substitutions (<a href="http://github.com/jgm/pandoc">pandoc</a>) and
+the first markdown parsers based on PEG grammars
+(<a href="http://github.com/jgm/peg-markdown">peg-markdown</a>,
+<a href="http://github.com/jgm/lunamark">lunamark</a>)</li>
+<li>a detailed examination of the differences between existing Markdown
+implementations using <a href="http://johnmacfarlane.net/babelmark2/">BabelMark 2</a>,
+and</li>
+<li>extensive discussions with David Greenspan, Jeff Atwood, Vicent
+Marti, Neil Williams, and Benjamin Dumke-von der Ehe.</li>
+</ul>
+<p>John MacFarlane was also responsible for the original versions of the
+C and JavaScript implementations.  The block parsing algorithm was
+worked out together with David Greenspan.  Vicent Marti
+optimized the C implementation for performance, increasing its speed
+tenfold.  Kārlis Gaņģis helped work out a better parsing algorithm
+for links and emphasis, eliminating several worst-case performance
+issues.  Nick Wellnhofer contributed many improvements, including
+most of the C library's API and its test harness.  Vitaly Puzrin
+has offered much good advice about the JavaScript implementation.</p>
+<h1>CommonMark</h1>
+<p>CommonMark is a rationalized version of Markdown syntax,
+with a <a href="http://spec.commonmark.org/0.13/">spec</a> and BSD3-licensed reference
+implementations in C and JavaScript.</p>
+<p><a href="http://spec.commonmark.org/dingus.html">Try it now!</a></p>
+<h2>The implementations</h2>
+<p>The C implementation provides both a shared library (<code>libcmark</code>) and a
+standalone program <code>cmark</code> that converts CommonMark to HTML.  It is
+written in standard C99 and has no library dependencies.  The parser is
+very fast (see <a href="benchmarks.md">benchmarks</a>).</p>
+<p>It is easy to use <code>libcmark</code> in python, lua, ruby, and other dynamic
+languages: see the <code>wrappers/</code> subdirectory for some simple examples.</p>
+<p>The JavaScript implementation provides both an NPM package and a
+single JavaScript file, with no dependencies, that can be linked into
+an HTML page. For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<p><strong>A note on security:</strong>
+Neither implementation attempts to sanitize link attributes or
+raw HTML.  If you use these libraries in applications that accept
+untrusted user input, you must run the output through an HTML
+sanitizer to protect against
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting">XSS attacks</a>.</p>
+<h2>Installing (C)</h2>
+<p>Building the C program (<code>cmark</code>) and shared library (<code>libcmark</code>)
+requires <a href="http://www.cmake.org/download/">cmake</a>.  If you modify <code>scanners.re</code>, then you will also
+need <a href="http://re2c.org">re2c</a>, which is used to generate <code>scanners.c</code> from
+<code>scanners.re</code>.  We have included a pre-generated <code>scanners.c</code> in
+the repository to reduce build dependencies.</p>
+<p>If you have GNU make, you can simply <code>make</code>, <code>make test</code>, and <code>make install</code>.  This calls <a href="http://www.cmake.org/download/">cmake</a> to create a <code>Makefile</code> in the <code>build</code>
+directory, then uses that <code>Makefile</code> to create the executable and
+library.  The binaries can be found in <code>build/src</code>.</p>
+<p>For a more portable method, you can use <a href="http://www.cmake.org/download/">cmake</a> manually. <a href="http://www.cmake.org/download/">cmake</a> knows
+how to create build environments for many build systems.  For example,
+on FreeBSD:</p>
+<pre><code>mkdir build
+cd build
+cmake ..  # optionally: -DCMAKE_INSTALL_PREFIX=path
+make      # executable will be created as build/src/cmark
+make test
+make install
+</code></pre>
+<p>Or, to create Xcode project files on OSX:</p>
+<pre><code>mkdir build
+cd build
+cmake -G Xcode ..
+make
+make test
+make install
+</code></pre>
+<p>The GNU Makefile also provides a few other targets for developers.
+To run a benchmark:</p>
+<pre><code>make bench
+</code></pre>
+<p>To run a &quot;fuzz test&quot; against ten long randomly generated inputs:</p>
+<pre><code>make fuzztest
+</code></pre>
+<p>To run a test for memory leaks using <code>valgrind</code>:</p>
+<pre><code>make leakcheck
+</code></pre>
+<p>To reformat source code using <code>astyle</code>:</p>
+<pre><code>make astyle
+</code></pre>
+<p>To make a release tarball and zip archive:</p>
+<pre><code>make archive
+</code></pre>
+<h2>Compiling for Windows</h2>
+<p>To compile with MSVC and NMAKE:</p>
+<pre><code>nmake
+</code></pre>
+<p>You can cross-compile a Windows binary and dll on linux if you have the
+<code>mingw32</code> compiler:</p>
+<pre><code>make mingw
+</code></pre>
+<p>The binaries will be in <code>build-mingw/windows/bin</code>.</p>
+<h2>Installing (JavaScript)</h2>
+<p>The JavaScript library can be installed through <code>npm</code>:</p>
+<pre><code>npm install commonmark
+</code></pre>
+<p>This includes a command-line converter called <code>commonmark</code>.</p>
+<p>If you want to use it in a client application, you can fetch
+a pre-built copy of <code>commonmark.js</code> from
+<a href="http://spec.commonmark.org/js/commonmark.js">http://spec.commonmark.org/js/commonmark.js</a>.</p>
+<p>For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<h2>The spec</h2>
+<p><a href="http://spec.commonmark.org/0.13/">The spec</a> contains over 500 embedded examples which serve as conformance
+tests. To run the tests using an executable <code>$PROG</code>:</p>
+<pre><code>python3 test/spec_tests.py --program $PROG
+</code></pre>
+<p>If you want to extract the raw test data from the spec without
+actually running the tests, you can do:</p>
+<pre><code>python3 test/spec_tests.py --dump-tests
+</code></pre>
+<p>and you'll get all the tests in JSON format.</p>
+<p>The source of <a href="http://spec.commonmark.org/0.13/">the spec</a> is <code>spec.txt</code>.  This is basically a Markdown
+file, with code examples written in a shorthand form:</p>
+<pre><code>.
+Markdown source
+.
+expected HTML output
+.
+</code></pre>
+<p>To build an HTML version of the spec, do <code>make spec.html</code>.  To build a
+PDF version, do <code>make spec.pdf</code>.  (Creating a PDF requires <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>
+and a LaTeX installation.  Creating the HTML version requires only
+<code>libcmark</code> and <code>python3</code>.)</p>
+<p>The spec is written from the point of view of the human writer, not
+the computer reader.  It is not an algorithm---an English translation of
+a computer program---but a declarative description of what counts as a block
+quote, a code block, and each of the other structural elements that can
+make up a Markdown document.</p>
+<p>Because John Gruber's <a href="http://daringfireball.net/projects/markdown/syntax">canonical syntax
+description</a> leaves
+many aspects of the syntax undetermined, writing a precise spec requires
+making a large number of decisions, many of them somewhat arbitrary.
+In making them, we have appealed to existing conventions and
+considerations of simplicity, readability, expressive power, and
+consistency.  We have tried to ensure that &quot;normal&quot; documents in the many
+incompatible existing implementations of Markdown will render, as far as
+possible, as their authors intended.  And we have tried to make the rules
+for different elements work together harmoniously.  In places where
+different decisions could have been made (for example, the rules
+governing list indentation), we have explained the rationale for
+my choices.  In a few cases, we have departed slightly from the canonical
+syntax description, in ways that we think further the goals of Markdown
+as stated in that description.</p>
+<p>For the most part, we have limited ourselves to the basic elements
+described in Gruber's canonical syntax description, eschewing extensions
+like footnotes and definition lists.  It is important to get the core
+right before considering such things. However, we have included a visible
+syntax for line breaks and fenced code blocks.</p>
+<h2>Differences from original Markdown</h2>
+<p>There are only a few places where this spec says things that contradict
+the canonical syntax description:</p>
+<ul>
+<li>
+<p>It allows all punctuation symbols to be backslash-escaped,
+not just the symbols with special meanings in Markdown. We found
+that it was just too hard to remember which symbols could be
+escaped.</p>
+</li>
+<li>
+<p>It introduces an alternative syntax for hard line
+breaks, a backslash at the end of the line, supplementing the
+two-spaces-at-the-end-of-line rule. This is motivated by persistent
+complaints about the “invisible” nature of the two-space rule.</p>
+</li>
+<li>
+<p>Link syntax has been made a bit more predictable (in a
+backwards-compatible way). For example, <code>Markdown.pl</code> allows single
+quotes around a title in inline links, but not in reference links.
+This kind of difference is really hard for users to remember, so the
+spec allows single quotes in both contexts.</p>
+</li>
+<li>
+<p>The rule for HTML blocks differs, though in most real cases it
+shouldn't make a difference. (See the section on HTML Blocks
+for details.) The spec's proposal makes it easy to include Markdown
+inside HTML block-level tags, if you want to, but also allows you to
+exclude this. It is also makes parsing much easier, avoiding
+expensive backtracking.</p>
+</li>
+<li>
+<p>It does not collapse adjacent bird-track blocks into a single
+blockquote:</p>
+<pre><code>&gt; this is two
+
+&gt; blockquotes
+
+&gt; this is a single
+&gt;
+&gt; blockquote with two paragraphs
+</code></pre>
+</li>
+<li>
+<p>Rules for content in lists differ in a few respects, though (as with
+HTML blocks), most lists in existing documents should render as
+intended. There is some discussion of the choice points and
+differences in the subsection of List Items entitled Motivation.
+We think that the spec's proposal does better than any existing
+implementation in rendering lists the way a human writer or reader
+would intuitively understand them. (We could give numerous examples
+of perfectly natural looking lists that nearly every existing
+implementation flubs up.)</p>
+</li>
+<li>
+<p>The spec stipulates that two blank lines break out of all list
+contexts.  This is an attempt to deal with issues that often come up
+when someone wants to have two adjacent lists, or a list followed by
+an indented code block.</p>
+</li>
+<li>
+<p>Changing bullet characters, or changing from bullets to numbers or
+vice versa, starts a new list. We think that is almost always going
+to be the writer's intent.</p>
+</li>
+<li>
+<p>The number that begins an ordered list item may be followed by
+either <code>.</code> or <code>)</code>. Changing the delimiter style starts a new
+list.</p>
+</li>
+<li>
+<p>The start number of an ordered list is significant.</p>
+</li>
+<li>
+<p>Fenced code blocks are supported, delimited by either
+backticks (<code>```</code> or tildes (<code>~~~</code>).</p>
+</li>
+</ul>
+<h2>Contributing</h2>
+<p>There is a <a href="http://talk.commonmark.org">forum for discussing
+CommonMark</a>; you should use it instead of
+github issues for questions and possibly open-ended discussions.
+Use the <a href="http://github.com/jgm/CommonMark/issues">github issue tracker</a>
+only for simple, clear, actionable issues.</p>
+<h2>Authors</h2>
+<p>The spec was written by John MacFarlane, drawing on</p>
+<ul>
+<li>his experience writing and maintaining Markdown implementations in several
+languages, including the first Markdown parser not based on regular
+expression substitutions (<a href="http://github.com/jgm/pandoc">pandoc</a>) and
+the first markdown parsers based on PEG grammars
+(<a href="http://github.com/jgm/peg-markdown">peg-markdown</a>,
+<a href="http://github.com/jgm/lunamark">lunamark</a>)</li>
+<li>a detailed examination of the differences between existing Markdown
+implementations using <a href="http://johnmacfarlane.net/babelmark2/">BabelMark 2</a>,
+and</li>
+<li>extensive discussions with David Greenspan, Jeff Atwood, Vicent
+Marti, Neil Williams, and Benjamin Dumke-von der Ehe.</li>
+</ul>
+<p>John MacFarlane was also responsible for the original versions of the
+C and JavaScript implementations.  The block parsing algorithm was
+worked out together with David Greenspan.  Vicent Marti
+optimized the C implementation for performance, increasing its speed
+tenfold.  Kārlis Gaņģis helped work out a better parsing algorithm
+for links and emphasis, eliminating several worst-case performance
+issues.  Nick Wellnhofer contributed many improvements, including
+most of the C library's API and its test harness.  Vitaly Puzrin
+has offered much good advice about the JavaScript implementation.</p>
+<h1>CommonMark</h1>
+<p>CommonMark is a rationalized version of Markdown syntax,
+with a <a href="http://spec.commonmark.org/0.13/">spec</a> and BSD3-licensed reference
+implementations in C and JavaScript.</p>
+<p><a href="http://spec.commonmark.org/dingus.html">Try it now!</a></p>
+<h2>The implementations</h2>
+<p>The C implementation provides both a shared library (<code>libcmark</code>) and a
+standalone program <code>cmark</code> that converts CommonMark to HTML.  It is
+written in standard C99 and has no library dependencies.  The parser is
+very fast (see <a href="benchmarks.md">benchmarks</a>).</p>
+<p>It is easy to use <code>libcmark</code> in python, lua, ruby, and other dynamic
+languages: see the <code>wrappers/</code> subdirectory for some simple examples.</p>
+<p>The JavaScript implementation provides both an NPM package and a
+single JavaScript file, with no dependencies, that can be linked into
+an HTML page. For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<p><strong>A note on security:</strong>
+Neither implementation attempts to sanitize link attributes or
+raw HTML.  If you use these libraries in applications that accept
+untrusted user input, you must run the output through an HTML
+sanitizer to protect against
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting">XSS attacks</a>.</p>
+<h2>Installing (C)</h2>
+<p>Building the C program (<code>cmark</code>) and shared library (<code>libcmark</code>)
+requires <a href="http://www.cmake.org/download/">cmake</a>.  If you modify <code>scanners.re</code>, then you will also
+need <a href="http://re2c.org">re2c</a>, which is used to generate <code>scanners.c</code> from
+<code>scanners.re</code>.  We have included a pre-generated <code>scanners.c</code> in
+the repository to reduce build dependencies.</p>
+<p>If you have GNU make, you can simply <code>make</code>, <code>make test</code>, and <code>make install</code>.  This calls <a href="http://www.cmake.org/download/">cmake</a> to create a <code>Makefile</code> in the <code>build</code>
+directory, then uses that <code>Makefile</code> to create the executable and
+library.  The binaries can be found in <code>build/src</code>.</p>
+<p>For a more portable method, you can use <a href="http://www.cmake.org/download/">cmake</a> manually. <a href="http://www.cmake.org/download/">cmake</a> knows
+how to create build environments for many build systems.  For example,
+on FreeBSD:</p>
+<pre><code>mkdir build
+cd build
+cmake ..  # optionally: -DCMAKE_INSTALL_PREFIX=path
+make      # executable will be created as build/src/cmark
+make test
+make install
+</code></pre>
+<p>Or, to create Xcode project files on OSX:</p>
+<pre><code>mkdir build
+cd build
+cmake -G Xcode ..
+make
+make test
+make install
+</code></pre>
+<p>The GNU Makefile also provides a few other targets for developers.
+To run a benchmark:</p>
+<pre><code>make bench
+</code></pre>
+<p>To run a &quot;fuzz test&quot; against ten long randomly generated inputs:</p>
+<pre><code>make fuzztest
+</code></pre>
+<p>To run a test for memory leaks using <code>valgrind</code>:</p>
+<pre><code>make leakcheck
+</code></pre>
+<p>To reformat source code using <code>astyle</code>:</p>
+<pre><code>make astyle
+</code></pre>
+<p>To make a release tarball and zip archive:</p>
+<pre><code>make archive
+</code></pre>
+<h2>Compiling for Windows</h2>
+<p>To compile with MSVC and NMAKE:</p>
+<pre><code>nmake
+</code></pre>
+<p>You can cross-compile a Windows binary and dll on linux if you have the
+<code>mingw32</code> compiler:</p>
+<pre><code>make mingw
+</code></pre>
+<p>The binaries will be in <code>build-mingw/windows/bin</code>.</p>
+<h2>Installing (JavaScript)</h2>
+<p>The JavaScript library can be installed through <code>npm</code>:</p>
+<pre><code>npm install commonmark
+</code></pre>
+<p>This includes a command-line converter called <code>commonmark</code>.</p>
+<p>If you want to use it in a client application, you can fetch
+a pre-built copy of <code>commonmark.js</code> from
+<a href="http://spec.commonmark.org/js/commonmark.js">http://spec.commonmark.org/js/commonmark.js</a>.</p>
+<p>For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<h2>The spec</h2>
+<p><a href="http://spec.commonmark.org/0.13/">The spec</a> contains over 500 embedded examples which serve as conformance
+tests. To run the tests using an executable <code>$PROG</code>:</p>
+<pre><code>python3 test/spec_tests.py --program $PROG
+</code></pre>
+<p>If you want to extract the raw test data from the spec without
+actually running the tests, you can do:</p>
+<pre><code>python3 test/spec_tests.py --dump-tests
+</code></pre>
+<p>and you'll get all the tests in JSON format.</p>
+<p>The source of <a href="http://spec.commonmark.org/0.13/">the spec</a> is <code>spec.txt</code>.  This is basically a Markdown
+file, with code examples written in a shorthand form:</p>
+<pre><code>.
+Markdown source
+.
+expected HTML output
+.
+</code></pre>
+<p>To build an HTML version of the spec, do <code>make spec.html</code>.  To build a
+PDF version, do <code>make spec.pdf</code>.  (Creating a PDF requires <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>
+and a LaTeX installation.  Creating the HTML version requires only
+<code>libcmark</code> and <code>python3</code>.)</p>
+<p>The spec is written from the point of view of the human writer, not
+the computer reader.  It is not an algorithm---an English translation of
+a computer program---but a declarative description of what counts as a block
+quote, a code block, and each of the other structural elements that can
+make up a Markdown document.</p>
+<p>Because John Gruber's <a href="http://daringfireball.net/projects/markdown/syntax">canonical syntax
+description</a> leaves
+many aspects of the syntax undetermined, writing a precise spec requires
+making a large number of decisions, many of them somewhat arbitrary.
+In making them, we have appealed to existing conventions and
+considerations of simplicity, readability, expressive power, and
+consistency.  We have tried to ensure that &quot;normal&quot; documents in the many
+incompatible existing implementations of Markdown will render, as far as
+possible, as their authors intended.  And we have tried to make the rules
+for different elements work together harmoniously.  In places where
+different decisions could have been made (for example, the rules
+governing list indentation), we have explained the rationale for
+my choices.  In a few cases, we have departed slightly from the canonical
+syntax description, in ways that we think further the goals of Markdown
+as stated in that description.</p>
+<p>For the most part, we have limited ourselves to the basic elements
+described in Gruber's canonical syntax description, eschewing extensions
+like footnotes and definition lists.  It is important to get the core
+right before considering such things. However, we have included a visible
+syntax for line breaks and fenced code blocks.</p>
+<h2>Differences from original Markdown</h2>
+<p>There are only a few places where this spec says things that contradict
+the canonical syntax description:</p>
+<ul>
+<li>
+<p>It allows all punctuation symbols to be backslash-escaped,
+not just the symbols with special meanings in Markdown. We found
+that it was just too hard to remember which symbols could be
+escaped.</p>
+</li>
+<li>
+<p>It introduces an alternative syntax for hard line
+breaks, a backslash at the end of the line, supplementing the
+two-spaces-at-the-end-of-line rule. This is motivated by persistent
+complaints about the “invisible” nature of the two-space rule.</p>
+</li>
+<li>
+<p>Link syntax has been made a bit more predictable (in a
+backwards-compatible way). For example, <code>Markdown.pl</code> allows single
+quotes around a title in inline links, but not in reference links.
+This kind of difference is really hard for users to remember, so the
+spec allows single quotes in both contexts.</p>
+</li>
+<li>
+<p>The rule for HTML blocks differs, though in most real cases it
+shouldn't make a difference. (See the section on HTML Blocks
+for details.) The spec's proposal makes it easy to include Markdown
+inside HTML block-level tags, if you want to, but also allows you to
+exclude this. It is also makes parsing much easier, avoiding
+expensive backtracking.</p>
+</li>
+<li>
+<p>It does not collapse adjacent bird-track blocks into a single
+blockquote:</p>
+<pre><code>&gt; this is two
+
+&gt; blockquotes
+
+&gt; this is a single
+&gt;
+&gt; blockquote with two paragraphs
+</code></pre>
+</li>
+<li>
+<p>Rules for content in lists differ in a few respects, though (as with
+HTML blocks), most lists in existing documents should render as
+intended. There is some discussion of the choice points and
+differences in the subsection of List Items entitled Motivation.
+We think that the spec's proposal does better than any existing
+implementation in rendering lists the way a human writer or reader
+would intuitively understand them. (We could give numerous examples
+of perfectly natural looking lists that nearly every existing
+implementation flubs up.)</p>
+</li>
+<li>
+<p>The spec stipulates that two blank lines break out of all list
+contexts.  This is an attempt to deal with issues that often come up
+when someone wants to have two adjacent lists, or a list followed by
+an indented code block.</p>
+</li>
+<li>
+<p>Changing bullet characters, or changing from bullets to numbers or
+vice versa, starts a new list. We think that is almost always going
+to be the writer's intent.</p>
+</li>
+<li>
+<p>The number that begins an ordered list item may be followed by
+either <code>.</code> or <code>)</code>. Changing the delimiter style starts a new
+list.</p>
+</li>
+<li>
+<p>The start number of an ordered list is significant.</p>
+</li>
+<li>
+<p>Fenced code blocks are supported, delimited by either
+backticks (<code>```</code> or tildes (<code>~~~</code>).</p>
+</li>
+</ul>
+<h2>Contributing</h2>
+<p>There is a <a href="http://talk.commonmark.org">forum for discussing
+CommonMark</a>; you should use it instead of
+github issues for questions and possibly open-ended discussions.
+Use the <a href="http://github.com/jgm/CommonMark/issues">github issue tracker</a>
+only for simple, clear, actionable issues.</p>
+<h2>Authors</h2>
+<p>The spec was written by John MacFarlane, drawing on</p>
+<ul>
+<li>his experience writing and maintaining Markdown implementations in several
+languages, including the first Markdown parser not based on regular
+expression substitutions (<a href="http://github.com/jgm/pandoc">pandoc</a>) and
+the first markdown parsers based on PEG grammars
+(<a href="http://github.com/jgm/peg-markdown">peg-markdown</a>,
+<a href="http://github.com/jgm/lunamark">lunamark</a>)</li>
+<li>a detailed examination of the differences between existing Markdown
+implementations using <a href="http://johnmacfarlane.net/babelmark2/">BabelMark 2</a>,
+and</li>
+<li>extensive discussions with David Greenspan, Jeff Atwood, Vicent
+Marti, Neil Williams, and Benjamin Dumke-von der Ehe.</li>
+</ul>
+<p>John MacFarlane was also responsible for the original versions of the
+C and JavaScript implementations.  The block parsing algorithm was
+worked out together with David Greenspan.  Vicent Marti
+optimized the C implementation for performance, increasing its speed
+tenfold.  Kārlis Gaņģis helped work out a better parsing algorithm
+for links and emphasis, eliminating several worst-case performance
+issues.  Nick Wellnhofer contributed many improvements, including
+most of the C library's API and its test harness.  Vitaly Puzrin
+has offered much good advice about the JavaScript implementation.</p>
+<h1>CommonMark</h1>
+<p>CommonMark is a rationalized version of Markdown syntax,
+with a <a href="http://spec.commonmark.org/0.13/">spec</a> and BSD3-licensed reference
+implementations in C and JavaScript.</p>
+<p><a href="http://spec.commonmark.org/dingus.html">Try it now!</a></p>
+<h2>The implementations</h2>
+<p>The C implementation provides both a shared library (<code>libcmark</code>) and a
+standalone program <code>cmark</code> that converts CommonMark to HTML.  It is
+written in standard C99 and has no library dependencies.  The parser is
+very fast (see <a href="benchmarks.md">benchmarks</a>).</p>
+<p>It is easy to use <code>libcmark</code> in python, lua, ruby, and other dynamic
+languages: see the <code>wrappers/</code> subdirectory for some simple examples.</p>
+<p>The JavaScript implementation provides both an NPM package and a
+single JavaScript file, with no dependencies, that can be linked into
+an HTML page. For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<p><strong>A note on security:</strong>
+Neither implementation attempts to sanitize link attributes or
+raw HTML.  If you use these libraries in applications that accept
+untrusted user input, you must run the output through an HTML
+sanitizer to protect against
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting">XSS attacks</a>.</p>
+<h2>Installing (C)</h2>
+<p>Building the C program (<code>cmark</code>) and shared library (<code>libcmark</code>)
+requires <a href="http://www.cmake.org/download/">cmake</a>.  If you modify <code>scanners.re</code>, then you will also
+need <a href="http://re2c.org">re2c</a>, which is used to generate <code>scanners.c</code> from
+<code>scanners.re</code>.  We have included a pre-generated <code>scanners.c</code> in
+the repository to reduce build dependencies.</p>
+<p>If you have GNU make, you can simply <code>make</code>, <code>make test</code>, and <code>make install</code>.  This calls <a href="http://www.cmake.org/download/">cmake</a> to create a <code>Makefile</code> in the <code>build</code>
+directory, then uses that <code>Makefile</code> to create the executable and
+library.  The binaries can be found in <code>build/src</code>.</p>
+<p>For a more portable method, you can use <a href="http://www.cmake.org/download/">cmake</a> manually. <a href="http://www.cmake.org/download/">cmake</a> knows
+how to create build environments for many build systems.  For example,
+on FreeBSD:</p>
+<pre><code>mkdir build
+cd build
+cmake ..  # optionally: -DCMAKE_INSTALL_PREFIX=path
+make      # executable will be created as build/src/cmark
+make test
+make install
+</code></pre>
+<p>Or, to create Xcode project files on OSX:</p>
+<pre><code>mkdir build
+cd build
+cmake -G Xcode ..
+make
+make test
+make install
+</code></pre>
+<p>The GNU Makefile also provides a few other targets for developers.
+To run a benchmark:</p>
+<pre><code>make bench
+</code></pre>
+<p>To run a &quot;fuzz test&quot; against ten long randomly generated inputs:</p>
+<pre><code>make fuzztest
+</code></pre>
+<p>To run a test for memory leaks using <code>valgrind</code>:</p>
+<pre><code>make leakcheck
+</code></pre>
+<p>To reformat source code using <code>astyle</code>:</p>
+<pre><code>make astyle
+</code></pre>
+<p>To make a release tarball and zip archive:</p>
+<pre><code>make archive
+</code></pre>
+<h2>Compiling for Windows</h2>
+<p>To compile with MSVC and NMAKE:</p>
+<pre><code>nmake
+</code></pre>
+<p>You can cross-compile a Windows binary and dll on linux if you have the
+<code>mingw32</code> compiler:</p>
+<pre><code>make mingw
+</code></pre>
+<p>The binaries will be in <code>build-mingw/windows/bin</code>.</p>
+<h2>Installing (JavaScript)</h2>
+<p>The JavaScript library can be installed through <code>npm</code>:</p>
+<pre><code>npm install commonmark
+</code></pre>
+<p>This includes a command-line converter called <code>commonmark</code>.</p>
+<p>If you want to use it in a client application, you can fetch
+a pre-built copy of <code>commonmark.js</code> from
+<a href="http://spec.commonmark.org/js/commonmark.js">http://spec.commonmark.org/js/commonmark.js</a>.</p>
+<p>For further information, see the
+<a href="js/README.md">README in the js directory</a>.</p>
+<h2>The spec</h2>
+<p><a href="http://spec.commonmark.org/0.13/">The spec</a> contains over 500 embedded examples which serve as conformance
+tests. To run the tests using an executable <code>$PROG</code>:</p>
+<pre><code>python3 test/spec_tests.py --program $PROG
+</code></pre>
+<p>If you want to extract the raw test data from the spec without
+actually running the tests, you can do:</p>
+<pre><code>python3 test/spec_tests.py --dump-tests
+</code></pre>
+<p>and you'll get all the tests in JSON format.</p>
+<p>The source of <a href="http://spec.commonmark.org/0.13/">the spec</a> is <code>spec.txt</code>.  This is basically a Markdown
+file, with code examples written in a shorthand form:</p>
+<pre><code>.
+Markdown source
+.
+expected HTML output
+.
+</code></pre>
+<p>To build an HTML version of the spec, do <code>make spec.html</code>.  To build a
+PDF version, do <code>make spec.pdf</code>.  (Creating a PDF requires <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>
+and a LaTeX installation.  Creating the HTML version requires only
+<code>libcmark</code> and <code>python3</code>.)</p>
+<p>The spec is written from the point of view of the human writer, not
+the computer reader.  It is not an algorithm---an English translation of
+a computer program---but a declarative description of what counts as a block
+quote, a code block, and each of the other structural elements that can
+make up a Markdown document.</p>
+<p>Because John Gruber's <a href="http://daringfireball.net/projects/markdown/syntax">canonical syntax
+description</a> leaves
+many aspects of the syntax undetermined, writing a precise spec requires
+making a large number of decisions, many of them somewhat arbitrary.
+In making them, we have appealed to existing conventions and
+considerations of simplicity, readability, expressive power, and
+consistency.  We have tried to ensure that &quot;normal&quot; documents in the many
+incompatible existing implementations of Markdown will render, as far as
+possible, as their authors intended.  And we have tried to make the rules
+for different elements work together harmoniously.  In places where
+different decisions could have been made (for example, the rules
+governing list indentation), we have explained the rationale for
+my choices.  In a few cases, we have departed slightly from the canonical
+syntax description, in ways that we think further the goals of Markdown
+as stated in that description.</p>
+<p>For the most part, we have limited ourselves to the basic elements
+described in Gruber's canonical syntax description, eschewing extensions
+like footnotes and definition lists.  It is important to get the core
+right before considering such things. However, we have included a visible
+syntax for line breaks and fenced code blocks.</p>
+<h2>Differences from original Markdown</h2>
+<p>There are only a few places where this spec says things that contradict
+the canonical syntax description:</p>
+<ul>
+<li>
+<p>It allows all punctuation symbols to be backslash-escaped,
+not just the symbols with special meanings in Markdown. We found
+that it was just too hard to remember which symbols could be
+escaped.</p>
+</li>
+<li>
+<p>It introduces an alternative syntax for hard line
+breaks, a backslash at the end of the line, supplementing the
+two-spaces-at-the-end-of-line rule. This is motivated by persistent
+complaints about the “invisible” nature of the two-space rule.</p>
+</li>
+<li>
+<p>Link syntax has been made a bit more predictable (in a
+backwards-compatible way). For example, <code>Markdown.pl</code> allows single
+quotes around a title in inline links, but not in reference links.
+This kind of difference is really hard for users to remember, so the
+spec allows single quotes in both contexts.</p>
+</li>
+<li>
+<p>The rule for HTML blocks differs, though in most real cases it
+shouldn't make a difference. (See the section on HTML Blocks
+for details.) The spec's proposal makes it easy to include Markdown
+inside HTML block-level tags, if you want to, but also allows you to
+exclude this. It is also makes parsing much easier, avoiding
+expensive backtracking.</p>
+</li>
+<li>
+<p>It does not collapse adjacent bird-track blocks into a single
+blockquote:</p>
+<pre><code>&gt; this is two
+
+&gt; blockquotes
+
+&gt; this is a single
+&gt;
+&gt; blockquote with two paragraphs
+</code></pre>
+</li>
+<li>
+<p>Rules for content in lists differ in a few respects, though (as with
+HTML blocks), most lists in existing documents should render as
+intended. There is some discussion of the choice points and
+differences in the subsection of List Items entitled Motivation.
+We think that the spec's proposal does better than any existing
+implementation in rendering lists the way a human writer or reader
+would intuitively understand them. (We could give numerous examples
+of perfectly natural looking lists that nearly every existing
+implementation flubs up.)</p>
+</li>
+<li>
+<p>The spec stipulates that two blank lines break out of all list
+contexts.  This is an attempt to deal with issues that often come up
+when someone wants to have two adjacent lists, or a list followed by
+an indented code block.</p>
+</li>
+<li>
+<p>Changing bullet characters, or changing from bullets to numbers or
+vice versa, starts a new list. We think that is almost always going
+to be the writer's intent.</p>
+</li>
+<li>
+<p>The number that begins an ordered list item may be followed by
+either <code>.</code> or <code>)</code>. Changing the delimiter style starts a new
+list.</p>
+</li>
+<li>
+<p>The start number of an ordered list is significant.</p>
+</li>
+<li>
+<p>Fenced code blocks are supported, delimited by either
+backticks (<code>```</code> or tildes (<code>~~~</code>).</p>
+</li>
+</ul>
+<h2>Contributing</h2>
+<p>There is a <a href="http://talk.commonmark.org">forum for discussing
+CommonMark</a>; you should use it instead of
+github issues for questions and possibly open-ended discussions.
+Use the <a href="http://github.com/jgm/CommonMark/issues">github issue tracker</a>
+only for simple, clear, actionable issues.</p>
+<h2>Authors</h2>
+<p>The spec was written by John MacFarlane, drawing on</p>
+<ul>
+<li>his experience writing and maintaining Markdown implementations in several
+languages, including the first Markdown parser not based on regular
+expression substitutions (<a href="http://github.com/jgm/pandoc">pandoc</a>) and
+the first markdown parsers based on PEG grammars
+(<a href="http://github.com/jgm/peg-markdown">peg-markdown</a>,
+<a href="http://github.com/jgm/lunamark">lunamark</a>)</li>
+<li>a detailed examination of the differences between existing Markdown
+implementations using <a href="http://johnmacfarlane.net/babelmark2/">BabelMark 2</a>,
+and</li>
+<li>extensive discussions with David Greenspan, Jeff Atwood, Vicent
+Marti, Neil Williams, and Benjamin Dumke-von der Ehe.</li>
+</ul>
+<p>John MacFarlane was also responsible for the original versions of the
+C and JavaScript implementations.  The block parsing algorithm was
+worked out together with David Greenspan.  Vicent Marti
+optimized the C implementation for performance, increasing its speed
+tenfold.  Kārlis Gaņģis helped work out a better parsing algorithm
+for links and emphasis, eliminating several worst-case performance
+issues.  Nick Wellnhofer contributed many improvements, including
+most of the C library's API and its test harness.  Vitaly Puzrin
+has offered much good advice about the JavaScript implementation.</p>
+[deoptimize context: 178447d414b1]
+**** DEOPT: finalize at bailout #3, address 0x0, frame size 16
+[deoptimizing: begin 0xad50cd2641 finalize @3]
+  translating finalize => node=3, height=8
+    0x7fff5fbff1a8: [top + 56] <- 0x342843f041e1 ; [sp + 64] 0x342843f041e1 <an Object>
+    0x7fff5fbff1a0: [top + 48] <- 0x342843f29581 ; rbx 0x342843f29581 <JS Object>
+    0x7fff5fbff198: [top + 40] <- 0x6ae00000000 ; [sp + 48] 1710
+    0x7fff5fbff190: [top + 32] <- 0x1175cc7799f8 ; caller's pc
+    0x7fff5fbff188: [top + 24] <- 0x7fff5fbff1d8 ; caller's fp
+    0x7fff5fbff180: [top + 16] <- 0xad50c689d9; context
+    0x7fff5fbff178: [top + 8] <- 0xad50cd2641; function
+    0x7fff5fbff170: [top + 0] <- 0x178447d04121 <undefined> ; literal
+[deoptimizing: end 0xad50cd2641 finalize => node=3, pc=0x1175cc786898, state=NO_REGISTERS, alignment=no padding, took 0.039 ms]
+[removing optimized code for: finalize]
+**** DEOPT: isAlphaNumeric at bailout #1, address 0x0, frame size 8
+[deoptimizing: begin 0x178447d557f1 isAlphaNumeric @1]
+  translating isAlphaNumeric => node=38, height=0
+    0x7fff5fbfeed0: [top + 40] <- 0x178447d04121 ; [sp + 48] 0x178447d04121 <undefined>
+    0x7fff5fbfeec8: [top + 32] <- 0x5200000000 ; [sp + 40] 82
+    0x7fff5fbfeec0: [top + 24] <- 0x1175cc7919b4 ; caller's pc
+    0x7fff5fbfeeb8: [top + 16] <- 0x7fff5fbfeee8 ; caller's fp
+    0x7fff5fbfeeb0: [top + 8] <- 0x178447d41a29; context
+    0x7fff5fbfeea8: [top + 0] <- 0x178447d557f1; function
+[deoptimizing: end 0x178447d557f1 isAlphaNumeric => node=38, pc=0x1175cc791e35, state=NO_REGISTERS, alignment=no padding, took 0.014 ms]
+[removing optimized code for: isAlphaNumeric]
+**** DEOPT: renderNodes at bailout #15, address 0x0, frame size 456
+[deoptimizing: begin 0xad50cf59b9 renderNodes @15]
+  translating renderNodes => node=171, height=120
+    0x7fff5fbff1f0: [top + 160] <- 0xad50cf5ae1 ; [sp + 216] 0xad50cf5ae1 <an Object>
+    0x7fff5fbff1e8: [top + 152] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff1e0: [top + 144] <- 0x1175cc763fa0 ; caller's pc
+    0x7fff5fbff1d8: [top + 136] <- 0x7fff5fbff278 ; caller's fp
+    0x7fff5fbff1d0: [top + 128] <- 0x342842f0a129; context
+    0x7fff5fbff1c8: [top + 120] <- 0xad50cf59b9; function
+    0x7fff5fbff1c0: [top + 112] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff1b8: [top + 104] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff1b0: [top + 96] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff1a8: [top + 88] <- 0x342842f0a2e1 ; [sp + 232] 0x342842f0a2e1 <an Object>
+    0x7fff5fbff1a0: [top + 80] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff198: [top + 72] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff190: [top + 64] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff188: [top + 56] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff180: [top + 48] <- 0x342842f0a1b9 ; [sp + 240] 0x342842f0a1b9 <JS Function>
+    0x7fff5fbff178: [top + 40] <- 0xad50cdcdc9 ; [sp + 248] 0xad50cdcdc9 <JS Function>
+    0x7fff5fbff170: [top + 32] <- 0x342842f0a171 ; [sp + 256] 0x342842f0a171 <JS Function>
+    0x7fff5fbff168: [top + 24] <- 0xad50cf5a01 ; [sp + 264] 0xad50cf5a01 <an Object>
+    0x7fff5fbff160: [top + 16] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff158: [top + 8] <- 0x178447d04121 <undefined> ; literal
+    0x7fff5fbff150: [top + 0] <- 0x178447d04101 ; rax 0x178447d04101 <null>
+[deoptimizing: end 0xad50cf59b9 renderNodes => node=171, pc=0x1175cc7c88cd, state=TOS_REG, alignment=no padding, took 0.056 ms]
+[removing optimized code for: renderNodes]
+<blockquote>
+<p>the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+... continuation
+... continuation
+... continuation
+... continuation</p>
+</blockquote>
+<p>empty blockquote:</p>
+<blockquote>
+</blockquote>
+<blockquote>
+<p>the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+... continuation
+... continuation
+... continuation
+... continuation</p>
+</blockquote>
+<p>empty blockquote:</p>
+<blockquote>
+</blockquote>
+<blockquote>
+<p>the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+... continuation
+... continuation
+... continuation
+... continuation</p>
+</blockquote>
+<p>empty blockquote:</p>
+<blockquote>
+</blockquote>
+<blockquote>
+<p>the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+... continuation
+... continuation
+... continuation
+... continuation</p>
+</blockquote>
+<p>empty blockquote:</p>
+<blockquote>
+</blockquote>
+<blockquote>
+<p>the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+... continuation
+... continuation
+... continuation
+... continuation</p>
+</blockquote>
+<p>empty blockquote:</p>
+<blockquote>
+</blockquote>
+<blockquote>
+<p>the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+the simple example of a blockquote
+... continuation
+... continuation
+... continuation
+... continuation</p>
+</blockquote>
+<p>empty blockquote:</p>
+<blockquote>
+</blockquote>
+[deoptimize context: 2e84393414b1]
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote
+deeply nested blockquote</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+<blockquote>
+<p>deeply nested blockquote</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+[deoptimize context: c4f7ec414b1]
+**** DEOPT: blocks.BlockQuote at bailout #7, address 0x0, frame size 24
+[deoptimizing: begin 0x128f92f23821 blocks.BlockQuote @7]
+  translating blocks.BlockQuote => node=54, height=8
+    0x7fff5fbff100: [top + 64] <- 0x128f92f23549 ; [sp + 80] 0x128f92f23549 <an Object>
+    0x7fff5fbff0f8: [top + 56] <- 0x128f92f3a9b1 ; rbx 0x128f92f3a9b1 <an Object>
+    0x7fff5fbff0f0: [top + 48] <- 0x128f92f49fd1 ; [sp + 64] 0x128f92f49fd1 <JS Object>
+    0x7fff5fbff0e8: [top + 40] <- 0x00000000 ; [sp + 56] 0
+    0x7fff5fbff0e0: [top + 32] <- 0x1d9e8b97a465 ; caller's pc
+    0x7fff5fbff0d8: [top + 24] <- 0x7fff5fbff190 ; caller's fp
+    0x7fff5fbff0d0: [top + 16] <- 0x26caf97689d9; context
+    0x7fff5fbff0c8: [top + 8] <- 0x128f92f23821; function
+    0x7fff5fbff0c0: [top + 0] <- 0x128f92f3ec01 ; rcx 0x128f92f3ec01 <String[0]: >
+[deoptimizing: end 0x128f92f23821 blocks.BlockQuote => node=54, pc=0x1d9e8b97f21d, state=NO_REGISTERS, alignment=no padding, took 0.046 ms]
+[removing optimized code for: blocks.BlockQuote]
+<pre><code>    an
+    example
+
+    of
+
+
+
+    a code
+    block
+
+
+    an
+    example
+
+    of
+
+
+
+    a code
+    block
+
+
+    an
+    example
+
+    of
+
+
+
+    a code
+    block
+
+
+    an
+    example
+
+    of
+
+
+
+    a code
+    block
+
+
+    an
+    example
+
+    of
+
+
+
+    a code
+    block
+
+
+    an
+    example
+
+    of
+
+
+
+    a code
+    block
+</code></pre>
+[deoptimize context: ebc82b414b1]
+<pre><code class="language-text">an
+example
+```
+of
+
+
+a fenced
+```
+code
+block
+</code></pre>
+<pre><code class="language-text">an
+example
+```
+of
+
+
+a fenced
+```
+code
+block
+</code></pre>
+<pre><code class="language-text">an
+example
+```
+of
+
+
+a fenced
+```
+code
+block
+</code></pre>
+<pre><code class="language-text">an
+example
+```
+of
+
+
+a fenced
+```
+code
+block
+</code></pre>
+<pre><code class="language-text">an
+example
+```
+of
+
+
+a fenced
+```
+code
+block
+</code></pre>
+<pre><code class="language-text">an
+example
+```
+of
+
+
+a fenced
+```
+code
+block
+</code></pre>
+[deoptimize context: 24d2ab9414b1]
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading</h5>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading ##########</h5>
+<p>############ not a heading</p>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading</h5>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading ##########</h5>
+<p>############ not a heading</p>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading</h5>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading ##########</h5>
+<p>############ not a heading</p>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading</h5>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading ##########</h5>
+<p>############ not a heading</p>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading</h5>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading ##########</h5>
+<p>############ not a heading</p>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading</h5>
+<h1>heading</h1>
+<h3>heading</h3>
+<h5>heading ##########</h5>
+<p>############ not a heading</p>
+[deoptimize context: 19b78f414b1]
+<hr />
+<hr />
+<hr />
+<p>************************* text</p>
+<hr />
+<hr />
+<hr />
+<p>************************* text</p>
+<hr />
+<hr />
+<hr />
+<p>************************* text</p>
+<hr />
+<hr />
+<hr />
+<p>************************* text</p>
+<hr />
+<hr />
+<hr />
+<p>************************* text</p>
+<hr />
+<hr />
+<hr />
+<p>************************* text</p>
+[deoptimize context: 3485ab6414b1]
+<div class="this is an html block">
+<p>blah blah</p>
+</div>
+<table>
+  <tr>
+    <td>
+      **test**
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+<pre><code>&lt;td&gt;
+
+  test
+
+&lt;/td&gt;
+</code></pre>
+  </tr>
+</table>
+<![CDATA[
+  [[[[[[[[[[[... *cdata section - this should not be parsed* ...]]]]]]]]]]]
+]]>
+<div class="this is an html block">
+<p>blah blah</p>
+</div>
+<table>
+  <tr>
+    <td>
+      **test**
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+<pre><code>&lt;td&gt;
+
+  test
+
+&lt;/td&gt;
+</code></pre>
+  </tr>
+</table>
+<![CDATA[
+  [[[[[[[[[[[... *cdata section - this should not be parsed* ...]]]]]]]]]]]
+]]>
+<div class="this is an html block">
+<p>blah blah</p>
+</div>
+<table>
+  <tr>
+    <td>
+      **test**
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+<pre><code>&lt;td&gt;
+
+  test
+
+&lt;/td&gt;
+</code></pre>
+  </tr>
+</table>
+<![CDATA[
+  [[[[[[[[[[[... *cdata section - this should not be parsed* ...]]]]]]]]]]]
+]]>
+<div class="this is an html block">
+<p>blah blah</p>
+</div>
+<table>
+  <tr>
+    <td>
+      **test**
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+<pre><code>&lt;td&gt;
+
+  test
+
+&lt;/td&gt;
+</code></pre>
+  </tr>
+</table>
+<![CDATA[
+  [[[[[[[[[[[... *cdata section - this should not be parsed* ...]]]]]]]]]]]
+]]>
+<div class="this is an html block">
+<p>blah blah</p>
+</div>
+<table>
+  <tr>
+    <td>
+      **test**
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+<pre><code>&lt;td&gt;
+
+  test
+
+&lt;/td&gt;
+</code></pre>
+  </tr>
+</table>
+<![CDATA[
+  [[[[[[[[[[[... *cdata section - this should not be parsed* ...]]]]]]]]]]]
+]]>
+<div class="this is an html block">
+<p>blah blah</p>
+</div>
+<table>
+  <tr>
+    <td>
+      **test**
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+<pre><code>&lt;td&gt;
+
+  test
+
+&lt;/td&gt;
+</code></pre>
+  </tr>
+</table>
+<![CDATA[
+  [[[[[[[[[[[... *cdata section - this should not be parsed* ...]]]]]]]]]]]
+]]>
+[deoptimize context: 127aa14414b1]
+<h2>heading</h2>
+<h1>heading</h1>
+<p>not a heading
+----------------------------------- text
+heading</p>
+<hr />
+<h1>heading</h1>
+<p>not a heading
+----------------------------------- text
+heading</p>
+<hr />
+<h1>heading</h1>
+<p>not a heading
+----------------------------------- text
+heading</p>
+<hr />
+<h1>heading</h1>
+<p>not a heading
+----------------------------------- text
+heading</p>
+<hr />
+<h1>heading</h1>
+<p>not a heading
+----------------------------------- text
+heading</p>
+<hr />
+<h1>heading</h1>
+<p>not a heading
+----------------------------------- text</p>
+[deoptimize context: 3252a7c414b1]
+<ul>
+<li>tidy</li>
+<li>bullet</li>
+<li>list</li>
+</ul>
+<ul>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ol>
+<li>ordered</li>
+<li>list</li>
+<li>example</li>
+</ol>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<ol>
+<li></li>
+<li></li>
+<li></li>
+</ol>
+<ul>
+<li>
+<p>an example
+of a list item
+with a continuation</p>
+<p>this part is inside the list</p>
+</li>
+</ul>
+<p>this part is just a paragraph</p>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol start="1.1111111111111112e+41">
+<li>is this a valid bullet?</li>
+</ol>
+<ul>
+<li>
+<hr />
+</li>
+<li>
+<p>this</p>
+</li>
+<li>
+<p>is</p>
+<p>a</p>
+<p>long</p>
+</li>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>with</p>
+</li>
+<li>
+<p>some</p>
+<p>tidy</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>items</p>
+</li>
+<li>
+<p>in</p>
+</li>
+<li>
+<p>between</p>
+</li>
+<li>
+<hr />
+</li>
+<li>
+<p>tidy</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ul>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ol>
+<li>ordered</li>
+<li>list</li>
+<li>example</li>
+</ol>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<ol>
+<li></li>
+<li></li>
+<li></li>
+</ol>
+<ul>
+<li>
+<p>an example
+of a list item
+with a continuation</p>
+<p>this part is inside the list</p>
+</li>
+</ul>
+<p>this part is just a paragraph</p>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol start="1.1111111111111112e+41">
+<li>is this a valid bullet?</li>
+</ol>
+<ul>
+<li>
+<hr />
+</li>
+<li>
+<p>this</p>
+</li>
+<li>
+<p>is</p>
+<p>a</p>
+<p>long</p>
+</li>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>with</p>
+</li>
+<li>
+<p>some</p>
+<p>tidy</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>items</p>
+</li>
+<li>
+<p>in</p>
+</li>
+<li>
+<p>between</p>
+</li>
+<li>
+<hr />
+</li>
+<li>
+<p>tidy</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ul>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ol>
+<li>ordered</li>
+<li>list</li>
+<li>example</li>
+</ol>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<ol>
+<li></li>
+<li></li>
+<li></li>
+</ol>
+<ul>
+<li>
+<p>an example
+of a list item
+with a continuation</p>
+<p>this part is inside the list</p>
+</li>
+</ul>
+<p>this part is just a paragraph</p>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol start="1.1111111111111112e+41">
+<li>is this a valid bullet?</li>
+</ol>
+<ul>
+<li>
+<hr />
+</li>
+<li>
+<p>this</p>
+</li>
+<li>
+<p>is</p>
+<p>a</p>
+<p>long</p>
+</li>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>with</p>
+</li>
+<li>
+<p>some</p>
+<p>tidy</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>items</p>
+</li>
+<li>
+<p>in</p>
+</li>
+<li>
+<p>between</p>
+</li>
+<li>
+<hr />
+</li>
+<li>
+<p>tidy</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ul>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ol>
+<li>ordered</li>
+<li>list</li>
+<li>example</li>
+</ol>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<ol>
+<li></li>
+<li></li>
+<li></li>
+</ol>
+<ul>
+<li>
+<p>an example
+of a list item
+with a continuation</p>
+<p>this part is inside the list</p>
+</li>
+</ul>
+<p>this part is just a paragraph</p>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol start="1.1111111111111112e+41">
+<li>is this a valid bullet?</li>
+</ol>
+<ul>
+<li>
+<hr />
+</li>
+<li>
+<p>this</p>
+</li>
+<li>
+<p>is</p>
+<p>a</p>
+<p>long</p>
+</li>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>with</p>
+</li>
+<li>
+<p>some</p>
+<p>tidy</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>items</p>
+</li>
+<li>
+<p>in</p>
+</li>
+<li>
+<p>between</p>
+</li>
+<li>
+<hr />
+</li>
+<li>
+<p>tidy</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ul>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ol>
+<li>ordered</li>
+<li>list</li>
+<li>example</li>
+</ol>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<ol>
+<li></li>
+<li></li>
+<li></li>
+</ol>
+<ul>
+<li>
+<p>an example
+of a list item
+with a continuation</p>
+<p>this part is inside the list</p>
+</li>
+</ul>
+<p>this part is just a paragraph</p>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol start="1.1111111111111112e+41">
+<li>is this a valid bullet?</li>
+</ol>
+<ul>
+<li>
+<hr />
+</li>
+<li>
+<p>this</p>
+</li>
+<li>
+<p>is</p>
+<p>a</p>
+<p>long</p>
+</li>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>with</p>
+</li>
+<li>
+<p>some</p>
+<p>tidy</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>items</p>
+</li>
+<li>
+<p>in</p>
+</li>
+<li>
+<p>between</p>
+</li>
+<li>
+<hr />
+</li>
+<li>
+<p>tidy</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ul>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>bullet</p>
+</li>
+<li>
+<p>list</p>
+</li>
+</ul>
+<ol>
+<li>ordered</li>
+<li>list</li>
+<li>example</li>
+</ol>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<ol>
+<li></li>
+<li></li>
+<li></li>
+</ol>
+<ul>
+<li>
+<p>an example
+of a list item
+with a continuation</p>
+<p>this part is inside the list</p>
+</li>
+</ul>
+<p>this part is just a paragraph</p>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol>
+<li>test</li>
+</ol>
+<ul>
+<li>test</li>
+</ul>
+<ol start="1.1111111111111112e+41">
+<li>is this a valid bullet?</li>
+</ol>
+<ul>
+<li>
+<hr />
+</li>
+<li>
+<p>this</p>
+</li>
+<li>
+<p>is</p>
+<p>a</p>
+<p>long</p>
+</li>
+<li>
+<p>loose</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>with</p>
+</li>
+<li>
+<p>some</p>
+<p>tidy</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>items</p>
+</li>
+<li>
+<p>in</p>
+</li>
+<li>
+<p>between</p>
+</li>
+<li>
+<hr />
+</li>
+</ul>
+[deoptimize context: 3e8a8f4414b1]
+**** DEOPT: finalize at bailout #3, address 0x0, frame size 16
+[deoptimizing: begin 0x26975af23001 finalize @3]
+  translating finalize => node=3, height=8
+    0x7fff5fbff1a8: [top + 56] <- 0x26975af3a9b1 ; [sp + 64] 0x26975af3a9b1 <an Object>
+    0x7fff5fbff1a0: [top + 48] <- 0x26975af3e339 ; rbx 0x26975af3e339 <JS Object>
+    0x7fff5fbff198: [top + 40] <- 0x19200000000 ; [sp + 48] 402
+    0x7fff5fbff190: [top + 32] <- 0x17c9ef9799f8 ; caller's pc
+    0x7fff5fbff188: [top + 24] <- 0x7fff5fbff1d8 ; caller's fp
+    0x7fff5fbff180: [top + 16] <- 0x689524689d9; context
+    0x7fff5fbff178: [top + 8] <- 0x26975af23001; function
+    0x7fff5fbff170: [top + 0] <- 0x3e8a8f404121 <undefined> ; literal
+[deoptimizing: end 0x26975af23001 finalize => node=3, pc=0x17c9ef9862b8, state=NO_REGISTERS, alignment=no padding, took 0.035 ms]
+[removing optimized code for: finalize]
+**** DEOPT: renderNodes at bailout #15, address 0x0, frame size 440
+[deoptimizing: begin 0x26975af2f1d1 renderNodes @15]
+  translating renderNodes => node=171, height=120
+    0x7fff5fbff1f0: [top + 160] <- 0x26975af3ce99 ; [sp + 200] 0x26975af3ce99 <an Object>
+    0x7fff5fbff1e8: [top + 152] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff1e0: [top + 144] <- 0x17c9ef963fa0 ; caller's pc
+    0x7fff5fbff1d8: [top + 136] <- 0x7fff5fbff278 ; caller's fp
+    0x7fff5fbff1d0: [top + 128] <- 0x26975afbeb99; context
+    0x7fff5fbff1c8: [top + 120] <- 0x26975af2f1d1; function
+    0x7fff5fbff1c0: [top + 112] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff1b8: [top + 104] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff1b0: [top + 96] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff1a8: [top + 88] <- 0x26975afbec49 ; [sp + 216] 0x26975afbec49 <an Object>
+    0x7fff5fbff1a0: [top + 80] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff198: [top + 72] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff190: [top + 64] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff188: [top + 56] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff180: [top + 48] <- 0x26975afbec89 ; [sp + 224] 0x26975afbec89 <JS Function>
+    0x7fff5fbff178: [top + 40] <- 0x26975af23461 ; [sp + 232] 0x26975af23461 <JS Function>
+    0x7fff5fbff170: [top + 32] <- 0x26975afbecd1 ; [sp + 240] 0x26975afbecd1 <JS Function>
+    0x7fff5fbff168: [top + 24] <- 0x26975af39e39 ; [sp + 248] 0x26975af39e39 <an Object>
+    0x7fff5fbff160: [top + 16] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff158: [top + 8] <- 0x3e8a8f404121 <undefined> ; literal
+    0x7fff5fbff150: [top + 0] <- 0x3e8a8f404101 ; rax 0x3e8a8f404101 <null>
+[deoptimizing: end 0x26975af2f1d1 renderNodes => node=171, pc=0x17c9ef9a018d, state=TOS_REG, alignment=no padding, took 0.047 ms]
+[removing optimized code for: renderNodes]
+<ul>
+<li>this
+<ul>
+<li>is
+<ul>
+<li>a
+<ul>
+<li>deeply
+<ul>
+<li>nested
+<ul>
+<li>bullet
+<ul>
+<li>list</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>this
+<ol start="2">
+<li>is
+<ol start="3">
+<li>a
+<ol start="4">
+<li>deeply
+<ol start="5">
+<li>nested
+<ol start="6">
+<li>unordered
+<ol start="7">
+<li>list</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>1</li>
+<li>2</li>
+<li>3
+- 4
+<ul>
+<li>5</li>
+<li>6</li>
+<li>7</li>
+<li>6</li>
+<li>5
+- 4</li>
+</ul>
+</li>
+<li>3</li>
+<li>2</li>
+<li>1</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>deeply-nested one-element item</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>this
+<ul>
+<li>is
+<ul>
+<li>a
+<ul>
+<li>deeply
+<ul>
+<li>nested
+<ul>
+<li>bullet
+<ul>
+<li>list</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>this
+<ol start="2">
+<li>is
+<ol start="3">
+<li>a
+<ol start="4">
+<li>deeply
+<ol start="5">
+<li>nested
+<ol start="6">
+<li>unordered
+<ol start="7">
+<li>list</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>1</li>
+<li>2</li>
+<li>3
+- 4
+<ul>
+<li>5</li>
+<li>6</li>
+<li>7</li>
+<li>6</li>
+<li>5
+- 4</li>
+</ul>
+</li>
+<li>3</li>
+<li>2</li>
+<li>1</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>deeply-nested one-element item</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>this
+<ul>
+<li>is
+<ul>
+<li>a
+<ul>
+<li>deeply
+<ul>
+<li>nested
+<ul>
+<li>bullet
+<ul>
+<li>list</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>this
+<ol start="2">
+<li>is
+<ol start="3">
+<li>a
+<ol start="4">
+<li>deeply
+<ol start="5">
+<li>nested
+<ol start="6">
+<li>unordered
+<ol start="7">
+<li>list</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>1</li>
+<li>2</li>
+<li>3
+- 4
+<ul>
+<li>5</li>
+<li>6</li>
+<li>7</li>
+<li>6</li>
+<li>5
+- 4</li>
+</ul>
+</li>
+<li>3</li>
+<li>2</li>
+<li>1</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>deeply-nested one-element item</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>this
+<ul>
+<li>is
+<ul>
+<li>a
+<ul>
+<li>deeply
+<ul>
+<li>nested
+<ul>
+<li>bullet
+<ul>
+<li>list</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>this
+<ol start="2">
+<li>is
+<ol start="3">
+<li>a
+<ol start="4">
+<li>deeply
+<ol start="5">
+<li>nested
+<ol start="6">
+<li>unordered
+<ol start="7">
+<li>list</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>1</li>
+<li>2</li>
+<li>3
+- 4
+<ul>
+<li>5</li>
+<li>6</li>
+<li>7</li>
+<li>6</li>
+<li>5
+- 4</li>
+</ul>
+</li>
+<li>3</li>
+<li>2</li>
+<li>1</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>deeply-nested one-element item</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>this
+<ul>
+<li>is
+<ul>
+<li>a
+<ul>
+<li>deeply
+<ul>
+<li>nested
+<ul>
+<li>bullet
+<ul>
+<li>list</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>this
+<ol start="2">
+<li>is
+<ol start="3">
+<li>a
+<ol start="4">
+<li>deeply
+<ol start="5">
+<li>nested
+<ol start="6">
+<li>unordered
+<ol start="7">
+<li>list</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>1</li>
+<li>2</li>
+<li>3
+- 4
+<ul>
+<li>5</li>
+<li>6</li>
+<li>7</li>
+<li>6</li>
+<li>5
+- 4</li>
+</ul>
+</li>
+<li>3</li>
+<li>2</li>
+<li>1</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>deeply-nested one-element item</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>this
+<ul>
+<li>is
+<ul>
+<li>a
+<ul>
+<li>deeply
+<ul>
+<li>nested
+<ul>
+<li>bullet
+<ul>
+<li>list</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>this
+<ol start="2">
+<li>is
+<ol start="3">
+<li>a
+<ol start="4">
+<li>deeply
+<ol start="5">
+<li>nested
+<ol start="6">
+<li>unordered
+<ol start="7">
+<li>list</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>1</li>
+<li>2</li>
+<li>3
+- 4
+<ul>
+<li>5</li>
+<li>6</li>
+<li>7</li>
+<li>6</li>
+<li>5
+- 4</li>
+</ul>
+</li>
+<li>3</li>
+<li>2</li>
+<li>1</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>deeply-nested one-element item</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+[deoptimize context: 154db30414b1]
+**** DEOPT: finalize at bailout #3, address 0x0, frame size 16
+[deoptimizing: begin 0x25ae66f23001 finalize @3]
+  translating finalize => node=3, height=8
+    0x7fff5fbff1a8: [top + 56] <- 0x25ae66f3a9b1 ; [sp + 64] 0x25ae66f3a9b1 <an Object>
+    0x7fff5fbff1a0: [top + 48] <- 0x25ae66f3e019 ; rbx 0x25ae66f3e019 <JS Object>
+    0x7fff5fbff198: [top + 40] <- 0xd800000000 ; [sp + 48] 216
+    0x7fff5fbff190: [top + 32] <- 0x31243f0799f8 ; caller's pc
+    0x7fff5fbff188: [top + 24] <- 0x7fff5fbff1d8 ; caller's fp
+    0x7fff5fbff180: [top + 16] <- 0x14919d6689d9; context
+    0x7fff5fbff178: [top + 8] <- 0x25ae66f23001; function
+    0x7fff5fbff170: [top + 0] <- 0x154db3004121 <undefined> ; literal
+[deoptimizing: end 0x25ae66f23001 finalize => node=3, pc=0x31243f086af8, state=NO_REGISTERS, alignment=no padding, took 0.036 ms]
+[removing optimized code for: finalize]
+**** DEOPT: renderNodes at bailout #15, address 0x0, frame size 432
+[deoptimizing: begin 0x25ae67f04479 renderNodes @15]
+  translating renderNodes => node=171, height=120
+    0x7fff5fbff1f0: [top + 160] <- 0x25ae67f04301 ; [sp + 192] 0x25ae67f04301 <an Object>
+    0x7fff5fbff1e8: [top + 152] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff1e0: [top + 144] <- 0x31243f063fa0 ; caller's pc
+    0x7fff5fbff1d8: [top + 136] <- 0x7fff5fbff278 ; caller's fp
+    0x7fff5fbff1d0: [top + 128] <- 0x25ae67f04339; context
+    0x7fff5fbff1c8: [top + 120] <- 0x25ae67f04479; function
+    0x7fff5fbff1c0: [top + 112] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff1b8: [top + 104] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff1b0: [top + 96] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff1a8: [top + 88] <- 0x25ae67f04381 ; [sp + 208] 0x25ae67f04381 <an Object>
+    0x7fff5fbff1a0: [top + 80] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff198: [top + 72] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff190: [top + 64] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff188: [top + 56] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff180: [top + 48] <- 0x25ae67f043c1 ; [sp + 216] 0x25ae67f043c1 <JS Function>
+    0x7fff5fbff178: [top + 40] <- 0x14919d6da8a1 ; [sp + 224] 0x14919d6da8a1 <JS Function>
+    0x7fff5fbff170: [top + 32] <- 0x25ae67f04409 ; [sp + 232] 0x25ae67f04409 <JS Function>
+    0x7fff5fbff168: [top + 24] <- 0x25ae67f04451 ; [sp + 240] 0x25ae67f04451 <an Object>
+    0x7fff5fbff160: [top + 16] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff158: [top + 8] <- 0x154db3004121 <undefined> ; literal
+    0x7fff5fbff150: [top + 0] <- 0x154db3004101 ; rax 0x154db3004101 <null>
+[deoptimizing: end 0x25ae67f04479 renderNodes => node=171, pc=0x31243f09fd2d, state=TOS_REG, alignment=no padding, took 0.055 ms]
+[removing optimized code for: renderNodes]
+<p><a href="http://something.example.com/foo/bar" title="test">1</a> <a href="http://something.example.com/foo/bar">3</a> <a href="http://foo/bar">2</a></p>
+<p>[looooooooooooooooooooooooooooooooooooooooooooooooooong label]</p>
+<p>[[[[[[[[[[[[[[[[[[[[ this should not slow down anything ]]]]]]]]]]]]]]]]]]]]: q
+(as long as it is not referenced anywhere)</p>
+<p>[[[[[[[[[[[[[[[[[[[[]: this is not a valid reference
+<a href="http://something.example.com/foo/bar" title="test">1</a> <a href="http://something.example.com/foo/bar">3</a> <a href="http://foo/bar">2</a></p>
+<p>[looooooooooooooooooooooooooooooooooooooooooooooooooong label]</p>
+<p>[[[[[[[[[[[[[[[[[[[[ this should not slow down anything ]]]]]]]]]]]]]]]]]]]]: q
+(as long as it is not referenced anywhere)</p>
+<p>[[[[[[[[[[[[[[[[[[[[]: this is not a valid reference
+<a href="http://something.example.com/foo/bar" title="test">1</a> <a href="http://something.example.com/foo/bar">3</a> <a href="http://foo/bar">2</a></p>
+<p>[looooooooooooooooooooooooooooooooooooooooooooooooooong label]</p>
+<p>[[[[[[[[[[[[[[[[[[[[ this should not slow down anything ]]]]]]]]]]]]]]]]]]]]: q
+(as long as it is not referenced anywhere)</p>
+<p>[[[[[[[[[[[[[[[[[[[[]: this is not a valid reference
+<a href="http://something.example.com/foo/bar" title="test">1</a> <a href="http://something.example.com/foo/bar">3</a> <a href="http://foo/bar">2</a></p>
+<p>[looooooooooooooooooooooooooooooooooooooooooooooooooong label]</p>
+<p>[[[[[[[[[[[[[[[[[[[[ this should not slow down anything ]]]]]]]]]]]]]]]]]]]]: q
+(as long as it is not referenced anywhere)</p>
+<p>[[[[[[[[[[[[[[[[[[[[]: this is not a valid reference
+<a href="http://something.example.com/foo/bar" title="test">1</a> <a href="http://something.example.com/foo/bar">3</a> <a href="http://foo/bar">2</a></p>
+<p>[looooooooooooooooooooooooooooooooooooooooooooooooooong label]</p>
+<p>[[[[[[[[[[[[[[[[[[[[ this should not slow down anything ]]]]]]]]]]]]]]]]]]]]: q
+(as long as it is not referenced anywhere)</p>
+<p>[[[[[[[[[[[[[[[[[[[[]: this is not a valid reference
+<a href="http://something.example.com/foo/bar" title="test">1</a> <a href="http://something.example.com/foo/bar">3</a> <a href="http://foo/bar">2</a></p>
+<p>[looooooooooooooooooooooooooooooooooooooooooooooooooong label]</p>
+<p>[[[[[[[[[[[[[[[[[[[[ this should not slow down anything ]]]]]]]]]]]]]]]]]]]]: q
+(as long as it is not referenced anywhere)</p>
+<p>[[[[[[[[[[[[[[[[[[[[]: this is not a valid reference</p>
+[deoptimize context: a58893414b1]
+<p>[[[[[[[foo]]]]]]]</p>
+<p>[[[[[[[foo]]]]]]]: bar
+[[[[[[foo]]]]]]: bar
+[[[[[foo]]]]]: bar
+[[[[foo]]]]: bar
+[[[foo]]]: bar
+[[foo]]: bar
+[foo]: bar</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]: bar
+[<em>[</em>[<em>[foo]</em>]<em>]</em>]: bar
+[<em>[</em>[foo]<em>]</em>]: bar
+[<em>[foo]</em>]: bar
+[foo]: bar
+[[[[[[[foo]]]]]]]</p>
+<p>[[[[[[[foo]]]]]]]: bar
+[[[[[[foo]]]]]]: bar
+[[[[[foo]]]]]: bar
+[[[[foo]]]]: bar
+[[[foo]]]: bar
+[[foo]]: bar
+[foo]: bar</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]: bar
+[<em>[</em>[<em>[foo]</em>]<em>]</em>]: bar
+[<em>[</em>[foo]<em>]</em>]: bar
+[<em>[foo]</em>]: bar
+[foo]: bar
+[[[[[[[foo]]]]]]]</p>
+<p>[[[[[[[foo]]]]]]]: bar
+[[[[[[foo]]]]]]: bar
+[[[[[foo]]]]]: bar
+[[[[foo]]]]: bar
+[[[foo]]]: bar
+[[foo]]: bar
+[foo]: bar</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]: bar
+[<em>[</em>[<em>[foo]</em>]<em>]</em>]: bar
+[<em>[</em>[foo]<em>]</em>]: bar
+[<em>[foo]</em>]: bar
+[foo]: bar
+[[[[[[[foo]]]]]]]</p>
+<p>[[[[[[[foo]]]]]]]: bar
+[[[[[[foo]]]]]]: bar
+[[[[[foo]]]]]: bar
+[[[[foo]]]]: bar
+[[[foo]]]: bar
+[[foo]]: bar
+[foo]: bar</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]: bar
+[<em>[</em>[<em>[foo]</em>]<em>]</em>]: bar
+[<em>[</em>[foo]<em>]</em>]: bar
+[<em>[foo]</em>]: bar
+[foo]: bar
+[[[[[[[foo]]]]]]]</p>
+<p>[[[[[[[foo]]]]]]]: bar
+[[[[[[foo]]]]]]: bar
+[[[[[foo]]]]]: bar
+[[[[foo]]]]: bar
+[[[foo]]]: bar
+[[foo]]: bar
+[foo]: bar</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]: bar
+[<em>[</em>[<em>[foo]</em>]<em>]</em>]: bar
+[<em>[</em>[foo]<em>]</em>]: bar
+[<em>[foo]</em>]: bar
+[foo]: bar
+[[[[[[[foo]]]]]]]</p>
+<p>[[[[[[[foo]]]]]]]: bar
+[[[[[[foo]]]]]]: bar
+[[[[[foo]]]]]: bar
+[[[[foo]]]]: bar
+[[[foo]]]: bar
+[[foo]]: bar
+[foo]: bar</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]</p>
+<p>[<em>[</em>[<em>[</em>[foo]<em>]</em>]<em>]</em>]: bar
+[<em>[</em>[<em>[foo]</em>]<em>]</em>]: bar
+[<em>[</em>[foo]<em>]</em>]: bar
+[<em>[foo]</em>]: bar
+[foo]: bar</p>
+[deoptimize context: 2c9a0a9414b1]
+**** DEOPT: test at bailout #37, address 0x0, frame size 48
+[deoptimizing: begin 0x2c9a0a94a529 test @37]
+  translating test => node=383, height=32
+    0x7fff5fbff100: [top + 72] <- 0x26462af227a1 ; [sp + 88] 0x26462af227a1 <JS RegExp>
+    0x7fff5fbff0f8: [top + 64] <- 0x146574c1d109 ; [sp + 40] 0x146574c1d109 <String[1]: [>
+    0x7fff5fbff0f0: [top + 56] <- 0xe51d5a9f157 ; caller's pc
+    0x7fff5fbff0e8: [top + 48] <- 0x7fff5fbff118 ; caller's fp
+    0x7fff5fbff0e0: [top + 40] <- 0x2c9a0a941a29; context
+    0x7fff5fbff0d8: [top + 32] <- 0x2c9a0a94a529; function
+    0x7fff5fbff0d0: [top + 24] <- 0x00000000 ; [sp + 32] 0
+    0x7fff5fbff0c8: [top + 16] <- 0x00000000 ; [sp + 24] 0
+    0x7fff5fbff0c0: [top + 8] <- 0x2c9a0a904121 <undefined> ; literal
+    0x7fff5fbff0b8: [top + 0] <- 0x2c9a0a904121 <undefined> ; literal
+[deoptimizing: end 0x2c9a0a94a529 test => node=383, pc=0xe51d5a64f72, state=NO_REGISTERS, alignment=no padding, took 0.039 ms]
+[removing optimized code for: test]
+**** DEOPT: isFinite at bailout #4, address 0x0, frame size 8
+[deoptimizing: begin 0x2c9a0a949431 isFinite @4]
+  translating isFinite => node=35, height=8
+    0x7fff5fbfefd8: [top + 48] <- 0x2c9a0a904121 ; [sp + 48] 0x2c9a0a904121 <undefined>
+    0x7fff5fbfefd0: [top + 40] <- 0x146574c04149 ; rbx 0x146574c04149 <Number: nan>
+    0x7fff5fbfefc8: [top + 32] <- 0xe51d5aa3715 ; caller's pc
+    0x7fff5fbfefc0: [top + 24] <- 0x7fff5fbff008 ; caller's fp
+    0x7fff5fbfefb8: [top + 16] <- 0x2c9a0a941a29; context
+    0x7fff5fbfefb0: [top + 8] <- 0x2c9a0a949431; function
+    0x7fff5fbfefa8: [top + 0] <- 0x2c9a0a904181 ; rax 0x2c9a0a904181 <false>
+[deoptimizing: end 0x2c9a0a949431 isFinite => node=35, pc=0xe51d5a8cd8e, state=TOS_REG, alignment=no padding, took 0.024 ms]
+[removing optimized code for: isFinite]
+<p>closed (valid) autolinks:</p>
+<p><a href="ftp://1.2.3.4:21/path/foo">ftp://1.2.3.4:21/path/foo</a>
+<a href="http://foo.bar.baz?q=hello&amp;id=22&amp;boolean">http://foo.bar.baz?q=hello&amp;id=22&amp;boolean</a>
+<a href="http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/">http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/</a>
+<a href="mailto:teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com">teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com</a></p>
+<p>these are not autolinks:</p>
+<p>&lt;ftp://1.2.3.4:21/path/foo
+&lt;http://foo.bar.baz?q=hello&amp;id=22&amp;boolean
+&lt;http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink
+&lt;teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com
+&lt; http://foo.bar.baz?q=hello&amp;id=22&amp;boolean &gt;
+closed (valid) autolinks:</p>
+<p><a href="ftp://1.2.3.4:21/path/foo">ftp://1.2.3.4:21/path/foo</a>
+<a href="http://foo.bar.baz?q=hello&amp;id=22&amp;boolean">http://foo.bar.baz?q=hello&amp;id=22&amp;boolean</a>
+<a href="http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/">http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/</a>
+<a href="mailto:teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com">teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com</a></p>
+<p>these are not autolinks:</p>
+<p>&lt;ftp://1.2.3.4:21/path/foo
+&lt;http://foo.bar.baz?q=hello&amp;id=22&amp;boolean
+&lt;http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink
+&lt;teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com
+&lt; http://foo.bar.baz?q=hello&amp;id=22&amp;boolean &gt;
+closed (valid) autolinks:</p>
+<p><a href="ftp://1.2.3.4:21/path/foo">ftp://1.2.3.4:21/path/foo</a>
+<a href="http://foo.bar.baz?q=hello&amp;id=22&amp;boolean">http://foo.bar.baz?q=hello&amp;id=22&amp;boolean</a>
+<a href="http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/">http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/</a>
+<a href="mailto:teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com">teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com</a></p>
+<p>these are not autolinks:</p>
+<p>&lt;ftp://1.2.3.4:21/path/foo
+&lt;http://foo.bar.baz?q=hello&amp;id=22&amp;boolean
+&lt;http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink
+&lt;teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com
+&lt; http://foo.bar.baz?q=hello&amp;id=22&amp;boolean &gt;
+closed (valid) autolinks:</p>
+<p><a href="ftp://1.2.3.4:21/path/foo">ftp://1.2.3.4:21/path/foo</a>
+<a href="http://foo.bar.baz?q=hello&amp;id=22&amp;boolean">http://foo.bar.baz?q=hello&amp;id=22&amp;boolean</a>
+<a href="http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/">http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/</a>
+<a href="mailto:teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com">teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com</a></p>
+<p>these are not autolinks:</p>
+<p>&lt;ftp://1.2.3.4:21/path/foo
+&lt;http://foo.bar.baz?q=hello&amp;id=22&amp;boolean
+&lt;http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink
+&lt;teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com
+&lt; http://foo.bar.baz?q=hello&amp;id=22&amp;boolean &gt;
+closed (valid) autolinks:</p>
+<p><a href="ftp://1.2.3.4:21/path/foo">ftp://1.2.3.4:21/path/foo</a>
+<a href="http://foo.bar.baz?q=hello&amp;id=22&amp;boolean">http://foo.bar.baz?q=hello&amp;id=22&amp;boolean</a>
+<a href="http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/">http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/</a>
+<a href="mailto:teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com">teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com</a></p>
+<p>these are not autolinks:</p>
+<p>&lt;ftp://1.2.3.4:21/path/foo
+&lt;http://foo.bar.baz?q=hello&amp;id=22&amp;boolean
+&lt;http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink
+&lt;teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com
+&lt; http://foo.bar.baz?q=hello&amp;id=22&amp;boolean &gt;
+closed (valid) autolinks:</p>
+<p><a href="ftp://1.2.3.4:21/path/foo">ftp://1.2.3.4:21/path/foo</a>
+<a href="http://foo.bar.baz?q=hello&amp;id=22&amp;boolean">http://foo.bar.baz?q=hello&amp;id=22&amp;boolean</a>
+<a href="http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/">http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink/</a>
+<a href="mailto:teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com">teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com</a></p>
+<p>these are not autolinks:</p>
+<p>&lt;ftp://1.2.3.4:21/path/foo
+&lt;http://foo.bar.baz?q=hello&amp;id=22&amp;boolean
+&lt;http://veeeeeeeeeeeeeeeeeeery.loooooooooooooooooooooooooooooooong.autolink
+&lt;teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest@gmail.com
+&lt; http://foo.bar.baz?q=hello&amp;id=22&amp;boolean &gt;</p>
+[deoptimize context: 2a2daaf414b1]
+<p><code>lots</code>of<code>backticks</code></p>
+<p><code>i</code>wonder<code>how</code>this<code>will</code>be<code>parsed</code>
+<code>lots</code>of<code>backticks</code></p>
+<p><code>i</code>wonder<code>how</code>this<code>will</code>be<code>parsed</code>
+<code>lots</code>of<code>backticks</code></p>
+<p><code>i</code>wonder<code>how</code>this<code>will</code>be<code>parsed</code>
+<code>lots</code>of<code>backticks</code></p>
+<p><code>i</code>wonder<code>how</code>this<code>will</code>be<code>parsed</code>
+<code>lots</code>of<code>backticks</code></p>
+<p><code>i</code>wonder<code>how</code>this<code>will</code>be<code>parsed</code>
+<code>lots</code>of<code>backticks</code></p>
+<p><code>i</code>wonder<code>how</code>this<code>will</code>be<code>parsed</code></p>
+[deoptimize context: 2872348414b1]
+<p><em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><strong>this</strong> <strong>is</strong> <strong>your</strong> <strong>basic</strong> <strong>boring</strong> <strong>emphasis</strong>
+<em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><strong>this</strong> <strong>is</strong> <strong>your</strong> <strong>basic</strong> <strong>boring</strong> <strong>emphasis</strong>
+<em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><strong>this</strong> <strong>is</strong> <strong>your</strong> <strong>basic</strong> <strong>boring</strong> <strong>emphasis</strong>
+<em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><strong>this</strong> <strong>is</strong> <strong>your</strong> <strong>basic</strong> <strong>boring</strong> <strong>emphasis</strong>
+<em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><strong>this</strong> <strong>is</strong> <strong>your</strong> <strong>basic</strong> <strong>boring</strong> <strong>emphasis</strong>
+<em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><em>this</em> <em>is</em> <em>your</em> <em>basic</em> <em>boring</em> <em>emphasis</em></p>
+<p><strong>this</strong> <strong>is</strong> <strong>your</strong> <strong>basic</strong> <strong>boring</strong> <strong>emphasis</strong></p>
+[deoptimize context: 23bca40414b1]
+**** DEOPT: test at bailout #37, address 0x0, frame size 48
+[deoptimizing: begin 0x23bca404a529 test @37]
+  translating test => node=383, height=32
+    0x7fff5fbff100: [top + 72] <- 0x25ca88f227a1 ; [sp + 88] 0x25ca88f227a1 <JS RegExp>
+    0x7fff5fbff0f8: [top + 64] <- 0x25ca88f45191 ; [sp + 40] 0x25ca88f45191 <String[4]: this>
+    0x7fff5fbff0f0: [top + 56] <- 0x399116e9d317 ; caller's pc
+    0x7fff5fbff0e8: [top + 48] <- 0x7fff5fbff118 ; caller's fp
+    0x7fff5fbff0e0: [top + 40] <- 0x23bca4041a29; context
+    0x7fff5fbff0d8: [top + 32] <- 0x23bca404a529; function
+    0x7fff5fbff0d0: [top + 24] <- 0x00000000 ; [sp + 32] 0
+    0x7fff5fbff0c8: [top + 16] <- 0x00000000 ; [sp + 24] 0
+    0x7fff5fbff0c0: [top + 8] <- 0x23bca4004121 <undefined> ; literal
+    0x7fff5fbff0b8: [top + 0] <- 0x23bca4004121 <undefined> ; literal
+[deoptimizing: end 0x23bca404a529 test => node=383, pc=0x399116e64f72, state=NO_REGISTERS, alignment=no padding, took 0.039 ms]
+[removing optimized code for: test]
+**** DEOPT: isFinite at bailout #4, address 0x0, frame size 8
+[deoptimizing: begin 0x23bca4049431 isFinite @4]
+  translating isFinite => node=35, height=8
+    0x7fff5fbfefd8: [top + 48] <- 0x23bca4004121 ; [sp + 48] 0x23bca4004121 <undefined>
+    0x7fff5fbfefd0: [top + 40] <- 0x319fc2604149 ; rbx 0x319fc2604149 <Number: nan>
+    0x7fff5fbfefc8: [top + 32] <- 0x399116ea0d95 ; caller's pc
+    0x7fff5fbfefc0: [top + 24] <- 0x7fff5fbff008 ; caller's fp
+    0x7fff5fbfefb8: [top + 16] <- 0x23bca4041a29; context
+    0x7fff5fbfefb0: [top + 8] <- 0x23bca4049431; function
+    0x7fff5fbfefa8: [top + 0] <- 0x23bca4004181 ; rax 0x23bca4004181 <false>
+[deoptimizing: end 0x23bca4049431 isFinite => node=35, pc=0x399116e8c78e, state=TOS_REG, alignment=no padding, took 0.018 ms]
+[removing optimized code for: isFinite]
+<p><em>this <em>is <em>a <em>bunch</em> of</em> nested</em> emphases</em></p>
+<p><strong>this <strong>is <strong>a <strong>bunch</strong> of</strong> nested</strong> emphases</strong></p>
+<p><strong><em>this <strong><em>is <strong><em>a <strong><em>bunch</em></strong> of</em></strong> nested</em></strong> emphases</em></strong>
+<em>this <em>is <em>a <em>bunch</em> of</em> nested</em> emphases</em></p>
+<p><strong>this <strong>is <strong>a <strong>bunch</strong> of</strong> nested</strong> emphases</strong></p>
+<p><strong><em>this <strong><em>is <strong><em>a <strong><em>bunch</em></strong> of</em></strong> nested</em></strong> emphases</em></strong>
+<em>this <em>is <em>a <em>bunch</em> of</em> nested</em> emphases</em></p>
+<p><strong>this <strong>is <strong>a <strong>bunch</strong> of</strong> nested</strong> emphases</strong></p>
+<p><strong><em>this <strong><em>is <strong><em>a <strong><em>bunch</em></strong> of</em></strong> nested</em></strong> emphases</em></strong>
+<em>this <em>is <em>a <em>bunch</em> of</em> nested</em> emphases</em></p>
+<p><strong>this <strong>is <strong>a <strong>bunch</strong> of</strong> nested</strong> emphases</strong></p>
+<p><strong><em>this <strong><em>is <strong><em>a <strong><em>bunch</em></strong> of</em></strong> nested</em></strong> emphases</em></strong>
+<em>this <em>is <em>a <em>bunch</em> of</em> nested</em> emphases</em></p>
+<p><strong>this <strong>is <strong>a <strong>bunch</strong> of</strong> nested</strong> emphases</strong></p>
+<p><strong><em>this <strong><em>is <strong><em>a <strong><em>bunch</em></strong> of</em></strong> nested</em></strong> emphases</em></strong>
+<em>this <em>is <em>a <em>bunch</em> of</em> nested</em> emphases</em></p>
+<p><strong>this <strong>is <strong>a <strong>bunch</strong> of</strong> nested</strong> emphases</strong></p>
+<p><strong><em>this <strong><em>is <strong><em>a <strong><em>bunch</em></strong> of</em></strong> nested</em></strong> emphases</em></strong></p>
+[deoptimize context: 2df9f19414b1]
+**** DEOPT: test at bailout #37, address 0x0, frame size 48
+[deoptimizing: begin 0x2df9f194a529 test @37]
+  translating test => node=383, height=32
+    0x7fff5fbff100: [top + 72] <- 0x3d804ef227a1 ; [sp + 88] 0x3d804ef227a1 <JS RegExp>
+    0x7fff5fbff0f8: [top + 64] <- 0x3d804ef451a9 ; [sp + 40] 0x3d804ef451a9 <String[5]: this >
+    0x7fff5fbff0f0: [top + 56] <- 0x3a6a5549d5f7 ; caller's pc
+    0x7fff5fbff0e8: [top + 48] <- 0x7fff5fbff118 ; caller's fp
+    0x7fff5fbff0e0: [top + 40] <- 0x2df9f1941a29; context
+    0x7fff5fbff0d8: [top + 32] <- 0x2df9f194a529; function
+    0x7fff5fbff0d0: [top + 24] <- 0x00000000 ; [sp + 32] 0
+    0x7fff5fbff0c8: [top + 16] <- 0x00000000 ; [sp + 24] 0
+    0x7fff5fbff0c0: [top + 8] <- 0x2df9f1904121 <undefined> ; literal
+    0x7fff5fbff0b8: [top + 0] <- 0x2df9f1904121 <undefined> ; literal
+[deoptimizing: end 0x2df9f194a529 test => node=383, pc=0x3a6a55464f72, state=NO_REGISTERS, alignment=no padding, took 0.037 ms]
+[removing optimized code for: test]
+**** DEOPT: isFinite at bailout #4, address 0x0, frame size 8
+[deoptimizing: begin 0x2df9f1949431 isFinite @4]
+  translating isFinite => node=35, height=8
+    0x7fff5fbfefd8: [top + 48] <- 0x2df9f1904121 ; [sp + 48] 0x2df9f1904121 <undefined>
+    0x7fff5fbfefd0: [top + 40] <- 0xba07e104149 ; rbx 0xba07e104149 <Number: nan>
+    0x7fff5fbfefc8: [top + 32] <- 0x3a6a554a0a95 ; caller's pc
+    0x7fff5fbfefc0: [top + 24] <- 0x7fff5fbff008 ; caller's fp
+    0x7fff5fbfefb8: [top + 16] <- 0x2df9f1941a29; context
+    0x7fff5fbfefb0: [top + 8] <- 0x2df9f1949431; function
+    0x7fff5fbfefa8: [top + 0] <- 0x2df9f1904181 ; rax 0x2df9f1904181 <false>
+[deoptimizing: end 0x2df9f1949431 isFinite => node=35, pc=0x3a6a5548c78e, state=TOS_REG, alignment=no padding, took 0.018 ms]
+[removing optimized code for: isFinite]
+<p>*this *is *a *worst *case *for *em *backtracking</p>
+<p>__this __is __a __worst __case __for __em __backtracking</p>
+<p>***this ***is ***a ***worst ***case ***for ***em ***backtracking
+*this *is *a *worst *case *for *em *backtracking</p>
+<p>__this __is __a __worst __case __for __em __backtracking</p>
+<p>***this ***is ***a ***worst ***case ***for ***em ***backtracking
+*this *is *a *worst *case *for *em *backtracking</p>
+<p>__this __is __a __worst __case __for __em __backtracking</p>
+<p>***this ***is ***a ***worst ***case ***for ***em ***backtracking
+*this *is *a *worst *case *for *em *backtracking</p>
+<p>__this __is __a __worst __case __for __em __backtracking</p>
+<p>***this ***is ***a ***worst ***case ***for ***em ***backtracking
+*this *is *a *worst *case *for *em *backtracking</p>
+<p>__this __is __a __worst __case __for __em __backtracking</p>
+<p>***this ***is ***a ***worst ***case ***for ***em ***backtracking
+*this *is *a *worst *case *for *em *backtracking</p>
+<p>__this __is __a __worst __case __for __em __backtracking</p>
+<p>***this ***is ***a ***worst ***case ***for ***em ***backtracking</p>
+[deoptimize context: 353e5d5414b1]
+**** DEOPT: test at bailout #37, address 0x0, frame size 48
+[deoptimizing: begin 0x353e5d54a529 test @37]
+  translating test => node=383, height=32
+    0x7fff5fbff100: [top + 72] <- 0xf391ef227a1 ; [sp + 88] 0xf391ef227a1 <JS RegExp>
+    0x7fff5fbff0f8: [top + 64] <- 0x21fce57380c9 ; [sp + 40] 0x21fce57380c9 <String[1]: *>
+    0x7fff5fbff0f0: [top + 56] <- 0x37c79af9d2b7 ; caller's pc
+    0x7fff5fbff0e8: [top + 48] <- 0x7fff5fbff118 ; caller's fp
+    0x7fff5fbff0e0: [top + 40] <- 0x353e5d541a29; context
+    0x7fff5fbff0d8: [top + 32] <- 0x353e5d54a529; function
+    0x7fff5fbff0d0: [top + 24] <- 0x00000000 ; [sp + 32] 0
+    0x7fff5fbff0c8: [top + 16] <- 0x00000000 ; [sp + 24] 0
+    0x7fff5fbff0c0: [top + 8] <- 0x353e5d504121 <undefined> ; literal
+    0x7fff5fbff0b8: [top + 0] <- 0x353e5d504121 <undefined> ; literal
+[deoptimizing: end 0x353e5d54a529 test => node=383, pc=0x37c79af64f72, state=NO_REGISTERS, alignment=no padding, took 0.037 ms]
+[removing optimized code for: test]
+**** DEOPT: isFinite at bailout #4, address 0x0, frame size 8
+[deoptimizing: begin 0x353e5d549431 isFinite @4]
+  translating isFinite => node=35, height=8
+    0x7fff5fbfefd8: [top + 48] <- 0x353e5d504121 ; [sp + 48] 0x353e5d504121 <undefined>
+    0x7fff5fbfefd0: [top + 40] <- 0x387c2a04149 ; rbx 0x387c2a04149 <Number: nan>
+    0x7fff5fbfefc8: [top + 32] <- 0x37c79afa0d35 ; caller's pc
+    0x7fff5fbfefc0: [top + 24] <- 0x7fff5fbff008 ; caller's fp
+    0x7fff5fbfefb8: [top + 16] <- 0x353e5d541a29; context
+    0x7fff5fbfefb0: [top + 8] <- 0x353e5d549431; function
+    0x7fff5fbfefa8: [top + 0] <- 0x353e5d504181 ; rax 0x353e5d504181 <false>
+[deoptimizing: end 0x353e5d549431 isFinite => node=35, pc=0x37c79af8c78e, state=TOS_REG, alignment=no padding, took 0.019 ms]
+[removing optimized code for: isFinite]
+<p>entities:</p>
+<p>  &amp; © Æ Ď ¾ ℋ ⅆ ∲</p>
+<p># Ӓ Ϡ �</p>
+<p>non-entities:</p>
+<p>&amp;18900987654321234567890; &amp;1234567890098765432123456789009876543212345678987654;</p>
+<p>&amp;qwertyuioppoiuytrewqwer; &amp;oiuytrewqwertyuioiuytrewqwertyuioytrewqwertyuiiuytri;
+entities:</p>
+<p>  &amp; © Æ Ď ¾ ℋ ⅆ ∲</p>
+<p># Ӓ Ϡ �</p>
+<p>non-entities:</p>
+<p>&amp;18900987654321234567890; &amp;1234567890098765432123456789009876543212345678987654;</p>
+<p>&amp;qwertyuioppoiuytrewqwer; &amp;oiuytrewqwertyuioiuytrewqwertyuioytrewqwertyuiiuytri;
+entities:</p>
+<p>  &amp; © Æ Ď ¾ ℋ ⅆ ∲</p>
+<p># Ӓ Ϡ �</p>
+<p>non-entities:</p>
+<p>&amp;18900987654321234567890; &amp;1234567890098765432123456789009876543212345678987654;</p>
+<p>&amp;qwertyuioppoiuytrewqwer; &amp;oiuytrewqwertyuioiuytrewqwertyuioytrewqwertyuiiuytri;
+entities:</p>
+<p>  &amp; © Æ Ď ¾ ℋ ⅆ ∲</p>
+<p># Ӓ Ϡ �</p>
+<p>non-entities:</p>
+<p>&amp;18900987654321234567890; &amp;1234567890098765432123456789009876543212345678987654;</p>
+<p>&amp;qwertyuioppoiuytrewqwer; &amp;oiuytrewqwertyuioiuytrewqwertyuioytrewqwertyuiiuytri;
+entities:</p>
+<p>  &amp; © Æ Ď ¾ ℋ ⅆ ∲</p>
+<p># Ӓ Ϡ �</p>
+<p>non-entities:</p>
+<p>&amp;18900987654321234567890; &amp;1234567890098765432123456789009876543212345678987654;</p>
+<p>&amp;qwertyuioppoiuytrewqwer; &amp;oiuytrewqwertyuioiuytrewqwertyuioytrewqwertyuiiuytri;
+entities:</p>
+<p>  &amp; © Æ Ď ¾ ℋ ⅆ ∲</p>
+<p># Ӓ Ϡ �</p>
+<p>non-entities:</p>
+<p>&amp;18900987654321234567890; &amp;1234567890098765432123456789009876543212345678987654;</p>
+<p>&amp;qwertyuioppoiuytrewqwer; &amp;oiuytrewqwertyuioiuytrewqwertyuioytrewqwertyuiiuytri;</p>
+[deoptimize context: 63fc3414b1]
+<p>\t\e\s\t\i\n\g \e\s\c\a\p\e \s\e\q\u\e\n\c\e\s</p>
+<p>!\&quot;#$%&amp;'()*+,./:;&lt;=&gt;?</p>
+<p>@ [ ] ^ _ ` { | } ~ - '</p>
+<p><br />
+\
+\<br />
+\\
+\\\</p>
+<p>&lt;this&gt; &lt;is&gt; &lt;not&gt; &lt;html&gt;</p>
+<p>\t\e\s\t\i\n\g \e\s\c\a\p\e \s\e\q\u\e\n\c\e\s</p>
+<p>!\&quot;#$%&amp;'()*+,./:;&lt;=&gt;?</p>
+<p>@ [ ] ^ _ ` { | } ~ - '</p>
+<p><br />
+\
+\<br />
+\\
+\\\</p>
+<p>&lt;this&gt; &lt;is&gt; &lt;not&gt; &lt;html&gt;</p>
+<p>\t\e\s\t\i\n\g \e\s\c\a\p\e \s\e\q\u\e\n\c\e\s</p>
+<p>!\&quot;#$%&amp;'()*+,./:;&lt;=&gt;?</p>
+<p>@ [ ] ^ _ ` { | } ~ - '</p>
+<p><br />
+\
+\<br />
+\\
+\\\</p>
+<p>&lt;this&gt; &lt;is&gt; &lt;not&gt; &lt;html&gt;</p>
+<p>\t\e\s\t\i\n\g \e\s\c\a\p\e \s\e\q\u\e\n\c\e\s</p>
+<p>!\&quot;#$%&amp;'()*+,./:;&lt;=&gt;?</p>
+<p>@ [ ] ^ _ ` { | } ~ - '</p>
+<p><br />
+\
+\<br />
+\\
+\\\</p>
+<p>&lt;this&gt; &lt;is&gt; &lt;not&gt; &lt;html&gt;</p>
+<p>\t\e\s\t\i\n\g \e\s\c\a\p\e \s\e\q\u\e\n\c\e\s</p>
+<p>!\&quot;#$%&amp;'()*+,./:;&lt;=&gt;?</p>
+<p>@ [ ] ^ _ ` { | } ~ - '</p>
+<p><br />
+\
+\<br />
+\\
+\\\</p>
+<p>&lt;this&gt; &lt;is&gt; &lt;not&gt; &lt;html&gt;</p>
+<p>\t\e\s\t\i\n\g \e\s\c\a\p\e \s\e\q\u\e\n\c\e\s</p>
+<p>!\&quot;#$%&amp;'()*+,./:;&lt;=&gt;?</p>
+<p>@ [ ] ^ _ ` { | } ~ - '</p>
+<p><br />
+\
+\<br />
+\\
+\\\</p>
+<p>&lt;this&gt; &lt;is&gt; &lt;not&gt; &lt;html&gt;</p>
+[deoptimize context: acd67a414b1]
+**** DEOPT: parseBackslash at bailout #8, address 0x0, frame size 48
+[deoptimizing: begin 0x39061ef1dbc9 parseBackslash @8]
+  translating parseBackslash => node=251, height=24
+    0x7fff5fbff0e0: [top + 64] <- 0x39061ef3c3c1 ; rbx 0x39061ef3c3c1 <an Object>
+    0x7fff5fbff0d8: [top + 56] <- 0x39061ef46421 ; [sp + 80] 0x39061ef46421 <JS Object>
+    0x7fff5fbff0d0: [top + 48] <- 0x10a85f084090 ; caller's pc
+    0x7fff5fbff0c8: [top + 40] <- 0x7fff5fbff110 ; caller's fp
+    0x7fff5fbff0c0: [top + 32] <- 0x39061ef1b1f9; context
+    0x7fff5fbff0b8: [top + 24] <- 0x39061ef1dbc9; function
+    0x7fff5fbff0b0: [top + 16] <- 0x39061ef6ff51 ; rcx 0x39061ef6ff51 <String[19]\: \\\n\\\\\n\\\\\\\n\\\\\\\\\n\\\\\\\\\\>
+    0x7fff5fbff0a8: [top + 8] <- 0x1200000000 ; rdi 18
+    0x7fff5fbff0a0: [top + 0] <- 0xacd67a04121 <undefined> ; literal
+[deoptimizing: end 0x39061ef1dbc9 parseBackslash => node=251, pc=0x10a85f084559, state=NO_REGISTERS, alignment=no padding, took 0.047 ms]
+[removing optimized code for: parseBackslash]
+**** DEOPT: test at bailout #37, address 0x0, frame size 48
+[deoptimizing: begin 0xacd67a4a529 test @37]
+  translating test => node=383, height=32
+    0x7fff5fbff100: [top + 72] <- 0x39061ef227a1 ; [sp + 88] 0x39061ef227a1 <JS RegExp>
+    0x7fff5fbff0f8: [top + 64] <- 0x3ab5d8d1fdd1 ; [sp + 40] 0x3ab5d8d1fdd1 <String[1]: \>
+    0x7fff5fbff0f0: [top + 56] <- 0x10a85f094937 ; caller's pc
+    0x7fff5fbff0e8: [top + 48] <- 0x7fff5fbff118 ; caller's fp
+    0x7fff5fbff0e0: [top + 40] <- 0xacd67a41a29; context
+    0x7fff5fbff0d8: [top + 32] <- 0xacd67a4a529; function
+    0x7fff5fbff0d0: [top + 24] <- 0x00000000 ; [sp + 32] 0
+    0x7fff5fbff0c8: [top + 16] <- 0x00000000 ; [sp + 24] 0
+    0x7fff5fbff0c0: [top + 8] <- 0xacd67a04121 <undefined> ; literal
+    0x7fff5fbff0b8: [top + 0] <- 0xacd67a04121 <undefined> ; literal
+[deoptimizing: end 0xacd67a4a529 test => node=383, pc=0x10a85f064f72, state=NO_REGISTERS, alignment=no padding, took 0.026 ms]
+[removing optimized code for: test]
+<p>Taking commonmark tests from the spec for benchmarking here:</p>
+<p><a><bab><c2c></p>
+<p><a/><b2/></p>
+<p><a  /><b2
+data="foo" ></p>
+<p><a foo="bar" bam = 'baz <em>"</em>'
+_boolean zoop:33=zoop:33 /></p>
+<p>&lt;33&gt; &lt;__&gt;</p>
+<p>&lt;a h*#ref=&quot;hi&quot;&gt;</p>
+<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>
+<p>&lt; a&gt;&lt;
+foo&gt;&lt;bar/ &gt;</p>
+<p>&lt;a href='bar'title=title&gt;</p>
+<p></a>
+</foo ></p>
+<p>&lt;/a href=&quot;foo&quot;&gt;</p>
+<p>foo <!-- this is a
+comment - with hyphen --></p>
+<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>
+<p>foo <?php echo $a; ?></p>
+<p>foo <!ELEMENT br EMPTY></p>
+<p>foo <![CDATA[>&<]]></p>
+<p><a href="&ouml;"></p>
+<p><a href="\*"></p>
+<p>&lt;a href=&quot;&quot;&quot;&gt;
+Taking commonmark tests from the spec for benchmarking here:</p>
+<p><a><bab><c2c></p>
+<p><a/><b2/></p>
+<p><a  /><b2
+data="foo" ></p>
+<p><a foo="bar" bam = 'baz <em>"</em>'
+_boolean zoop:33=zoop:33 /></p>
+<p>&lt;33&gt; &lt;__&gt;</p>
+<p>&lt;a h*#ref=&quot;hi&quot;&gt;</p>
+<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>
+<p>&lt; a&gt;&lt;
+foo&gt;&lt;bar/ &gt;</p>
+<p>&lt;a href='bar'title=title&gt;</p>
+<p></a>
+</foo ></p>
+<p>&lt;/a href=&quot;foo&quot;&gt;</p>
+<p>foo <!-- this is a
+comment - with hyphen --></p>
+<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>
+<p>foo <?php echo $a; ?></p>
+<p>foo <!ELEMENT br EMPTY></p>
+<p>foo <![CDATA[>&<]]></p>
+<p><a href="&ouml;"></p>
+<p><a href="\*"></p>
+<p>&lt;a href=&quot;&quot;&quot;&gt;
+Taking commonmark tests from the spec for benchmarking here:</p>
+<p><a><bab><c2c></p>
+<p><a/><b2/></p>
+<p><a  /><b2
+data="foo" ></p>
+<p><a foo="bar" bam = 'baz <em>"</em>'
+_boolean zoop:33=zoop:33 /></p>
+<p>&lt;33&gt; &lt;__&gt;</p>
+<p>&lt;a h*#ref=&quot;hi&quot;&gt;</p>
+<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>
+<p>&lt; a&gt;&lt;
+foo&gt;&lt;bar/ &gt;</p>
+<p>&lt;a href='bar'title=title&gt;</p>
+<p></a>
+</foo ></p>
+<p>&lt;/a href=&quot;foo&quot;&gt;</p>
+<p>foo <!-- this is a
+comment - with hyphen --></p>
+<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>
+<p>foo <?php echo $a; ?></p>
+<p>foo <!ELEMENT br EMPTY></p>
+<p>foo <![CDATA[>&<]]></p>
+<p><a href="&ouml;"></p>
+<p><a href="\*"></p>
+<p>&lt;a href=&quot;&quot;&quot;&gt;
+Taking commonmark tests from the spec for benchmarking here:</p>
+<p><a><bab><c2c></p>
+<p><a/><b2/></p>
+<p><a  /><b2
+data="foo" ></p>
+<p><a foo="bar" bam = 'baz <em>"</em>'
+_boolean zoop:33=zoop:33 /></p>
+<p>&lt;33&gt; &lt;__&gt;</p>
+<p>&lt;a h*#ref=&quot;hi&quot;&gt;</p>
+<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>
+<p>&lt; a&gt;&lt;
+foo&gt;&lt;bar/ &gt;</p>
+<p>&lt;a href='bar'title=title&gt;</p>
+<p></a>
+</foo ></p>
+<p>&lt;/a href=&quot;foo&quot;&gt;</p>
+<p>foo <!-- this is a
+comment - with hyphen --></p>
+<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>
+<p>foo <?php echo $a; ?></p>
+<p>foo <!ELEMENT br EMPTY></p>
+<p>foo <![CDATA[>&<]]></p>
+<p><a href="&ouml;"></p>
+<p><a href="\*"></p>
+<p>&lt;a href=&quot;&quot;&quot;&gt;
+Taking commonmark tests from the spec for benchmarking here:</p>
+<p><a><bab><c2c></p>
+<p><a/><b2/></p>
+<p><a  /><b2
+data="foo" ></p>
+<p><a foo="bar" bam = 'baz <em>"</em>'
+_boolean zoop:33=zoop:33 /></p>
+<p>&lt;33&gt; &lt;__&gt;</p>
+<p>&lt;a h*#ref=&quot;hi&quot;&gt;</p>
+<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>
+<p>&lt; a&gt;&lt;
+foo&gt;&lt;bar/ &gt;</p>
+<p>&lt;a href='bar'title=title&gt;</p>
+<p></a>
+</foo ></p>
+<p>&lt;/a href=&quot;foo&quot;&gt;</p>
+<p>foo <!-- this is a
+comment - with hyphen --></p>
+<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>
+<p>foo <?php echo $a; ?></p>
+<p>foo <!ELEMENT br EMPTY></p>
+<p>foo <![CDATA[>&<]]></p>
+<p><a href="&ouml;"></p>
+<p><a href="\*"></p>
+<p>&lt;a href=&quot;&quot;&quot;&gt;
+Taking commonmark tests from the spec for benchmarking here:</p>
+<p><a><bab><c2c></p>
+<p><a/><b2/></p>
+<p><a  /><b2
+data="foo" ></p>
+<p><a foo="bar" bam = 'baz <em>"</em>'
+_boolean zoop:33=zoop:33 /></p>
+<p>&lt;33&gt; &lt;__&gt;</p>
+<p>&lt;a h*#ref=&quot;hi&quot;&gt;</p>
+<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>
+<p>&lt; a&gt;&lt;
+foo&gt;&lt;bar/ &gt;</p>
+<p>&lt;a href='bar'title=title&gt;</p>
+<p></a>
+</foo ></p>
+<p>&lt;/a href=&quot;foo&quot;&gt;</p>
+<p>foo <!-- this is a
+comment - with hyphen --></p>
+<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>
+<p>foo <?php echo $a; ?></p>
+<p>foo <!ELEMENT br EMPTY></p>
+<p>foo <![CDATA[>&<]]></p>
+<p><a href="&ouml;"></p>
+<p><a href="\*"></p>
+<p>&lt;a href=&quot;&quot;&quot;&gt;</p>
+[deoptimize context: 2252644414b1]
+**** DEOPT: next at bailout #7, address 0x0, frame size 48
+[deoptimizing: begin 0xb9ea5748e39 next @7]
+  translating next => node=203, height=24
+    0x7fff5fbff158: [top + 56] <- 0x17998f5b991 ; rdi 0x17998f5b991 <an Object>
+    0x7fff5fbff150: [top + 48] <- 0x2d3fb718b888 ; caller's pc
+    0x7fff5fbff148: [top + 40] <- 0x7fff5fbff190 ; caller's fp
+    0x7fff5fbff140: [top + 32] <- 0xb9ea573dba9; context
+    0x7fff5fbff138: [top + 24] <- 0xb9ea5748e39; function
+    0x7fff5fbff130: [top + 16] <- 0x17998f5b3e9 ; rcx 0x17998f5b3e9 <JS Object>
+    0x7fff5fbff128: [top + 8] <- 0x225264404181 ; rdx 0x225264404181 <false>
+    0x7fff5fbff120: [top + 0] <- 0x225264404161 ; rbx 0x225264404161 <true>
+[deoptimizing: end 0xb9ea5748e39 next => node=203, pc=0x2d3fb718c269, state=NO_REGISTERS, alignment=no padding, took 0.036 ms]
+[removing optimized code for: next]
+<p>Valid links:</p>
+<p><a href="">this is a link</a>
+<a href="http://something.example.com/foo/bar">this is a link</a>
+<a href="http://something.example.com/foo/bar" title="test">this is a link</a>
+<img src="" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" title="test" /></p>
+<p><a href="%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E" title="''''''''''''''">escape test</a>
+<a href="))))))))))))))">escape test ]]]]]]]]]]]]]]]]</a></p>
+<p>Invalid links:</p>
+<p>[this is not a link</p>
+<p>[this is not a link](</p>
+<p>[this is not a link](http://something.example.com/foo/bar 'test'</p>
+<p>[this is not a link](((((((((((((((((((((((((((((((((((((((((((((((</p>
+<p>[this is not a link]((((((((((()))))))))) (((((((((()))))))))))
+Valid links:</p>
+<p><a href="">this is a link</a>
+<a href="http://something.example.com/foo/bar">this is a link</a>
+<a href="http://something.example.com/foo/bar" title="test">this is a link</a>
+<img src="" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" title="test" /></p>
+<p><a href="%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E" title="''''''''''''''">escape test</a>
+<a href="))))))))))))))">escape test ]]]]]]]]]]]]]]]]</a></p>
+<p>Invalid links:</p>
+<p>[this is not a link</p>
+<p>[this is not a link](</p>
+<p>[this is not a link](http://something.example.com/foo/bar 'test'</p>
+<p>[this is not a link](((((((((((((((((((((((((((((((((((((((((((((((</p>
+<p>[this is not a link]((((((((((()))))))))) (((((((((()))))))))))
+Valid links:</p>
+<p><a href="">this is a link</a>
+<a href="http://something.example.com/foo/bar">this is a link</a>
+<a href="http://something.example.com/foo/bar" title="test">this is a link</a>
+<img src="" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" title="test" /></p>
+<p><a href="%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E" title="''''''''''''''">escape test</a>
+<a href="))))))))))))))">escape test ]]]]]]]]]]]]]]]]</a></p>
+<p>Invalid links:</p>
+<p>[this is not a link</p>
+<p>[this is not a link](</p>
+<p>[this is not a link](http://something.example.com/foo/bar 'test'</p>
+<p>[this is not a link](((((((((((((((((((((((((((((((((((((((((((((((</p>
+<p>[this is not a link]((((((((((()))))))))) (((((((((()))))))))))
+Valid links:</p>
+<p><a href="">this is a link</a>
+<a href="http://something.example.com/foo/bar">this is a link</a>
+<a href="http://something.example.com/foo/bar" title="test">this is a link</a>
+<img src="" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" title="test" /></p>
+<p><a href="%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E" title="''''''''''''''">escape test</a>
+<a href="))))))))))))))">escape test ]]]]]]]]]]]]]]]]</a></p>
+<p>Invalid links:</p>
+<p>[this is not a link</p>
+<p>[this is not a link](</p>
+<p>[this is not a link](http://something.example.com/foo/bar 'test'</p>
+<p>[this is not a link](((((((((((((((((((((((((((((((((((((((((((((((</p>
+<p>[this is not a link]((((((((((()))))))))) (((((((((()))))))))))
+Valid links:</p>
+<p><a href="">this is a link</a>
+<a href="http://something.example.com/foo/bar">this is a link</a>
+<a href="http://something.example.com/foo/bar" title="test">this is a link</a>
+<img src="" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" title="test" /></p>
+<p><a href="%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E" title="''''''''''''''">escape test</a>
+<a href="))))))))))))))">escape test ]]]]]]]]]]]]]]]]</a></p>
+<p>Invalid links:</p>
+<p>[this is not a link</p>
+<p>[this is not a link](</p>
+<p>[this is not a link](http://something.example.com/foo/bar 'test'</p>
+<p>[this is not a link](((((((((((((((((((((((((((((((((((((((((((((((</p>
+<p>[this is not a link]((((((((((()))))))))) (((((((((()))))))))))
+Valid links:</p>
+<p><a href="">this is a link</a>
+<a href="http://something.example.com/foo/bar">this is a link</a>
+<a href="http://something.example.com/foo/bar" title="test">this is a link</a>
+<img src="" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" />
+<img src="http://something.example.com/foo/bar" alt="this is an image" title="test" /></p>
+<p><a href="%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E%3E" title="''''''''''''''">escape test</a>
+<a href="))))))))))))))">escape test ]]]]]]]]]]]]]]]]</a></p>
+<p>Invalid links:</p>
+<p>[this is not a link</p>
+<p>[this is not a link](</p>
+<p>[this is not a link](http://something.example.com/foo/bar 'test'</p>
+<p>[this is not a link](((((((((((((((((((((((((((((((((((((((((((((((</p>
+<p>[this is not a link]((((((((((()))))))))) (((((((((()))))))))))</p>
+[deoptimize context: 26e063b414b1]
+**** DEOPT: renderNodes at bailout #15, address 0x0, frame size 456
+[deoptimizing: begin 0x38de80f2f1d1 renderNodes @15]
+  translating renderNodes => node=171, height=120
+    0x7fff5fbff1f0: [top + 160] <- 0x38de80f3ce99 ; [sp + 216] 0x38de80f3ce99 <an Object>
+    0x7fff5fbff1e8: [top + 152] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff1e0: [top + 144] <- 0x3454b9763fa0 ; caller's pc
+    0x7fff5fbff1d8: [top + 136] <- 0x7fff5fbff278 ; caller's fp
+    0x7fff5fbff1d0: [top + 128] <- 0x38de80f8cb39; context
+    0x7fff5fbff1c8: [top + 120] <- 0x38de80f2f1d1; function
+    0x7fff5fbff1c0: [top + 112] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff1b8: [top + 104] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff1b0: [top + 96] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff1a8: [top + 88] <- 0x38de80f8cbe9 ; [sp + 232] 0x38de80f8cbe9 <an Object>
+    0x7fff5fbff1a0: [top + 80] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff198: [top + 72] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff190: [top + 64] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff188: [top + 56] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff180: [top + 48] <- 0x38de80f8cc29 ; [sp + 240] 0x38de80f8cc29 <JS Function>
+    0x7fff5fbff178: [top + 40] <- 0x38de80f23461 ; [sp + 248] 0x38de80f23461 <JS Function>
+    0x7fff5fbff170: [top + 32] <- 0x38de80f8cc71 ; [sp + 256] 0x38de80f8cc71 <JS Function>
+    0x7fff5fbff168: [top + 24] <- 0x38de80f39e39 ; [sp + 264] 0x38de80f39e39 <an Object>
+    0x7fff5fbff160: [top + 16] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff158: [top + 8] <- 0x26e063b04121 <undefined> ; literal
+    0x7fff5fbff150: [top + 0] <- 0x26e063b04101 ; rax 0x26e063b04101 <null>
+[deoptimizing: end 0x38de80f2f1d1 renderNodes => node=171, pc=0x3454b979d46d, state=TOS_REG, alignment=no padding, took 0.078 ms]
+[removing optimized code for: renderNodes]
+<p>Valid links:</p>
+<p>[[[[[[[<a href="test"></a>](test)](test)](test)](test)](test)](test)]</p>
+<p>[ [[[[[[[[[[[[[[[[[[ <a href="test"></a> ]]]]]]]]]]]]]]]]]] ](test)</p>
+<p>Invalid links:</p>
+<p>[[[[[[[[[</p>
+<p>[ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [</p>
+<p>![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![
+Valid links:</p>
+<p>[[[[[[[<a href="test"></a>](test)](test)](test)](test)](test)](test)]</p>
+<p>[ [[[[[[[[[[[[[[[[[[ <a href="test"></a> ]]]]]]]]]]]]]]]]]] ](test)</p>
+<p>Invalid links:</p>
+<p>[[[[[[[[[</p>
+<p>[ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [</p>
+<p>![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![
+Valid links:</p>
+<p>[[[[[[[<a href="test"></a>](test)](test)](test)](test)](test)](test)]</p>
+<p>[ [[[[[[[[[[[[[[[[[[ <a href="test"></a> ]]]]]]]]]]]]]]]]]] ](test)</p>
+<p>Invalid links:</p>
+<p>[[[[[[[[[</p>
+<p>[ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [</p>
+<p>![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![
+Valid links:</p>
+<p>[[[[[[[<a href="test"></a>](test)](test)](test)](test)](test)](test)]</p>
+<p>[ [[[[[[[[[[[[[[[[[[ <a href="test"></a> ]]]]]]]]]]]]]]]]]] ](test)</p>
+<p>Invalid links:</p>
+<p>[[[[[[[[[</p>
+<p>[ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [</p>
+<p>![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![
+Valid links:</p>
+<p>[[[[[[[<a href="test"></a>](test)](test)](test)](test)](test)](test)]</p>
+<p>[ [[[[[[[[[[[[[[[[[[ <a href="test"></a> ]]]]]]]]]]]]]]]]]] ](test)</p>
+<p>Invalid links:</p>
+<p>[[[[[[[[[</p>
+<p>[ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [</p>
+<p>![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![
+Valid links:</p>
+<p>[[[[[[[<a href="test"></a>](test)](test)](test)](test)](test)](test)]</p>
+<p>[ [[[[[[[[[[[[[[[[[[ <a href="test"></a> ]]]]]]]]]]]]]]]]]] ](test)</p>
+<p>Invalid links:</p>
+<p>[[[[[[[[[</p>
+<p>[ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [</p>
+<p>![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![![</p>
+[deoptimize context: 39e1644414b1]
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines<br />
+too</p>
+<p>this
+should
+not
+be
+separated
+by
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines<br />
+too</p>
+<p>this
+should
+not
+be
+separated
+by
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines<br />
+too</p>
+<p>this
+should
+not
+be
+separated
+by
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines<br />
+too</p>
+<p>this
+should
+not
+be
+separated
+by
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines<br />
+too</p>
+<p>this
+should
+not
+be
+separated
+by
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines</p>
+<p>this<br />
+should<br />
+be<br />
+separated<br />
+by<br />
+newlines<br />
+too</p>
+<p>this
+should
+not
+be
+separated
+by
+newlines</p>
+[deoptimize context: 3a5871a414b1]
+<p>Lorem ipsum dolor sit amet, <strong>consectetur</strong> adipiscing elit. Cras imperdiet nec erat ac condimentum. Nulla vel rutrum ligula. Sed hendrerit interdum orci a posuere. Vivamus ut velit aliquet, mollis purus eget, iaculis nisl. Proin posuere malesuada ante. Proin auctor orci eros, ac molestie lorem dictum nec. Vestibulum sit amet erat est. Morbi luctus sed elit ac luctus. Proin blandit, enim vitae egestas posuere, neque elit ultricies dui, vel mattis nibh enim ac lorem. Maecenas molestie nisl sit amet velit dictum lobortis. Aliquam erat volutpat.</p>
+<p>Vivamus sagittis, diam in <a href="https://github.com/markdown-it/markdown-it">vehicula</a> lobortis, sapien arcu mattis erat, vel aliquet sem urna et risus. Ut feugiat sapien vitae mi elementum laoreet. Suspendisse potenti. Aliquam erat nisl, aliquam pretium libero aliquet, sagittis eleifend nunc. In hac habitasse platea dictumst. Integer turpis augue, tincidunt dignissim mauris id, rhoncus dapibus purus. Maecenas et enim odio. Nullam massa metus, varius quis vehicula sed, pharetra mollis erat. In quis viverra velit. Vivamus placerat, est nec hendrerit varius, enim dui hendrerit magna, ut pulvinar nibh lorem vel lacus. Mauris a orci iaculis, hendrerit eros sed, gravida leo. In dictum mauris vel augue varius, ac ullamcorper nisl ornare. In eu posuere velit, ac fermentum arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam sed malesuada leo, at interdum elit.</p>
+<p>Nullam ut tincidunt nunc. <a href="https://github.com/markdown-it">Pellentesque</a> metus lacus, commodo eget justo ut, rutrum varius nunc. Sed non rhoncus risus. Morbi sodales gravida pulvinar. Duis malesuada, odio volutpat elementum vulputate, massa magna scelerisque ante, et accumsan tellus nunc in sem. Donec mattis arcu et velit aliquet, non sagittis justo vestibulum. Suspendisse volutpat felis lectus, nec consequat ipsum mattis id. Donec dapibus vehicula facilisis. In tincidunt mi nisi, nec faucibus tortor euismod nec. Suspendisse ante ligula, aliquet vitae libero eu, vulputate dapibus libero. Sed bibendum, sapien at posuere interdum, libero est sollicitudin magna, ac gravida tellus purus eu ipsum. Proin ut quam arcu.</p>
+<p>Suspendisse potenti. Donec ante velit, ornare at augue quis, tristique laoreet sem. Etiam in ipsum elit. Nullam cursus dolor sit amet nulla feugiat tristique. Phasellus ac tellus tincidunt, imperdiet purus eget, ullamcorper ipsum. Cras eu tincidunt sem. Nullam sed dapibus magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In id venenatis tortor. In consectetur sollicitudin pharetra. Etiam convallis nisi nunc, et aliquam turpis viverra sit amet. Maecenas faucibus sodales tortor. Suspendisse lobortis mi eu leo viverra volutpat. Pellentesque velit ante, vehicula sodales congue ut, elementum a urna. Cras tempor, ipsum eget luctus rhoncus, arcu ligula fermentum urna, vulputate pharetra enim enim non libero.</p>
+<p>Proin diam quam, elementum in eleifend id, elementum et metus. Cras in justo consequat justo semper ultrices. Sed dignissim lectus a ante mollis, nec vulputate ante molestie. Proin in porta nunc. Etiam pulvinar turpis sed velit porttitor, vel adipiscing velit fringilla. Cras ac tellus vitae purus pharetra tincidunt. Sed cursus aliquet aliquet. Cras eleifend commodo malesuada. In turpis turpis, ullamcorper ut tincidunt a, ullamcorper a nunc. Etiam luctus tellus ac dapibus gravida. Ut nec lacus laoreet neque ullamcorper volutpat.</p>
+<p>Nunc et leo erat. Aenean mattis ultrices lorem, eget adipiscing dolor ultricies eu. In hac habitasse platea dictumst. Vivamus cursus feugiat sapien quis aliquam. Mauris quam libero, porta vel volutpat ut, blandit a purus. Vivamus vestibulum dui vel tortor molestie, sit amet feugiat sem commodo. Nulla facilisi. Sed molestie arcu eget tellus vestibulum tristique.</p>
+<p>Lorem ipsum dolor sit amet, <strong>consectetur</strong> adipiscing elit. Cras imperdiet nec erat ac condimentum. Nulla vel rutrum ligula. Sed hendrerit interdum orci a posuere. Vivamus ut velit aliquet, mollis purus eget, iaculis nisl. Proin posuere malesuada ante. Proin auctor orci eros, ac molestie lorem dictum nec. Vestibulum sit amet erat est. Morbi luctus sed elit ac luctus. Proin blandit, enim vitae egestas posuere, neque elit ultricies dui, vel mattis nibh enim ac lorem. Maecenas molestie nisl sit amet velit dictum lobortis. Aliquam erat volutpat.</p>
+<p>Vivamus sagittis, diam in <a href="https://github.com/markdown-it/markdown-it">vehicula</a> lobortis, sapien arcu mattis erat, vel aliquet sem urna et risus. Ut feugiat sapien vitae mi elementum laoreet. Suspendisse potenti. Aliquam erat nisl, aliquam pretium libero aliquet, sagittis eleifend nunc. In hac habitasse platea dictumst. Integer turpis augue, tincidunt dignissim mauris id, rhoncus dapibus purus. Maecenas et enim odio. Nullam massa metus, varius quis vehicula sed, pharetra mollis erat. In quis viverra velit. Vivamus placerat, est nec hendrerit varius, enim dui hendrerit magna, ut pulvinar nibh lorem vel lacus. Mauris a orci iaculis, hendrerit eros sed, gravida leo. In dictum mauris vel augue varius, ac ullamcorper nisl ornare. In eu posuere velit, ac fermentum arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam sed malesuada leo, at interdum elit.</p>
+<p>Nullam ut tincidunt nunc. <a href="https://github.com/markdown-it">Pellentesque</a> metus lacus, commodo eget justo ut, rutrum varius nunc. Sed non rhoncus risus. Morbi sodales gravida pulvinar. Duis malesuada, odio volutpat elementum vulputate, massa magna scelerisque ante, et accumsan tellus nunc in sem. Donec mattis arcu et velit aliquet, non sagittis justo vestibulum. Suspendisse volutpat felis lectus, nec consequat ipsum mattis id. Donec dapibus vehicula facilisis. In tincidunt mi nisi, nec faucibus tortor euismod nec. Suspendisse ante ligula, aliquet vitae libero eu, vulputate dapibus libero. Sed bibendum, sapien at posuere interdum, libero est sollicitudin magna, ac gravida tellus purus eu ipsum. Proin ut quam arcu.</p>
+<p>Suspendisse potenti. Donec ante velit, ornare at augue quis, tristique laoreet sem. Etiam in ipsum elit. Nullam cursus dolor sit amet nulla feugiat tristique. Phasellus ac tellus tincidunt, imperdiet purus eget, ullamcorper ipsum. Cras eu tincidunt sem. Nullam sed dapibus magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In id venenatis tortor. In consectetur sollicitudin pharetra. Etiam convallis nisi nunc, et aliquam turpis viverra sit amet. Maecenas faucibus sodales tortor. Suspendisse lobortis mi eu leo viverra volutpat. Pellentesque velit ante, vehicula sodales congue ut, elementum a urna. Cras tempor, ipsum eget luctus rhoncus, arcu ligula fermentum urna, vulputate pharetra enim enim non libero.</p>
+<p>Proin diam quam, elementum in eleifend id, elementum et metus. Cras in justo consequat justo semper ultrices. Sed dignissim lectus a ante mollis, nec vulputate ante molestie. Proin in porta nunc. Etiam pulvinar turpis sed velit porttitor, vel adipiscing velit fringilla. Cras ac tellus vitae purus pharetra tincidunt. Sed cursus aliquet aliquet. Cras eleifend commodo malesuada. In turpis turpis, ullamcorper ut tincidunt a, ullamcorper a nunc. Etiam luctus tellus ac dapibus gravida. Ut nec lacus laoreet neque ullamcorper volutpat.</p>
+<p>Nunc et leo erat. Aenean mattis ultrices lorem, eget adipiscing dolor ultricies eu. In hac habitasse platea dictumst. Vivamus cursus feugiat sapien quis aliquam. Mauris quam libero, porta vel volutpat ut, blandit a purus. Vivamus vestibulum dui vel tortor molestie, sit amet feugiat sem commodo. Nulla facilisi. Sed molestie arcu eget tellus vestibulum tristique.</p>
+<p>Lorem ipsum dolor sit amet, <strong>consectetur</strong> adipiscing elit. Cras imperdiet nec erat ac condimentum. Nulla vel rutrum ligula. Sed hendrerit interdum orci a posuere. Vivamus ut velit aliquet, mollis purus eget, iaculis nisl. Proin posuere malesuada ante. Proin auctor orci eros, ac molestie lorem dictum nec. Vestibulum sit amet erat est. Morbi luctus sed elit ac luctus. Proin blandit, enim vitae egestas posuere, neque elit ultricies dui, vel mattis nibh enim ac lorem. Maecenas molestie nisl sit amet velit dictum lobortis. Aliquam erat volutpat.</p>
+<p>Vivamus sagittis, diam in <a href="https://github.com/markdown-it/markdown-it">vehicula</a> lobortis, sapien arcu mattis erat, vel aliquet sem urna et risus. Ut feugiat sapien vitae mi elementum laoreet. Suspendisse potenti. Aliquam erat nisl, aliquam pretium libero aliquet, sagittis eleifend nunc. In hac habitasse platea dictumst. Integer turpis augue, tincidunt dignissim mauris id, rhoncus dapibus purus. Maecenas et enim odio. Nullam massa metus, varius quis vehicula sed, pharetra mollis erat. In quis viverra velit. Vivamus placerat, est nec hendrerit varius, enim dui hendrerit magna, ut pulvinar nibh lorem vel lacus. Mauris a orci iaculis, hendrerit eros sed, gravida leo. In dictum mauris vel augue varius, ac ullamcorper nisl ornare. In eu posuere velit, ac fermentum arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam sed malesuada leo, at interdum elit.</p>
+<p>Nullam ut tincidunt nunc. <a href="https://github.com/markdown-it">Pellentesque</a> metus lacus, commodo eget justo ut, rutrum varius nunc. Sed non rhoncus risus. Morbi sodales gravida pulvinar. Duis malesuada, odio volutpat elementum vulputate, massa magna scelerisque ante, et accumsan tellus nunc in sem. Donec mattis arcu et velit aliquet, non sagittis justo vestibulum. Suspendisse volutpat felis lectus, nec consequat ipsum mattis id. Donec dapibus vehicula facilisis. In tincidunt mi nisi, nec faucibus tortor euismod nec. Suspendisse ante ligula, aliquet vitae libero eu, vulputate dapibus libero. Sed bibendum, sapien at posuere interdum, libero est sollicitudin magna, ac gravida tellus purus eu ipsum. Proin ut quam arcu.</p>
+<p>Suspendisse potenti. Donec ante velit, ornare at augue quis, tristique laoreet sem. Etiam in ipsum elit. Nullam cursus dolor sit amet nulla feugiat tristique. Phasellus ac tellus tincidunt, imperdiet purus eget, ullamcorper ipsum. Cras eu tincidunt sem. Nullam sed dapibus magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In id venenatis tortor. In consectetur sollicitudin pharetra. Etiam convallis nisi nunc, et aliquam turpis viverra sit amet. Maecenas faucibus sodales tortor. Suspendisse lobortis mi eu leo viverra volutpat. Pellentesque velit ante, vehicula sodales congue ut, elementum a urna. Cras tempor, ipsum eget luctus rhoncus, arcu ligula fermentum urna, vulputate pharetra enim enim non libero.</p>
+<p>Proin diam quam, elementum in eleifend id, elementum et metus. Cras in justo consequat justo semper ultrices. Sed dignissim lectus a ante mollis, nec vulputate ante molestie. Proin in porta nunc. Etiam pulvinar turpis sed velit porttitor, vel adipiscing velit fringilla. Cras ac tellus vitae purus pharetra tincidunt. Sed cursus aliquet aliquet. Cras eleifend commodo malesuada. In turpis turpis, ullamcorper ut tincidunt a, ullamcorper a nunc. Etiam luctus tellus ac dapibus gravida. Ut nec lacus laoreet neque ullamcorper volutpat.</p>
+<p>Nunc et leo erat. Aenean mattis ultrices lorem, eget adipiscing dolor ultricies eu. In hac habitasse platea dictumst. Vivamus cursus feugiat sapien quis aliquam. Mauris quam libero, porta vel volutpat ut, blandit a purus. Vivamus vestibulum dui vel tortor molestie, sit amet feugiat sem commodo. Nulla facilisi. Sed molestie arcu eget tellus vestibulum tristique.</p>
+<p>Lorem ipsum dolor sit amet, <strong>consectetur</strong> adipiscing elit. Cras imperdiet nec erat ac condimentum. Nulla vel rutrum ligula. Sed hendrerit interdum orci a posuere. Vivamus ut velit aliquet, mollis purus eget, iaculis nisl. Proin posuere malesuada ante. Proin auctor orci eros, ac molestie lorem dictum nec. Vestibulum sit amet erat est. Morbi luctus sed elit ac luctus. Proin blandit, enim vitae egestas posuere, neque elit ultricies dui, vel mattis nibh enim ac lorem. Maecenas molestie nisl sit amet velit dictum lobortis. Aliquam erat volutpat.</p>
+<p>Vivamus sagittis, diam in <a href="https://github.com/markdown-it/markdown-it">vehicula</a> lobortis, sapien arcu mattis erat, vel aliquet sem urna et risus. Ut feugiat sapien vitae mi elementum laoreet. Suspendisse potenti. Aliquam erat nisl, aliquam pretium libero aliquet, sagittis eleifend nunc. In hac habitasse platea dictumst. Integer turpis augue, tincidunt dignissim mauris id, rhoncus dapibus purus. Maecenas et enim odio. Nullam massa metus, varius quis vehicula sed, pharetra mollis erat. In quis viverra velit. Vivamus placerat, est nec hendrerit varius, enim dui hendrerit magna, ut pulvinar nibh lorem vel lacus. Mauris a orci iaculis, hendrerit eros sed, gravida leo. In dictum mauris vel augue varius, ac ullamcorper nisl ornare. In eu posuere velit, ac fermentum arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam sed malesuada leo, at interdum elit.</p>
+<p>Nullam ut tincidunt nunc. <a href="https://github.com/markdown-it">Pellentesque</a> metus lacus, commodo eget justo ut, rutrum varius nunc. Sed non rhoncus risus. Morbi sodales gravida pulvinar. Duis malesuada, odio volutpat elementum vulputate, massa magna scelerisque ante, et accumsan tellus nunc in sem. Donec mattis arcu et velit aliquet, non sagittis justo vestibulum. Suspendisse volutpat felis lectus, nec consequat ipsum mattis id. Donec dapibus vehicula facilisis. In tincidunt mi nisi, nec faucibus tortor euismod nec. Suspendisse ante ligula, aliquet vitae libero eu, vulputate dapibus libero. Sed bibendum, sapien at posuere interdum, libero est sollicitudin magna, ac gravida tellus purus eu ipsum. Proin ut quam arcu.</p>
+<p>Suspendisse potenti. Donec ante velit, ornare at augue quis, tristique laoreet sem. Etiam in ipsum elit. Nullam cursus dolor sit amet nulla feugiat tristique. Phasellus ac tellus tincidunt, imperdiet purus eget, ullamcorper ipsum. Cras eu tincidunt sem. Nullam sed dapibus magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In id venenatis tortor. In consectetur sollicitudin pharetra. Etiam convallis nisi nunc, et aliquam turpis viverra sit amet. Maecenas faucibus sodales tortor. Suspendisse lobortis mi eu leo viverra volutpat. Pellentesque velit ante, vehicula sodales congue ut, elementum a urna. Cras tempor, ipsum eget luctus rhoncus, arcu ligula fermentum urna, vulputate pharetra enim enim non libero.</p>
+<p>Proin diam quam, elementum in eleifend id, elementum et metus. Cras in justo consequat justo semper ultrices. Sed dignissim lectus a ante mollis, nec vulputate ante molestie. Proin in porta nunc. Etiam pulvinar turpis sed velit porttitor, vel adipiscing velit fringilla. Cras ac tellus vitae purus pharetra tincidunt. Sed cursus aliquet aliquet. Cras eleifend commodo malesuada. In turpis turpis, ullamcorper ut tincidunt a, ullamcorper a nunc. Etiam luctus tellus ac dapibus gravida. Ut nec lacus laoreet neque ullamcorper volutpat.</p>
+<p>Nunc et leo erat. Aenean mattis ultrices lorem, eget adipiscing dolor ultricies eu. In hac habitasse platea dictumst. Vivamus cursus feugiat sapien quis aliquam. Mauris quam libero, porta vel volutpat ut, blandit a purus. Vivamus vestibulum dui vel tortor molestie, sit amet feugiat sem commodo. Nulla facilisi. Sed molestie arcu eget tellus vestibulum tristique.</p>
+<p>Lorem ipsum dolor sit amet, <strong>consectetur</strong> adipiscing elit. Cras imperdiet nec erat ac condimentum. Nulla vel rutrum ligula. Sed hendrerit interdum orci a posuere. Vivamus ut velit aliquet, mollis purus eget, iaculis nisl. Proin posuere malesuada ante. Proin auctor orci eros, ac molestie lorem dictum nec. Vestibulum sit amet erat est. Morbi luctus sed elit ac luctus. Proin blandit, enim vitae egestas posuere, neque elit ultricies dui, vel mattis nibh enim ac lorem. Maecenas molestie nisl sit amet velit dictum lobortis. Aliquam erat volutpat.</p>
+<p>Vivamus sagittis, diam in <a href="https://github.com/markdown-it/markdown-it">vehicula</a> lobortis, sapien arcu mattis erat, vel aliquet sem urna et risus. Ut feugiat sapien vitae mi elementum laoreet. Suspendisse potenti. Aliquam erat nisl, aliquam pretium libero aliquet, sagittis eleifend nunc. In hac habitasse platea dictumst. Integer turpis augue, tincidunt dignissim mauris id, rhoncus dapibus purus. Maecenas et enim odio. Nullam massa metus, varius quis vehicula sed, pharetra mollis erat. In quis viverra velit. Vivamus placerat, est nec hendrerit varius, enim dui hendrerit magna, ut pulvinar nibh lorem vel lacus. Mauris a orci iaculis, hendrerit eros sed, gravida leo. In dictum mauris vel augue varius, ac ullamcorper nisl ornare. In eu posuere velit, ac fermentum arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam sed malesuada leo, at interdum elit.</p>
+<p>Nullam ut tincidunt nunc. <a href="https://github.com/markdown-it">Pellentesque</a> metus lacus, commodo eget justo ut, rutrum varius nunc. Sed non rhoncus risus. Morbi sodales gravida pulvinar. Duis malesuada, odio volutpat elementum vulputate, massa magna scelerisque ante, et accumsan tellus nunc in sem. Donec mattis arcu et velit aliquet, non sagittis justo vestibulum. Suspendisse volutpat felis lectus, nec consequat ipsum mattis id. Donec dapibus vehicula facilisis. In tincidunt mi nisi, nec faucibus tortor euismod nec. Suspendisse ante ligula, aliquet vitae libero eu, vulputate dapibus libero. Sed bibendum, sapien at posuere interdum, libero est sollicitudin magna, ac gravida tellus purus eu ipsum. Proin ut quam arcu.</p>
+<p>Suspendisse potenti. Donec ante velit, ornare at augue quis, tristique laoreet sem. Etiam in ipsum elit. Nullam cursus dolor sit amet nulla feugiat tristique. Phasellus ac tellus tincidunt, imperdiet purus eget, ullamcorper ipsum. Cras eu tincidunt sem. Nullam sed dapibus magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In id venenatis tortor. In consectetur sollicitudin pharetra. Etiam convallis nisi nunc, et aliquam turpis viverra sit amet. Maecenas faucibus sodales tortor. Suspendisse lobortis mi eu leo viverra volutpat. Pellentesque velit ante, vehicula sodales congue ut, elementum a urna. Cras tempor, ipsum eget luctus rhoncus, arcu ligula fermentum urna, vulputate pharetra enim enim non libero.</p>
+<p>Proin diam quam, elementum in eleifend id, elementum et metus. Cras in justo consequat justo semper ultrices. Sed dignissim lectus a ante mollis, nec vulputate ante molestie. Proin in porta nunc. Etiam pulvinar turpis sed velit porttitor, vel adipiscing velit fringilla. Cras ac tellus vitae purus pharetra tincidunt. Sed cursus aliquet aliquet. Cras eleifend commodo malesuada. In turpis turpis, ullamcorper ut tincidunt a, ullamcorper a nunc. Etiam luctus tellus ac dapibus gravida. Ut nec lacus laoreet neque ullamcorper volutpat.</p>
+<p>Nunc et leo erat. Aenean mattis ultrices lorem, eget adipiscing dolor ultricies eu. In hac habitasse platea dictumst. Vivamus cursus feugiat sapien quis aliquam. Mauris quam libero, porta vel volutpat ut, blandit a purus. Vivamus vestibulum dui vel tortor molestie, sit amet feugiat sem commodo. Nulla facilisi. Sed molestie arcu eget tellus vestibulum tristique.</p>
+<p>Lorem ipsum dolor sit amet, <strong>consectetur</strong> adipiscing elit. Cras imperdiet nec erat ac condimentum. Nulla vel rutrum ligula. Sed hendrerit interdum orci a posuere. Vivamus ut velit aliquet, mollis purus eget, iaculis nisl. Proin posuere malesuada ante. Proin auctor orci eros, ac molestie lorem dictum nec. Vestibulum sit amet erat est. Morbi luctus sed elit ac luctus. Proin blandit, enim vitae egestas posuere, neque elit ultricies dui, vel mattis nibh enim ac lorem. Maecenas molestie nisl sit amet velit dictum lobortis. Aliquam erat volutpat.</p>
+<p>Vivamus sagittis, diam in <a href="https://github.com/markdown-it/markdown-it">vehicula</a> lobortis, sapien arcu mattis erat, vel aliquet sem urna et risus. Ut feugiat sapien vitae mi elementum laoreet. Suspendisse potenti. Aliquam erat nisl, aliquam pretium libero aliquet, sagittis eleifend nunc. In hac habitasse platea dictumst. Integer turpis augue, tincidunt dignissim mauris id, rhoncus dapibus purus. Maecenas et enim odio. Nullam massa metus, varius quis vehicula sed, pharetra mollis erat. In quis viverra velit. Vivamus placerat, est nec hendrerit varius, enim dui hendrerit magna, ut pulvinar nibh lorem vel lacus. Mauris a orci iaculis, hendrerit eros sed, gravida leo. In dictum mauris vel augue varius, ac ullamcorper nisl ornare. In eu posuere velit, ac fermentum arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam sed malesuada leo, at interdum elit.</p>
+<p>Nullam ut tincidunt nunc. <a href="https://github.com/markdown-it">Pellentesque</a> metus lacus, commodo eget justo ut, rutrum varius nunc. Sed non rhoncus risus. Morbi sodales gravida pulvinar. Duis malesuada, odio volutpat elementum vulputate, massa magna scelerisque ante, et accumsan tellus nunc in sem. Donec mattis arcu et velit aliquet, non sagittis justo vestibulum. Suspendisse volutpat felis lectus, nec consequat ipsum mattis id. Donec dapibus vehicula facilisis. In tincidunt mi nisi, nec faucibus tortor euismod nec. Suspendisse ante ligula, aliquet vitae libero eu, vulputate dapibus libero. Sed bibendum, sapien at posuere interdum, libero est sollicitudin magna, ac gravida tellus purus eu ipsum. Proin ut quam arcu.</p>
+<p>Suspendisse potenti. Donec ante velit, ornare at augue quis, tristique laoreet sem. Etiam in ipsum elit. Nullam cursus dolor sit amet nulla feugiat tristique. Phasellus ac tellus tincidunt, imperdiet purus eget, ullamcorper ipsum. Cras eu tincidunt sem. Nullam sed dapibus magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In id venenatis tortor. In consectetur sollicitudin pharetra. Etiam convallis nisi nunc, et aliquam turpis viverra sit amet. Maecenas faucibus sodales tortor. Suspendisse lobortis mi eu leo viverra volutpat. Pellentesque velit ante, vehicula sodales congue ut, elementum a urna. Cras tempor, ipsum eget luctus rhoncus, arcu ligula fermentum urna, vulputate pharetra enim enim non libero.</p>
+<p>Proin diam quam, elementum in eleifend id, elementum et metus. Cras in justo consequat justo semper ultrices. Sed dignissim lectus a ante mollis, nec vulputate ante molestie. Proin in porta nunc. Etiam pulvinar turpis sed velit porttitor, vel adipiscing velit fringilla. Cras ac tellus vitae purus pharetra tincidunt. Sed cursus aliquet aliquet. Cras eleifend commodo malesuada. In turpis turpis, ullamcorper ut tincidunt a, ullamcorper a nunc. Etiam luctus tellus ac dapibus gravida. Ut nec lacus laoreet neque ullamcorper volutpat.</p>
+<p>Nunc et leo erat. Aenean mattis ultrices lorem, eget adipiscing dolor ultricies eu. In hac habitasse platea dictumst. Vivamus cursus feugiat sapien quis aliquam. Mauris quam libero, porta vel volutpat ut, blandit a purus. Vivamus vestibulum dui vel tortor molestie, sit amet feugiat sem commodo. Nulla facilisi. Sed molestie arcu eget tellus vestibulum tristique.</p>
+[deoptimize context: 2649fce414b1]
+<p>this is a test for tab expansion, be careful not to replace them with spaces</p>
+<p>1   4444
+22  333
+333 22
+4444    1</p>
+<pre><code>tab-indented line
+space-indented line
+tab-indented line
+</code></pre>
+<p>a lot of                                                spaces in between here</p>
+<p>a lot of                                                tabs in between here</p>
+<p>this is a test for tab expansion, be careful not to replace them with spaces</p>
+<p>1   4444
+22  333
+333 22
+4444    1</p>
+<pre><code>tab-indented line
+space-indented line
+tab-indented line
+</code></pre>
+<p>a lot of                                                spaces in between here</p>
+<p>a lot of                                                tabs in between here</p>
+<p>this is a test for tab expansion, be careful not to replace them with spaces</p>
+<p>1   4444
+22  333
+333 22
+4444    1</p>
+<pre><code>tab-indented line
+space-indented line
+tab-indented line
+</code></pre>
+<p>a lot of                                                spaces in between here</p>
+<p>a lot of                                                tabs in between here</p>
+<p>this is a test for tab expansion, be careful not to replace them with spaces</p>
+<p>1   4444
+22  333
+333 22
+4444    1</p>
+<pre><code>tab-indented line
+space-indented line
+tab-indented line
+</code></pre>
+<p>a lot of                                                spaces in between here</p>
+<p>a lot of                                                tabs in between here</p>
+<p>this is a test for tab expansion, be careful not to replace them with spaces</p>
+<p>1   4444
+22  333
+333 22
+4444    1</p>
+<pre><code>tab-indented line
+space-indented line
+tab-indented line
+</code></pre>
+<p>a lot of                                                spaces in between here</p>
+<p>a lot of                                                tabs in between here</p>
+<p>this is a test for tab expansion, be careful not to replace them with spaces</p>
+<p>1   4444
+22  333
+333 22
+4444    1</p>
+<pre><code>tab-indented line
+space-indented line
+tab-indented line
+</code></pre>
+<p>a lot of                                                spaces in between here</p>
+<p>a lot of                                                tabs in between here</p>
+[deoptimize context: 1679704414b1]

@@ -1,0 +1,42 @@
+var content = '# heading `code`\n _date_';
+ 
+function md2AST(content) {
+  var commonmark = require('./lib/index.js');
+  var reader = new commonmark.Parser();
+  return reader.parse(content);
+}
+ 
+// get first "h1" node from AST-tree
+function getTitleNode(content) {
+  var walker = md2AST(content).walker();
+  var event, node;
+  while (event = walker.next()) {
+    node = event.node;
+    if (event.entering && node.type === 'Header' && node.level === 1) {
+      return node;
+    }
+  }
+}
+ 
+// get plain text from AST-node
+function astNode2text(astNode) {
+  var walker = astNode.walker();
+  var acc = [];
+  var event, node;
+  while (event = walker.next()) {
+    node = event.node;
+    console.log(event.entering, node.type, walker.root.type);
+    if (node.literal) {
+      acc.push(node.literal);
+    }
+  }
+ 
+  return acc.join(' ');
+}
+ 
+// get plain text from h1 to paste into "html>head>title"
+var result = astNode2text(getTitleNode(content));
+ 
+// expectations: "heading code"
+// reality: "heading  code   date
+console.log(result);

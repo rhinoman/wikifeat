@@ -1,0 +1,53 @@
+commit 7aa96083679e667df7875d64d5df0d16f483e20f
+Author: John MacFarlane <jgm@berkeley.edu>
+Date:   Tue Apr 28 21:08:02 2015 -0700
+
+    Bump version in package.json.
+
+commit 639584c565fdcb214520cb7d892dedefd3ef8d77
+Author: John MacFarlane <jgm@berkeley.edu>
+Date:   Tue Apr 28 09:31:04 2015 -0700
+
+    Fixed variable shadowing (linter warnings) in test.js.
+
+commit ec476792eb8fff92852d12079f8dde82e674d61f
+Author: John MacFarlane <jgm@berkeley.edu>
+Date:   Tue Apr 28 09:29:41 2015 -0700
+
+    Makefile: Moved `lint` first to avoid regenerating `dist` by accident.
+
+commit 6857aff68f1583e99155c2f9fb873eb9fc3e4ef6
+Author: John MacFarlane <jgm@berkeley.edu>
+Date:   Tue Apr 28 09:24:41 2015 -0700
+
+    Dingus: Fixed word wrapping in text area.
+    
+    Closes jgm/CommonMark#319.
+
+commit 0b40889a85806097f06ccc8961d334da323c2ca4
+Author: John MacFarlane <jgm@berkeley.edu>
+Date:   Mon Apr 27 22:59:09 2015 -0700
+
+    Fixed _ emphasis to conform to spec changes.
+    
+    See jgm/CommonMark#317.
+    
+    Closes #12.
+
+commit de1f51a271ba0b7898404066a110b9aac595a797
+Author: John MacFarlane <jgm@berkeley.edu>
+Date:   Mon Apr 27 22:58:59 2015 -0700
+
+    Update spec.txt in test/.
+
+commit f878103da43ee1b777afcec16c4b9920ae7a7ea4
+Author: John MacFarlane <jgm@berkeley.edu>
+Date:   Tue Apr 21 22:17:49 2015 -0700
+
+    release_checklist:  add details about updating dingus.
+
+commit 68754ee2569db1d0e8fc56f0121593e392f463f6
+Author: John MacFarlane <jgm@berkeley.edu>
+Date:   Tue Apr 21 22:13:05 2015 -0700
+
+    Added release_checklist.md.

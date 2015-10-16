@@ -29,6 +29,7 @@
     "requirejs": "latest",
     "requirejs-text": "latest",
     "jquery-cookie": "~1.4.1",
-    "moment": "~2.9.0"
+    "moment": "~2.9.0",
+    "commonmark": "~0.22"
   }
 }

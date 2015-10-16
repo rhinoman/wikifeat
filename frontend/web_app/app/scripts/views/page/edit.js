@@ -23,97 +23,59 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'backbone.radio',
-    'backbone.stickit',
-    'markdown',
     'entities/wiki/page',
-    'views/main/alert',
+    'views/page/edit_form',
+    'views/page/edit_preview',
     'text!templates/page/edit_page.html'
-], function($,_,Marionette,Radio,Stickit,Markdown,
-            PageModel,AlertView,EditPageTemplate){
+], function($,_,Marionette,PageModel,EditFormView,
+            EditPreview,EditPageTemplate){
 
-   return Marionette.ItemView.extend({
+   return Marionette.LayoutView.extend({
        id: "edit-page-view",
        template: _.template(EditPageTemplate),
        model: PageModel,
        wikiModel: null,
-       bindings: {
-           '#wmd-input': {
-               observe: 'content',
-               onGet: function(dataContent){
-                   return dataContent.raw;
-               },
-               updateModel: false
-           },
-           '#inputTitle': {
-               observe: 'title'
-           }
+       regions: {
+           editorContentRegion: "#editorContent"
        },
        events: {
-           'submit form#editPageForm': 'publishChanges',
-           'click .page-cancel-button': 'cancelEdit'
+           'click #editLink': 'showEditForm',
+           'click #previewLink': 'showPreview'
        },
+       wipText: new Backbone.Model({
+           data: null
+       }),
 
        initialize: function(options){
            if(options.hasOwnProperty('wikiModel')){
                this.wikiModel = options.wikiModel;
            }
            this.model.on('invalid', this.showError, this);
+           this.wipText.set("data", this.model.get("content").raw)
        },
 
-       showError: function(model, error){
-           var alertText = 'Please correct the following errors: <ul id="error_list">';
-           if(error.hasOwnProperty('title')){
-               this.$("#title-input-group").addClass('has-error');
-               alertText += "<li>Page Title " + error.title + "</li>"
-           }
-           alertText += "</ul>";
-           var alertView = new AlertView({
-               el: $("#alertBox"),
-               alertType: 'alert-danger',
-               alertMessage: alertText
-           });
-           alertView.render();
-       },
-
-       //Save page edits to server
-       publishChanges: function(event){
+       showEditForm: function(event){
            event.preventDefault();
-           this.$("#title-input-group").removeClass('has-error');
-           var pageContent = this.model.get('content');
-           pageContent.raw = $("#wmd-input").val();
-           this.model.set('content', pageContent);
-
-           var self=this;
-           Radio.channel('page').request('save:page', this.model)
-               .done(function(response){
-                   //TODO: Check for undefined
-                   Radio.channel('page').
-                       trigger('show:page', self.model.id, self.wikiModel);
-               });
+           this.editorContentRegion.show(new EditFormView({
+               model: this.model,
+               wikiModel: this.wikiModel,
+               wipText: this.wipText
+           }));
+           this.$("#previewLink").parent("li").removeClass("active");
+           this.$("#editLink").parent("li").addClass("active");
        },
 
-       //Cancel and go back!
-       cancelEdit: function(event){
+       showPreview: function(event){
            event.preventDefault();
-           Radio.channel('page').trigger('show:page', this.model.id, this.wikiModel);
+           this.editorContentRegion.show(new EditPreview({
+               model: this.model,
+               wipText: this.wipText
+           }));
+           this.$("#editLink").parent("li").removeClass("active");
+           this.$("#previewLink").parent("li").addClass("active");
        },
-
-       onRender: function(){
-           this.$(".alert").css('display','none');
-           if(typeof this.model !== 'undefined'){
-               this.stickit();
-           }
-       },
-
        onShow: function(){
-           var converter = new Markdown.Converter();
-           var editor = new Markdown.Editor(converter);
-           editor.run();
-       },
-
-       onClose: function(){
-           this.unstickit();
+           this.$("#editLink").trigger('click');
        }
    });
 });

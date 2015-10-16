@@ -1,0 +1,172 @@
+<p>[0.18.0]</p>
+<ul>
+<li>Added <code>nextNonspace</code>, <code>blank</code>, <code>indent</code> properties to <code>Parser</code>.</li>
+<li>Factored out advance-to-nonspace code into <code>findNextNonspace</code>.</li>
+<li>Put block starts into <code>blockStarts</code> property of <code>Parser</code>. Now
+almost all block-specific material has been moved out of
+<code>incorporateLine</code>.</li>
+<li>Removed parameter from <code>addLine</code>.</li>
+<li>Simplified code, removed <code>matchAt</code>.</li>
+<li>Small optimization in <code>entityToChar</code></li>
+<li>Use <code>charCodeAt</code> in a few places where <code>charAt</code> was used.</li>
+<li>Added <code>peek()</code> function in blocks. This ensures we check bounds
+before calling <code>charCodeAt</code>.</li>
+<li>Use <code>peek</code> instead of raw <code>charCodeAt</code> in <code>inlines.js</code>.</li>
+<li>Dingus improvements:
+<ul>
+<li>Use ACE editor in dingus. Implemented L-&gt;R sync scroll. Also,
+the block containing the cursor is highlighted on the right.</li>
+<li>Split code from <code>dingus.html</code> into separate file <code>dingus.js</code>.</li>
+<li>Split CSS into separate file, <code>dingus.css</code>.</li>
+<li>Added debounce.</li>
+<li>Moved dingus code to <code>dingus/</code> directory. <code>dingus/Makefile</code>
+builds <code>commonmark.js</code> in the dingus directory. So to deploy,
+you just need to copy the dingus directory.</li>
+<li>Use local copies of js dependencies. Instead of including these in
+the repository, though, we have the Makefile install them with bower.</li>
+<li>Fixed one-off error in line number calculation.</li>
+<li>XML and HTML are now same font size.</li>
+<li>Allow line wrapping in editor.</li>
+<li>AST window now scrolls like HTML window.</li>
+</ul>
+</li>
+<li>Updated <code>reNonSpace</code> for new whitespace definition in spec.</li>
+<li>Added smart punctuation parsing option.
+<ul>
+<li>Added <code>options</code> param to InlineParser.  <code>options.smart</code> triggers
+smart punctuation parsing.</li>
+<li>Added <code>--smart</code> option to bin/commonmark.</li>
+<li>Implemented &quot;smart&quot; parsing of dashes, ellipses, quotes.  The
+algorithm is the same as in cmark.</li>
+<li>Renamed <code>handleEmphasis</code> -&gt; <code>handleDelims</code>.</li>
+<li>Added benchmark with <code>smart</code>.</li>
+<li>Added checkbox for <code>smart</code> to dingus.</li>
+</ul>
+</li>
+<li>Fixed code example for walk.</li>
+<li>Made <code>isContainer</code> a getter to conform to README (#7).</li>
+<li>Allow list start number of 0 in HTML writer (#10).</li>
+<li>Fixed use of <code>isContainer</code> in XML writer.
+<code>isContainer</code> is now a getter, not a function.</li>
+</ul>
+<p>[0.17.1]</p>
+<ul>
+<li>Reorganized block parsing in a more modular way. There is now
+a <code>blocks</code> property of the parser that contains information
+about each type of block, which is used in parsing.  Ultimately
+this will make it easier to extend the library, but the project
+is still only partially completed.</li>
+<li>Code cleanup and simplification, with some performance optimizations.</li>
+<li>Removed version from <code>bower.json</code>.  Bower takes version from tags.</li>
+<li>Initialize some properties at beginning of 'parse'.
+This fixes some mistakes in source position when the
+same Parser object was used to parse multiple times (#3).</li>
+<li>Made parsing of backslash escapes a bit more efficient.</li>
+<li>Removed refmap parameter of InlineParser.parse().
+Instead, set the refmap property before running the parser.</li>
+<li>Set <code>_string_content</code> to null after using, allowing it to be GCd.</li>
+<li>Removed <code>_strings</code>; just append to <code>_string_content</code>.
+This gives better performance with v8.</li>
+<li>Format benchmarks so that samples are linked.</li>
+<li>Added in-browser benchmark.</li>
+<li>Added API documentation to README.</li>
+<li>xml renderer:  use <code>sourcepos</code> attribute, not <code>data-sourcepos</code>.</li>
+<li>Changed license to 2-clause BSD.  Added clause for spec.</li>
+</ul>
+<p>[0.17.0]</p>
+<ul>
+<li>Renamed <code>DocParser</code> -&gt; <code>Parser</code>.
+Note: library users should update their code or it will break.</li>
+<li>Added <code>normalize-reference.js</code>. This does a proper unicode case
+fold instead of just using <code>toUpperCase</code>.  It is also faster,
+partly because we can do one pass for space and case normalization.</li>
+<li>Removed artificial distinction btw FencedCode, IndentedCode
+in <code>blocks.js</code>.</li>
+<li>Removed vestigial <code>ReferenceDef</code> node type.</li>
+<li>Added getters and (in some cases) setters for &quot;public&quot; properties
+of Nodes.  Renamed non-public properties to start with underscore.
+This will allow us to keep the API stable while changing the
+underlying data structure.  And it will avoid exposing properties
+that have only an instrumental value in parsing.</li>
+<li>Removed <code>Node.toObject()</code>.</li>
+<li>Rename <code>bullet_char</code> -&gt; <code>bulletChar</code>.</li>
+<li>Check for blank line before checking indent in Item.</li>
+<li>Removed unnecessary setting of default <code>tight=true</code> in <code>finalize</code>.
+We do that when the <code>listData</code> object is initialized.</li>
+<li>Performance optimization - avoid repeating scan for nonspace.</li>
+<li>Moved check for closing fence to close-block-check section.
+This is a more logical arrangement and addresses jgm/CommonMark#285.</li>
+<li>Added <code>offset</code> property to <code>DocParser</code>.  Use this in <code>addLine</code>,
+instead of <code>offset</code> parameter, which has been removed.</li>
+<li>Implemented new spec for emphasis and strong emphasis with <code>_</code>.</li>
+<li><code>html.js</code> - explicitly specify second parameter of <code>escapeXml</code>.</li>
+<li>Fixed escaping error in CDATA regex.</li>
+<li>Removed some dead code and fixed incorrect call to <code>addChild</code>
+with three arguments (Robin Stocker).</li>
+<li>Adjust <code>lastLineLength</code> before returning after close fence.</li>
+<li>Propagate <code>lastLineBlank</code> up through parents.
+Previously we just kept it set on the bottom child.
+But this will give a quicker determination of <code>lastLineBlank</code>.</li>
+<li>Moved continuation checks &amp; finalizers into <code>blocks</code> property
+of <code>Parser</code>. This is a first step towards keeping the code for
+each kind of block in a central place, rather than spread all over
+the code base. This is preparatory for a more modular structure,
+where each type of block has a record describing how it is parsed and
+finalized. Eventually this will also contain functions for checking for
+a block start, and metadata that determines how line data
+should be handled.</li>
+<li>Added <code>currentLine</code> property to <code>Parser</code>.</li>
+<li>Renamed <code>first_nonspace</code> -&gt; <code>next_nonspace</code>.</li>
+<li>Put generated <code>commonmark.js</code> in <code>dist/</code> rather than <code>js/</code>.</li>
+<li>Miscellaneous code cleanup.</li>
+<li>Split JS code into (this) independent repository.</li>
+<li>Added detailed benchmark with samples (<code>make bench-detailed</code>).</li>
+<li>Added <code>dist/commonmark.js</code> to repo (for bower).</li>
+<li>Added <code>bower.json</code> (jgm/CommonMark#288).</li>
+<li>Updated test suite. Now shows how performance depends on length in
+pathological cases.</li>
+<li>Don't use -1 as second param for .slice. This seems to cause a
+deoptimization, as reported by <code>node --trace-deopt</code>.</li>
+<li>Added <code>CONTRIBUTING.md</code>.</li>
+<li>Added <code>.travis.yml</code> to test against various node versions.</li>
+<li>Renamed <code>changelog.js.txt</code> -&gt; <code>changelog.txt</code>.</li>
+</ul>
+<p>[0.16]</p>
+<ul>
+<li>Improved regex for HTML comments (#263).</li>
+<li>Fixed CDATA regex (#267).</li>
+<li>Use linked list instead of arrays in AST: the same doubly linked
+node structure as cmark uses.  This simplifies some code and
+eliminates the need for recursive algorithms, so we can render
+deeply-nested structures without stack overflows.</li>
+<li>Use <code>children</code> instead of <code>label</code> (in Image and Link),
+<code>inline_content</code> (in Paragraph), and <code>c</code> (in Emph and Strong).</li>
+<li>Renamed the <code>c</code> property to <code>literal</code> to match <code>libcmark</code>.</li>
+<li>Use <code>literal</code> rather than <code>string_content</code> property for code
+blocks, HTML.  <code>string_content</code> is reserved for raw string
+content that has yet to be parsed as inlines.</li>
+<li>Improved end lines (#276).</li>
+<li>Added a node walker, for easy AST traversal (see <code>node.js</code>).</li>
+<li>Regularized position information into a <code>sourcepos</code> property.
+Added end column information.</li>
+<li>Renamed <code>html-renderer.js</code> to <code>html.js</code>.</li>
+<li>Replace NUL characters with U+FFFD, as per spec.</li>
+<li>Optimized code, resulting in significant performance gains.
+(We've gone from being twice as fast as showdown.js to being
+three times as fast, on par with marked.)</li>
+<li>Made <code>tight</code> a property of <code>list_data</code> rather than <code>Node</code>.</li>
+<li>Added options to renderer, parser objections.</li>
+<li>Added a <code>--sourcepos</code> command line option to <code>js/bin/commonmark</code>.</li>
+<li>HTML renderer now throws an error on unknown tag type (which
+indicates a programming error).</li>
+<li>Removed <code>ansi.js</code> code from the source tree. The test suite now
+uses its own mini ansi colors implementation.</li>
+<li>Added <code>--time</code> option to <code>js/bin/commonmark</code>.</li>
+<li>Added an XML renderer (XML representation of the AST, matching
+<code>Commonmark.dtd</code>).</li>
+<li>Changed <code>url</code> property to <code>destination</code> to match <code>cmark</code> and spec.</li>
+<li>Added <code>js/common.js</code> to hold some common code, like string
+unescaping and URI normalization.</li>
+<li>Use <code>decodeURI</code> instead of <code>unescape</code>.</li>
+<li>Added some &quot;pathological&quot; test cases to test suite.</li>
+</ul>

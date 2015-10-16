@@ -1,0 +1,6 @@
+Contributing
+============
+
+1.  Ensure that all tests pass (`make test`).
+2.  Ensure that performance has not been affected (`make bench`).
+3.  Commits should not mix changes to `lib` and changes to `dist`.

@@ -1,0 +1,21 @@
+var commonmark = require('./lib/index.js');
+var parser = new commonmark.Parser();
+var doc = parser.parse("# Hi\n\nA [link](url). ok.");
+var walker = doc.walker();
+var event;
+while (event = walker.next()) {
+  if (event.node.type === 'Link' && !event.entering) {
+    var rawstart = "START";
+    var rawend = "END";
+    event.node.insertBefore(rawstart);
+    var child = event.node.firstChild();
+    while (child) {
+      event.node.insertBefore(child);
+      child = child.next;
+    }
+    event.node.insertBefore(rawend);
+    event.node.unlink();
+  }
+}
+var renderer = new commonmark.HtmlRenderer();
+console.log(renderer.render(doc));
