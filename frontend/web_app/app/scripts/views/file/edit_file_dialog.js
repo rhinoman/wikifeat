@@ -80,11 +80,14 @@ define([
         submitForm: function(event){
             event.preventDefault();
             var self = this;
+            //disable the submit button
+            this.$("button#saveButton").attr("disabled", "disabled");
             //We do this in two steps
             //First save the file record (sans actual file)
             Radio.channel('wikiManager').request('save:file', this.model)
                 .done(function(response){
                     if(response.hasOwnProperty('error')){
+                        self.$("button#saveButton").removeAttr("disabled");
                         var error = {};
                         if(response.error.status === 400) {
                             error.serverError = "Invalid Request";
@@ -111,6 +114,7 @@ define([
                                     var error = {};
                                     error.serverError = "could not upload file";
                                     self.showError(self.model, error);
+                                    self.$("button#saveButton").removeAttr("disabled");
                                 } else {
                                     self.model.fetch();
                                     self.model.trigger('change');

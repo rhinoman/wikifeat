@@ -43,26 +43,30 @@ define([
         },
 
         initialize: function(options){
-            this.model.on('sync', this.render, this);
+            //this.model.on('sync', this.render, this);
+            this.model.on('change', this.render, this);
         },
 
         editFile: function(event){
             event.preventDefault();
-            var self = this;
-            Radio.channel('wikiManager').request('get:file', this.model.id,
+            //var self = this;
+            var editFileDialog = new EditFileDialogView({model: this.model});
+            Radio.channel('main').trigger('show:dialog', editFileDialog);
+            /*Radio.channel('wikiManager').request('get:file', this.model.id,
                 this.model.wikiId).done(function(model){
                     if(typeof model !== 'undefined'){
                         self.model = model;
-                        self.model.on('sync', self.render, self);
+                        //self.model.on('sync', self.render, self);
                         var editFileDialog =
                             new EditFileDialogView({model: self.model});
                         Radio.channel('main')
                             .trigger('show:dialog', editFileDialog);
                     }
-                });
+                });*/
         },
 
         deleteFile: function(event){
+            var self = this;
             var confirmCallback = function(){
                 Radio.channel('wikiManager').request('delete:file', self.model)
                     .done(function(response){
@@ -84,7 +88,6 @@ define([
 
             Radio.channel('main')
                 .trigger('show:dialog', confirmDialog);
-            var self = this;
         },
 
         onRender: function(){
@@ -107,6 +110,10 @@ define([
                 }
                 this.$('[data-toggle="tooltip"]').tooltip();
             }
+        },
+
+        onDestroy: function(){
+            console.log("I have been destroyed, view: " + this.cid);
         }
 
     });
