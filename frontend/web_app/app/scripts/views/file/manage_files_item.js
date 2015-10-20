@@ -17,6 +17,9 @@
  * along with WikiFeat.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ *  Individual File view in file table (i.e., one 'row')
+ */
 define([
     'jquery',
     'underscore',
@@ -47,24 +50,21 @@ define([
             this.model.on('change', this.render, this);
         },
 
+        /**
+         * Display the edit file dialog window
+         * @param event
+         */
         editFile: function(event){
             event.preventDefault();
             //var self = this;
             var editFileDialog = new EditFileDialogView({model: this.model});
             Radio.channel('main').trigger('show:dialog', editFileDialog);
-            /*Radio.channel('wikiManager').request('get:file', this.model.id,
-                this.model.wikiId).done(function(model){
-                    if(typeof model !== 'undefined'){
-                        self.model = model;
-                        //self.model.on('sync', self.render, self);
-                        var editFileDialog =
-                            new EditFileDialogView({model: self.model});
-                        Radio.channel('main')
-                            .trigger('show:dialog', editFileDialog);
-                    }
-                });*/
         },
 
+        /**
+         * Delete file from the database
+         * @param event
+         */
         deleteFile: function(event){
             var self = this;
             var confirmCallback = function(){

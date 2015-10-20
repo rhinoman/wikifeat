@@ -50,6 +50,10 @@ define([
             }
         },
 
+        /**
+         * Displays the Add File dialog window
+         * @param event
+         */
         addFile: function(event){
             event.preventDefault();
             var file = new FileModel({},{wikiId: this.wikiModel.id});
