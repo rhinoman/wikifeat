@@ -364,9 +364,6 @@ body {
   height: 100%;
 }
 
-.sidebar {
-  display: none;
-}
 .sidebar .tooltip {
   z-index: 9999;
 }
@@ -417,6 +414,16 @@ body {
 
 button.btn {
   border-radius: 0;
+}
+
+.btn-dark:enabled {
+  background-color: #333333;
+  color: #efefef;
+  border: 1px solid #efefef;
+}
+.btn-dark:hover {
+  color: white;
+  border: 1px solid white;
 }
 
 button.primary-color-btn {
@@ -476,23 +483,71 @@ pre {
   min-height: 8in;
 }
 
+.sidebar {
+  position: fixed;
+  left: 250px;
+  width: 0;
+  margin-left: -250px;
+  height: 100%;
+  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #333;
+  border-right: 1px solid #999;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+  color: #DEDEDE;
+}
+.sidebar div#logo-view {
+  text-align: center;
+}
+.sidebar nav#sidebar-view {
+  position: absolute;
+  width: 250px;
+  padding: 5px;
+  top: 0;
+  margin: 0;
+}
+
+div#container div#menuToggle {
+  background-color: #333333;
+  padding: 5px 10px 5px 10px;
+}
+div#container div#content {
+  width: 100%;
+  position: relative;
+}
+
+div#container.toggled {
+  padding-left: 260px;
+}
+div#container.toggled .sidebar {
+  width: 250px;
+}
+div#container.toggled div#content {
+  position: absolute;
+  margin-right: -250px;
+}
+
 @media (min-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 10px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    background-color: #333;
-    border-right: 1px solid #999;
-    color: #DEDEDE;
+  div#menuToggle {
+    display: none;
   }
-  .sidebar div#logo-view {
-    text-align: center;
+
+  div#container {
+    padding-left: 250px;
+  }
+
+  .sidebar {
+    width: 250px;
+  }
+
+  div#content {
+    position: relative;
+    padding-left: 20px;
+    padding-right: 10px;
   }
 }
 

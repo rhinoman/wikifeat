@@ -70,6 +70,10 @@ define([
 
     // Start it.
     WikiClient.on("start", function () {
+        //menu toggle event
+        $("#menuToggle button").click(function(){
+            $("#container").toggleClass('toggled');
+        });
         //jquery setup
         $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
             var csrfCookie = $.cookie("CsrfToken");

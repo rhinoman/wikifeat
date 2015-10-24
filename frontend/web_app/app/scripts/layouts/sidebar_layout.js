@@ -12,8 +12,12 @@ define([
 
     return Marionette.LayoutView.extend({
         template: _.template(SidebarTemplate),
+        tagName: "nav",
         id: 'sidebar-view',
-        className: 'nav nav-sidebar' ,
+        className: 'nav nav-sidebar',
+        attributes: {
+            "role": "navigation"
+        },
         regions: {
             logoRegion: "#logo",
             userMenuRegion: "#userMenu",
