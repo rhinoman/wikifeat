@@ -181,8 +181,11 @@ func TestPages(t *testing.T) {
 	index, err := theWiki.GetPageIndex()
 	printError(t, err)
 	//Get the history
-	history, err := theWiki.GetHistory(theId, 0)
+	history, err := theWiki.GetHistory(theId, 1, 0)
 	printError(t, err)
+	if history.TotalRows != 3 {
+		t.Errorf("Wrong number of Rows reported!")
+	}
 	if len(index) != 3 {
 		t.Errorf("len index should be 3, was %v", len(history.Rows))
 	}

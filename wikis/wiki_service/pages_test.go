@@ -144,7 +144,7 @@ func TestPageCRUD(t *testing.T) {
 
 		})
 		Convey("When the Page history is requested", func() {
-			hist, err := pm.GetHistory(wikiId, pageId, 0, curUser)
+			hist, err := pm.GetHistory(wikiId, pageId, 1, 0, curUser)
 			Convey("Error should be nil", func() {
 				So(err, ShouldBeNil)
 			})

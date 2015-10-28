@@ -182,11 +182,11 @@ func (pm *PageManager) Delete(wiki string, pageId string,
 }
 
 //Gets the history for this page
-func (pm *PageManager) GetHistory(wiki string, pageId string,
-	limit int, curUser *CurrentUserInfo) (*wikit.HistoryViewResponse, error) {
+func (pm *PageManager) GetHistory(wiki string, pageId string, pageNum int,
+	numPerPage int, curUser *CurrentUserInfo) (*wikit.HistoryViewResponse, error) {
 	auth := curUser.Auth
 	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
-	return theWiki.GetHistory(pageId, limit)
+	return theWiki.GetHistory(pageId, pageNum, numPerPage)
 }
 
 //Converts markdown text to html

@@ -23,6 +23,7 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/go-slugification"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -133,7 +134,7 @@ func (wiki *Wiki) GetLineage(pageId string, page *Page) ([]string, error) {
 // We're trying to enforce a unique constraint on page slugs
 func (wiki *Wiki) CheckForDuplicateSlug(slug string) error {
 	params := SetKey(slug)
-	response := CheckSlugResponse{}
+	response := KVResponse{}
 	params.Add("group", "true")
 	err := wiki.db.GetView("wikit", "checkUniqueSlug", &response, params)
 	if err != nil {
@@ -279,7 +280,7 @@ func (wiki *Wiki) SavePage(page *Page, id string, rev string, editor string) (st
 //Delete a Page
 func (wiki *Wiki) DeletePage(id string, rev string) (string, error) {
 	//Fetch the document's history first
-	history, err := wiki.GetHistory(id, 0)
+	history, err := wiki.GetHistory(id, 1, 0)
 	if err != nil {
 		return "", err
 	}
@@ -300,43 +301,54 @@ func (wiki *Wiki) DeletePage(id string, rev string) (string, error) {
 	return dRev, nil
 }
 
-//Save an attachment
-//TODO: enforce a max size somehow
-/*func (wiki *Wiki) SaveAttachment(docId string,
-	docRev string, attName string,
-	attType string, attContent io.Reader) (string, error) {
-	//Copy the document
-	copyId := getUuid()
-	copyRev, err := wiki.db.Copy(docId, docRev, copyId)
-	if err != nil {
-		return "", err
-	}
-	//now save the attachment
-	rev, err := wiki.db.SaveAttachment(docId, docRev, attName, attType, attContent)
-	if err != nil {
-		//Need to undo the file copy
-		wiki.db.Delete(copyId, copyRev)
-		return "", err
-	} else {
-		return rev, err
-	}
-}*/
-
 //Gets a History List
 //Returns the History List or an error
-func (wiki *Wiki) GetHistory(documentId string,
-	limit int) (*HistoryViewResponse, error) {
+func (wiki *Wiki) GetHistory(documentId string, pageNum int,
+	numPerPage int) (*HistoryViewResponse, error) {
 	response := HistoryViewResponse{}
 	theKeys := SetKeys([]string{documentId, "{}"}, []string{documentId})
-	if limit != 0 {
-		theKeys.Add("limit", strconv.Itoa(limit))
+	/* This function gets the "count" by calling the reduce function on the getHistory
+	 * couch view function
+	 */
+	var getCount = func(c chan int) {
+		params := SetKeys([]string{documentId, "{}"}, []string{documentId})
+		params.Add("group", "true")
+		params.Add("group_level", "1")
+		params.Add("reduce", "true")
+		var kvResp struct {
+			Rows []struct {
+				Keys  []string `json:"key"`
+				Value int      `json:"value"`
+			} `json:"rows"`
+		}
+		err := wiki.db.GetView("wikit", "getHistory", &kvResp, params)
+		if err != nil {
+			log.Printf("Error counting history: %v", err)
+			c <- 0
+		} else {
+			rec := kvResp.Rows[0]
+			c <- rec.Value
+		}
 	}
+	countChan := make(chan int)
+	//Grab the count concurrently
+	go getCount(countChan)
+	if numPerPage != 0 {
+		theKeys.Add("limit", strconv.Itoa(numPerPage))
+	}
+	skip := numPerPage * (pageNum - 1)
+	if skip > 0 {
+		theKeys.Add("skip", strconv.Itoa(skip))
+	}
+	theKeys.Add("reduce", "false")
 	err := wiki.db.GetView("wikit", "getHistory", &response, theKeys)
 	if err != nil {
 		return nil, err
 	} else if len(response.Rows) <= 0 {
 		return nil, nil
 	} else {
+		//Set total rows to the count
+		response.TotalRows = <-countChan
 		return &response, nil
 	}
 }
@@ -345,6 +357,7 @@ func (wiki *Wiki) GetHistory(documentId string,
 func (wiki *Wiki) GetChildPageIndex(pageId string) (PageIndex, error) {
 	response := PageIndexViewResponse{}
 	theKeys := SetKey(pageId)
+	theKeys.Add("reduce", "false")
 	err := wiki.db.GetView("wikit", "getChildPageIndex", &response, theKeys)
 	if err != nil {
 		return nil, err
@@ -360,7 +373,9 @@ func (wiki *Wiki) GetChildPageIndex(pageId string) (PageIndex, error) {
 //Returns the Page List or an error
 func (wiki *Wiki) GetPageIndex() (PageIndex, error) {
 	response := PageIndexViewResponse{}
-	err := wiki.db.GetView("wikit", "getIndex", &response, nil)
+	params := url.Values{}
+	params.Add("reduce", "false")
+	err := wiki.db.GetView("wikit", "getIndex", &response, &params)
 	if err != nil {
 		return nil, err
 	} else {
@@ -382,6 +397,7 @@ func (wiki *Wiki) GetFileIndex(pageNum int,
 	if skip > 0 {
 		params.Add("skip", strconv.Itoa(skip))
 	}
+	params.Add("reduce", "false")
 	err := wiki.db.GetView("wikit", "getFileIndex", &response, &params)
 	if err != nil {
 		return nil, err

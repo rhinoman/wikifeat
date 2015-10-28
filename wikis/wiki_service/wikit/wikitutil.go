@@ -50,6 +50,7 @@ var views = map[string]View{
 			"editor: doc.editor, contentSize: doc.content.raw.length}" +
 			");" +
 			"} }",
+		Reduce: "_count",
 	},
 	"getIndex": {
 		Map: `
@@ -65,6 +66,7 @@ var views = map[string]View{
 					}); 
 				} 
 			}`,
+		Reduce: "_count",
 	},
 	"getFileIndex": {
 		Map: `
@@ -73,6 +75,7 @@ var views = map[string]View{
 					emit(doc.name, doc);
 				}
 			}`,
+		Reduce: "_count",
 	},
 	"getPageBySlug": {
 		Map: "function(doc){" +
@@ -95,6 +98,7 @@ var views = map[string]View{
 					});
 				}
 			}`,
+		Reduce: "_count",
 	},
 	"getDescendants": {
 		Map: `

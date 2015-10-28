@@ -116,7 +116,7 @@ type SlugViewEntry struct {
 	Page Page   `json:"page"`
 }
 
-type CheckSlugResponse struct {
+type KVResponse struct {
 	Rows []KvItem `json:"rows"`
 }
 

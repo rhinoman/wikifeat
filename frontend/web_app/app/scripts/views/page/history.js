@@ -23,14 +23,15 @@ define([
     'marionette',
     'moment',
     'backbone.radio',
+    'views/paginated_table_view',
     'views/page/history_entry',
     'text!templates/page/history.html'
-], function($,_,Marionette,Moment,Radio,
+], function($,_,Marionette,Moment,Radio,PaginatedTableView,
             HistoryEntryView,HistoryTemplate){
 
     'use strict';
 
-    return Marionette.CompositeView.extend({
+    return PaginatedTableView.extend({
         childView: HistoryEntryView,
         template: _.template(HistoryTemplate),
         childViewContainer: '#historyEntriesContainer',
@@ -58,6 +59,7 @@ define([
             if(this.pageModel != null){
                 this.$("#pageTitle").html(this.pageModel.get('title'));
             }
+            PaginatedTableView.prototype.onRender.call(this);
         }
     });
 

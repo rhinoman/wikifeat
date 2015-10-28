@@ -35,6 +35,11 @@ define([
 
     HistoryEntryCollection.prototype.comparator = -"timestamp";
 
+    HistoryEntryCollection.prototype.state = {
+        firstPage: 1,
+        pageSize: 25
+    };
+
     return HistoryEntryCollection;
 
 });

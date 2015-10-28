@@ -120,7 +120,8 @@ func (pc PagesController) AddRoutes(ws *restful.WebService) {
 		Operation("history").
 		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
 		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
-		Param(ws.QueryParameter("limit", "Number of records to return").DataType("integer")).
+		Param(ws.QueryParameter("pageNum", "Page number for pagination").DataType("integer")).
+		Param(ws.QueryParameter("numPerPage", "Number of records to return").DataType("integer")).
 		Writes(HistoryResponse{}))
 
 	ws.Route(ws.GET("/slug/{wiki-slug}/pages/{page-slug}").To(pc.readBySlug).
@@ -300,15 +301,19 @@ func (pc PagesController) history(request *restful.Request,
 	}
 	wikiId := request.PathParameter("wiki-id")
 	pageId := request.PathParameter("page-id")
-	limit, err := strconv.Atoi(request.QueryParameter("limit"))
+	numPerPage, err := strconv.Atoi(request.QueryParameter("numPerPage"))
 	if err != nil {
-		limit = 50
+		numPerPage = 50
+	}
+	pageNum, err := strconv.Atoi(request.QueryParameter("pageNum"))
+	if err != nil {
+		pageNum = 1
 	}
 	if wikiId == "" || pageId == "" {
 		WriteBadRequestError(response)
 		return
 	}
-	history, err := new(PageManager).GetHistory(wikiId, pageId, limit, curUser)
+	history, err := new(PageManager).GetHistory(wikiId, pageId, pageNum, numPerPage, curUser)
 	if err != nil {
 		WriteError(err, response)
 		return
