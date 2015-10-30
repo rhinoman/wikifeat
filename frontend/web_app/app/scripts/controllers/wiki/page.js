@@ -131,7 +131,7 @@ define([
             if(options.hasOwnProperty('homePage')){
                 homePage = options.homePage;
             }
-            region.show(new CreatePageView({
+            region.show(new EditPageView({
                 model: model,
                 wikiModel: wikiModel,
                 homePage: homePage

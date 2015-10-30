@@ -32,7 +32,7 @@ define([
 ], function($,_,Marionette,Radio,Stickit,Markdown,
             PageModel,EditPageTemplate,AlertTemplate){
 
-    return Marionette.ItemView.extend({
+    return Marionette.LayoutView.extend({
         id: "create-page-view",
         template: _.template(EditPageTemplate),
         model: PageModel,

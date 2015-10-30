@@ -42,15 +42,15 @@ define([
     };
 
     PageModel.prototype.defaults = {
-        "content": {
-            "formatted": "",
-            "raw": ""
+        content: {
+            formatted: "",
+            raw: ""
         },
-        "editor": "Unknown",
-        "owner": "",
-        "parent": "",
-        "title": "Untitled",
-        "type": "page"
+        editor: "Unknown",
+        owner: "",
+        parent: "",
+        title: "Untitled",
+        type: "page"
     };
 
     //input validation function

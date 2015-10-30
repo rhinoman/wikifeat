@@ -36,6 +36,7 @@ define([
         template: _.template(EditPageFormTemplate),
         wikiModel: null,
         wipText: null,
+        homePage: false,
         bindings: {
             '#inputTitle': {
                 observe: 'title'
@@ -53,6 +54,9 @@ define([
             }
             if(options.hasOwnProperty('wipText')){
                 this.wipText = options.wipText;
+            }
+            if(options.hasOwnProperty('homePage')){
+                this.homePage = options.homePage;
             }
             this.model.on('invalid', this.showError, this);
         },
@@ -83,23 +87,55 @@ define([
         publishChanges: function(event){
             event.preventDefault();
             this.$("#title-input-group").removeClass('has-error');
-            var pageContent = this.model.get('content');
+            var pageContent = _.clone(this.model.get('content'));
             pageContent.raw = $("#wmd-input").val();
             this.model.set('content', pageContent);
 
             var self=this;
             Radio.channel('page').request('save:page', this.model)
-                .done(function(response){
-                    //TODO: Check for undefined
-                    Radio.channel('page').
-                        trigger('show:page', self.model.id, self.wikiModel);
-                });
+                .done(this.afterSave.bind(this));
+        },
+
+        //After page save callback
+        afterSave: function(response){
+            if(typeof response !== 'undefined'){
+                if(this.homePage === true){
+                    this.wikiModel.set("homePageId", this.model.id);
+                    Radio.channel('wikiManager').request('save:wiki', this.wikiModel)
+                        .done(this.afterWikiSave.bind(this))
+                } else {
+                    Radio.channel('page').trigger('show:page',
+                        this.model.id, this.wikiModel);
+                }
+
+            } else {
+                //TODO: Handle undefined
+            }
+        },
+
+        //Callback after the wiki is saved
+        afterWikiSave: function(response){
+            if(typeof response !== 'undefined'){
+                Radio.channel('page').trigger('show:page',
+                    this.model.id, this.wikiModel);
+            } else {
+                //TODO: Handle undefined
+            }
         },
 
         //Cancel and go back!
         cancelEdit: function(event){
             event.preventDefault();
-            Radio.channel('page').trigger('show:page', this.model.id, this.wikiModel);
+            if(typeof this.model.id !== "undefined") {
+                Radio.channel('page').trigger('show:page', this.model.id, this.wikiModel);
+            } else {
+                var parent = this.model.get('parent');
+                if(typeof parent !== 'undefined' && parent !== ""){
+                    Radio.channel('page').trigger('show:page', parent, this.wikiModel);
+                } else {
+                    Radio.channel('wiki').trigger('show:wiki', this.wikiModel.id);
+                }
+            }
         },
 
         onRender: function(){
