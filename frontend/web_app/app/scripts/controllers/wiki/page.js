@@ -26,13 +26,12 @@ define([
     'backbone.radio',
     'entities/wiki/page',
     'views/page/show',
-    'views/page/create',
     'views/page/edit',
     'views/page/placeholder',
     'views/page/history'
 ], function($,_,Marionette,Radio,PageModel,
-            ShowPageView,CreatePageView,
-            EditPageView,PlaceholderView,HistoryView){
+            ShowPageView,EditPageView,
+            PlaceholderView,HistoryView){
 
     var pageChannel = Radio.channel('page');
 
