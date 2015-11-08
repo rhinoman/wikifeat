@@ -177,6 +177,22 @@ func (page Page) Validate() error {
 	return nil
 }
 
+// Validation of Comment
+func (comment Comment) Validate() error {
+	err := &Error{
+		StatusCode: 400,
+	}
+	if comment.Author == "" {
+		err.Reason = "Comment has no author!"
+		return err
+	}
+	if comment.OwningPage == "" {
+		err.Reason = "Comment must have an owning page!"
+		return err
+	}
+	return nil
+}
+
 func (wiki *Wiki) createPage(page *Page, id string, editor string) (string, error) {
 	//Must be a new document eh, if not, it will error out on the write
 	page.DocType = "page"
@@ -310,29 +326,9 @@ func (wiki *Wiki) GetHistory(documentId string, pageNum int,
 	/* This function gets the "count" by calling the reduce function on the getHistory
 	 * couch view function
 	 */
-	var getCount = func(c chan int) {
-		params := SetKeys([]string{documentId, "{}"}, []string{documentId})
-		params.Add("group", "true")
-		params.Add("group_level", "1")
-		params.Add("reduce", "true")
-		var kvResp struct {
-			Rows []struct {
-				Keys  []string `json:"key"`
-				Value int      `json:"value"`
-			} `json:"rows"`
-		}
-		err := wiki.db.GetView("wikit", "getHistory", &kvResp, params)
-		if err != nil {
-			log.Printf("Error counting history: %v", err)
-			c <- 0
-		} else {
-			rec := kvResp.Rows[0]
-			c <- rec.Value
-		}
-	}
 	countChan := make(chan int)
 	//Grab the count concurrently
-	go getCount(countChan)
+	go wiki.getCountForView("wikit", "getHistory", documentId, countChan)
 	if numPerPage != 0 {
 		theKeys.Add("limit", strconv.Itoa(numPerPage))
 	}
@@ -446,4 +442,139 @@ func (wiki *Wiki) GetFileAttachment(fileId, fileRev,
 func (wiki *Wiki) GetFileAttachmentByProxy(fileId, fileRev,
 	attType string, attName string, r *http.Request, w http.ResponseWriter) error {
 	return wiki.db.GetAttachmentByProxy(fileId, fileRev, attType, attName, r, w)
+}
+
+//---Comments Stuff-----//
+
+// Get a comment by Id
+func (wiki *Wiki) ReadComment(commentId string, comment *Comment) (string, error) {
+	if rev, err := wiki.db.Read(commentId, comment, nil); err != nil {
+		return "", err
+	} else {
+		comment.Id = commentId
+		return rev, nil
+	}
+}
+
+// Save a comment
+func (wiki *Wiki) SaveComment(comment *Comment, id string,
+	rev string, pageId string, author string) (string, error) {
+	if rev == "" {
+		return wiki.createComment(comment, id, pageId, author)
+	} else {
+		return wiki.updateComment(comment, id, rev)
+	}
+}
+
+// Create a new comment
+func (wiki *Wiki) createComment(comment *Comment, id string,
+	pageId string, author string) (string, error) {
+	comment.DocType = "comment"
+	nowTime := time.Now().UTC()
+	comment.CreatedTime = nowTime
+	comment.ModifiedTime = nowTime
+	comment.Author = author
+	comment.OwningPage = pageId
+	if err := comment.Validate(); err != nil {
+		return "", err
+	} else {
+		return wiki.db.Save(comment, id, "")
+	}
+}
+
+// Update a comment
+func (wiki *Wiki) updateComment(comment *Comment, id string,
+	rev string) (string, error) {
+	comment.ModifiedTime = time.Now().UTC()
+	if err := comment.Validate(); err != nil {
+		return "", err
+	} else {
+		return wiki.db.Save(comment, id, rev)
+	}
+}
+
+// Delete a comment
+func (wiki *Wiki) DeleteComment(id string, rev string) (string, error) {
+	return wiki.db.Delete(id, rev)
+}
+
+// Get All Comments for a page
+func (wiki *Wiki) GetCommentsForPage(pageId string, pageNum int,
+	numPerPage int) (*CommentIndexViewResponse, error) {
+	response := CommentIndexViewResponse{}
+	theKeys := SetKeys([]string{pageId, "{}"}, []string{pageId})
+	// This function gets the "count" by calling the reduce function
+	countChan := make(chan int)
+	//Grab the count concurrently
+	go wiki.getCountForView("wikit_comments", "getCommentsForPage", pageId, countChan)
+	if numPerPage != 0 {
+		theKeys.Add("limit", strconv.Itoa(numPerPage))
+	}
+	skip := numPerPage * (pageNum - 1)
+	if skip > 0 {
+		theKeys.Add("skip", strconv.Itoa(skip))
+	}
+	theKeys.Add("reduce", "false")
+	err := wiki.db.GetView("wikit_comments", "getCommentsForPage", &response, theKeys)
+	if err != nil {
+		return nil, err
+	} else if len(response.Rows) <= 0 {
+		return nil, nil
+	} else {
+		//Set total rows to the count
+		response.TotalRows = <-countChan
+		return &response, nil
+	}
+}
+
+// Gets a list of a comment's first order descendants (i.e., first level of replies)
+func (wiki *Wiki) GetChildComments(commentId string) (*CommentIndexViewResponse, error) {
+	response := CommentIndexViewResponse{}
+	theKeys := SetKeys([]string{commentId, "{}"}, []string{commentId})
+	theKeys.Add("reduce", "false")
+	//Need to get the count for TotalRows
+	countChan := make(chan int)
+	go wiki.getCountForView("wikit_comments", "getChildComments", commentId, countChan)
+	err := wiki.db.GetView("wikit_comments", "getChildComments", &response, theKeys)
+	if err != nil {
+		return nil, err
+	} else if len(response.Rows) <= 0 {
+		return nil, nil
+	} else {
+		response.TotalRows = <-countChan
+		return &response, nil
+	}
+}
+
+// Gets the number of first order descendants a comment has
+func (wiki *Wiki) GetNumChildComments(commentId string) int {
+	c := make(chan int)
+	go wiki.getCountForView("wikit_comments", "getChildComments", commentId, c)
+	numComments := <-c
+	return numComments
+}
+
+// Assumes the Reduce function for the view is "_count"
+// Result of _count is written to the channel 'c'
+func (wiki *Wiki) getCountForView(ddoc string, view string, key string, c chan int) {
+	params := SetKeys([]string{key, "{}"}, []string{key})
+	params.Add("group", "true")
+	params.Add("group_level", "1")
+	params.Add("reduce", "true")
+	var kvResp struct {
+		Rows []struct {
+			Keys  []string `json:"key"`
+			Value int      `json:"value"`
+		} `json:"rows"`
+	}
+	err := wiki.db.GetView(ddoc, view, &kvResp, params)
+	if err != nil {
+		log.Printf("Error counting history: %v", err)
+		c <- 0
+	} else if len(kvResp.Rows) == 0 {
+		c <- 0
+	} else {
+		rec := kvResp.Rows[0]
+		c <- rec.Value
+	}
 }

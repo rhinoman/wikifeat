@@ -189,6 +189,38 @@ func (pm *PageManager) GetHistory(wiki string, pageId string, pageNum int,
 	return theWiki.GetHistory(pageId, pageNum, numPerPage)
 }
 
+//Creates or updates a comment
+func (pm *PageManager) SaveComment(wiki string, pageId string, comment *wikit.Comment,
+	commentId string, commentRev string, curUser *CurrentUserInfo) (string, error) {
+	auth := curUser.Auth
+	theUser := curUser.User
+	//Read the content from the comment
+	//parse the markdown to Html
+	out := make(chan string)
+	//Convert (Sanitized) Markdown to HTML
+	go processMarkdown(comment.Content.Raw, out)
+	comment.Content.Formatted = <-out
+	//Store it
+	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
+	return theWiki.SaveComment(comment, commentId, commentRev, pageId, theUser.UserName)
+}
+
+//Read a comment
+func (pm *PageManager) ReadComment(wiki string, commentId string,
+	comment *wikit.Comment, curUser *CurrentUserInfo) (string, error) {
+	auth := curUser.Auth
+	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
+	return theWiki.ReadComment(commentId, comment)
+}
+
+//Delete a comment.  Returns the revision if successful
+func (pm *PageManager) DeleteComment(wiki string, commentId string,
+	commentRev string, curUser *CurrentUserInfo) (string, error) {
+	auth := curUser.Auth
+	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
+	return theWiki.DeletePage(commentId, commentRev)
+}
+
 //Converts markdown text to html
 func processMarkdown(mdText string, out chan string) {
 	defer func() {

@@ -298,5 +298,97 @@ func TestFiles(t *testing.T) {
 	}
 	deleteDb(t, wikiName)
 	deleteUser(t, user)
+}
 
+func TestComments(t *testing.T) {
+	wikiName, user := createTestWiki(t)
+	defer deleteDb(t, wikiName)
+	defer deleteUser(t, user)
+	ba := &couchdb.BasicAuth{user, "password"}
+	theWiki := SelectWiki(connection, wikiName, ba)
+	t.Logf("dbnam: %v\n", wikiName)
+	page := Page{
+		Title: "Page of Commenting",
+		Owner: "Steve",
+		Content: PageContent{
+			Raw: "This is the original",
+		},
+	}
+	pageId := getUuid()
+	rev, err := theWiki.SavePage(&page, pageId, "", "steve")
+	printError(t, err)
+	t.Logf("new doc rev: %v\n", rev)
+	//Now let's create a comment
+	theId := getUuid()
+	comment := Comment{
+		Content: PageContent{
+			Raw: "This is a commment",
+		},
+	}
+	rev, err = theWiki.SaveComment(&comment, theId, "", pageId, "steve")
+	t.Logf("new doc rev: %v\n", rev)
+	//now update it
+	comment.Content.Raw = "I done had to edit my comment!"
+	uRev, err := theWiki.SaveComment(&comment, theId, rev, "", "")
+	printError(t, err)
+	t.Logf("first update rev: %v\n", uRev)
+	//now read it
+	readComment := Comment{}
+	readRev, err := theWiki.ReadComment(theId, &readComment)
+	printError(t, err)
+	t.Logf("read comment: %v\n", readComment)
+	t.Logf("read doc rev: %v\n", readRev)
+	if readRev != uRev {
+		t.Errorf("revisions don't match!")
+	}
+	if readComment.Content.Raw != "I done had to edit my comment!" {
+		t.Errorf("Content ain't right!")
+	}
+	//Create a second comment
+	secondComment := Comment{
+		Content: PageContent{
+			Raw: "This is another comment",
+		},
+	}
+	secondId := getUuid()
+	sRev, err := theWiki.SaveComment(&secondComment, secondId, "", pageId, "steve")
+	printError(t, err)
+	t.Logf("Second comment rev: %v\n", sRev)
+	//Create a comment, replying to the first one
+	replyComment := Comment{
+		ParentComment: theId,
+		Content: PageContent{
+			Raw: "This is a reply",
+		},
+	}
+	replyId := getUuid()
+	rRev, err := theWiki.SaveComment(&replyComment, replyId, "", pageId, "steve")
+	printError(t, err)
+	t.Logf("Update rev: %v\n", rRev)
+	//Get a list of all comments
+	civr, err := theWiki.GetCommentsForPage(pageId, 1, 0)
+	printError(t, err)
+	t.Logf("CommentList: %v\n", civr)
+	if civr.TotalRows != 3 {
+		t.Errorf("Total Rows should be 3, but was: %v", civr.TotalRows)
+	}
+	//Get number of child comments
+	numReplies := theWiki.GetNumChildComments(theId)
+	if numReplies != 1 {
+		t.Errorf("Replies should be 1, but was: %v", numReplies)
+	}
+	numReplies = theWiki.GetNumChildComments(secondId)
+	if numReplies != 0 {
+		t.Errorf("Replies should be 0, but was: %v", numReplies)
+	}
+	//Get child comments
+	cc, err := theWiki.GetChildComments(theId)
+	printError(t, err)
+	if cc.TotalRows != 1 {
+		t.Errorf("Replies should be 1, but was: %v", numReplies)
+	}
+	t.Logf("Reply Comment: %v\n", cc.Rows[0])
+	//now delete it!
+	_, err = theWiki.DeleteComment(theId, uRev)
+	printError(t, err)
 }

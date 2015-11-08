@@ -40,7 +40,7 @@ type View struct {
 	Reduce string `json:"reduce,omitempty"`
 }
 
-var views = map[string]View{
+var wikiViews = map[string]View{
 	"getHistory": {
 		Map: "function(doc) {" +
 			"if(doc.type===\"page\"){" +
@@ -128,14 +128,44 @@ var views = map[string]View{
 	},
 }
 
+var commentViews = map[string]View{
+	"getCommentsForPage": {
+		Map: `
+			function(doc){
+				if(doc.type==="comment"){
+					emit([doc.owning_page, doc.created_time], doc);
+				}
+			}`,
+		Reduce: "_count",
+	},
+	"getChildComments": {
+		Map: `
+			function(doc){
+				if(doc.type==="comment"){
+					emit([doc.parent_comment, doc.created_time], doc);
+				}
+			}`,
+		Reduce: "_count",
+	},
+}
+
 //Populate a database with views, etc.
 func InitDb(db *Database, wikiName string) error {
 	ddoc := DesignDocument{
 		Language: "javascript",
-		Views:    views,
+		Views:    wikiViews,
 	}
-	_, err := db.SaveDesignDoc("wikit", ddoc, "")
+	desRev, err := db.SaveDesignDoc("wikit", ddoc, "")
 	if err != nil {
+		return err
+	}
+	comment_ddoc := DesignDocument{
+		Language: "javascript",
+		Views:    commentViews,
+	}
+	_, err = db.SaveDesignDoc("wikit_comments", comment_ddoc, "")
+	if err != nil {
+		db.Delete("_design/wikit", desRev)
 		return err
 	}
 	//setup up roles

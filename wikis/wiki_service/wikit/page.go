@@ -166,3 +166,26 @@ type PageValue struct {
 	Rev string `json:"rev"`
 	Pg  Page   `json:"page"`
 }
+
+// Page comments
+type Comment struct {
+	Id            string      `json:"id"`
+	DocType       string      `json:"type"`
+	OwningPage    string      `json:"owning_page"`
+	ParentComment string      `json:"parent_comment"`
+	Author        string      `json:"author"`
+	CreatedTime   time.Time   `json:"created_time"`
+	ModifiedTime  time.Time   `json:"modified_time"`
+	Content       PageContent `json:"content"`
+}
+
+type CommentIndexViewResponse struct {
+	ViewResponse
+	Rows []CommentIndexResult `json:"rows,omitempty"`
+}
+
+type CommentIndexResult struct {
+	Id    string   `json:"id"`
+	Key   []string `json:"key"`
+	Value Comment  `json:"value"`
+}

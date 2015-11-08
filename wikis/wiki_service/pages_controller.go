@@ -76,6 +76,11 @@ type HistoryEntry struct {
 	DocumentRev string `json:"documentRev"`
 }
 
+type CommentResponse struct {
+	Links   HatLinks      `json:"_links"`
+	Comment wikit.Comment `json:"comment"`
+}
+
 var pageUri = "/{wiki-id}/pages"
 
 //Define routes
@@ -147,6 +152,42 @@ func (pc PagesController) AddRoutes(ws *restful.WebService) {
 		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
 		Param(ws.HeaderParameter("If-Match", "Page revision").DataType("string")).
 		Writes(BooleanResponse{}))
+
+	ws.Route(ws.POST(pageUri + "/{page-id}/comments").To(pc.createComment).
+		Doc("Creates a Comment for this page").
+		Operation("create").
+		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
+		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
+		Reads(wikit.Comment{}).
+		Writes(CommentResponse{}))
+
+	ws.Route(ws.GET(pageUri + "/{page-id}/comments/{comment-id}").To(pc.readComment).
+		Doc("Reads a Comment").
+		Operation("read").
+		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
+		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
+		Param(ws.PathParameter("comment-id", "Comment identifier").DataType("string")).
+		Writes(CommentResponse{}))
+
+	ws.Route(ws.PUT(pageUri + "/{page-id}/comments/{comment-id}").To(pc.updateComment).
+		Doc("Updates a Comment").
+		Operation("update").
+		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
+		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
+		Param(ws.PathParameter("comment-id", "Comment identifier").DataType("string")).
+		Param(ws.HeaderParameter("If-Match", "Comment Revision").DataType("string")).
+		Reads(wikit.Comment{}).
+		Writes(CommentResponse{}))
+
+	ws.Route(ws.DELETE(pageUri + "/{page-id}/comments/{comment-id}").To(pc.delComment).
+		Doc("Deletes a Comment").
+		Operation("delete").
+		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
+		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
+		Param(ws.PathParameter("comment-id", "Comment identifier").DataType("string")).
+		Param(ws.HeaderParameter("If-Match", "Comment Revision").DataType("string")).
+		Writes(BooleanResponse{}))
+
 }
 
 func (pc PagesController) genPageUri(wikiId string, pageId string) string {
@@ -408,6 +449,125 @@ func (pc PagesController) del(request *restful.Request,
 	response.AddHeader("ETag", rev)
 }
 
+//Create a comment
+func (pc PagesController) createComment(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	wikiId := request.PathParameter("wiki-id")
+	pageId := request.PathParameter("page-id")
+	theComment := new(wikit.Comment)
+	err := request.ReadEntity(theComment)
+	if err != nil {
+		WriteServerError(err, response)
+		return
+	}
+	commentId := GenUuid()
+	rev, err := new(PageManager).SaveComment(wikiId, pageId, theComment,
+		commentId, "", curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	response.AddHeader("ETag", rev)
+	response.WriteHeader(http.StatusCreated)
+	cr := pc.genCommentRecordResponse(curUser, wikiId, pageId, commentId, theComment)
+	SetAuth(response, curUser.Auth)
+	response.WriteEntity(cr)
+}
+
+//Read a comment
+func (pc PagesController) readComment(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	wikiId := request.PathParameter("wiki-id")
+	pageId := request.PathParameter("page-id")
+	commentId := request.PathParameter("comment-id")
+	if wikiId == "" || pageId == "" || commentId == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	comment := wikit.Comment{}
+	rev, err := new(PageManager).ReadComment(wikiId, commentId,
+		&comment, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	response.AddHeader("ETag", rev)
+	cr := pc.genCommentRecordResponse(curUser, wikiId, pageId, commentId, &comment)
+	SetAuth(response, curUser.Auth)
+	response.WriteEntity(cr)
+}
+
+//Update a comment
+func (pc PagesController) updateComment(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	wikiId := request.PathParameter("wiki-id")
+	pageId := request.PathParameter("page-id")
+	commentId := request.PathParameter("comment-id")
+	rev := request.HeaderParameter("If-Match")
+	if wikiId == "" || pageId == "" || commentId == "" || rev == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	theComment := new(wikit.Comment)
+	err := request.ReadEntity(theComment)
+	if err != nil {
+		WriteServerError(err, response)
+		return
+	}
+	rev, err = new(PageManager).SaveComment(wikiId, pageId, theComment,
+		commentId, rev, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	response.AddHeader("ETag", rev)
+	cr := pc.genCommentRecordResponse(curUser, wikiId, pageId, commentId, theComment)
+	SetAuth(response, curUser.Auth)
+	response.WriteEntity(cr)
+}
+
+//Delete a comment
+func (pc PagesController) delComment(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	wikiId := request.PathParameter("wiki-id")
+	pageId := request.PathParameter("page-id")
+	commentId := request.PathParameter("comment-id")
+	rev := request.HeaderParameter("If-Match")
+	if wikiId == "" || pageId == "" || commentId == "" || rev == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	rev, err := new(PageManager).DeleteComment(wikiId, commentId, rev, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	SetAuth(response, curUser.Auth)
+	response.WriteEntity(BooleanResponse{Success: true})
+	response.AddHeader("ETag", rev)
+
+}
+
 func (pc PagesController) genRecordResponse(curUser *CurrentUserInfo,
 	wikiId string, pageId string, page *wikit.Page) PageResponse {
 	page.Id = pageId
@@ -417,6 +577,17 @@ func (pc PagesController) genRecordResponse(curUser *CurrentUserInfo,
 		Page: *page,
 	}
 	return pr
+}
+
+func (pc PagesController) genCommentRecordResponse(curUser *CurrentUserInfo,
+	wikiId string, pageId string, commentId string, comment *wikit.Comment) CommentResponse {
+	comment.Id = commentId
+	cr := CommentResponse{
+		Links: GenRecordLinks(curUser.User.Roles, "wiki_"+wikiId,
+			pc.genPageUri(wikiId, pageId)+"/comments/"+commentId),
+		Comment: *comment,
+	}
+	return cr
 }
 
 //This is gnarly
