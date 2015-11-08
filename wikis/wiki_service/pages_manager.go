@@ -218,7 +218,24 @@ func (pm *PageManager) DeleteComment(wiki string, commentId string,
 	commentRev string, curUser *CurrentUserInfo) (string, error) {
 	auth := curUser.Auth
 	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
-	return theWiki.DeletePage(commentId, commentRev)
+	return theWiki.DeleteComment(commentId, commentRev)
+}
+
+//Gets a list of all comments for a page
+func (pm *PageManager) GetComments(wiki string, pageId string,
+	pageNum int, numPerPage int,
+	curUser *CurrentUserInfo) (*wikit.CommentIndexViewResponse, error) {
+	auth := curUser.Auth
+	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
+	return theWiki.GetCommentsForPage(pageId, pageNum, numPerPage)
+}
+
+//Gets a list of child comments
+func (pm *PageManager) GetChildComments(wiki string, commentId string,
+	curUser *CurrentUserInfo) (*wikit.CommentIndexViewResponse, error) {
+	auth := curUser.Auth
+	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
+	return theWiki.GetChildComments(commentId)
 }
 
 //Converts markdown text to html

@@ -174,6 +174,7 @@ type Comment struct {
 	OwningPage    string      `json:"owning_page"`
 	ParentComment string      `json:"parent_comment"`
 	Author        string      `json:"author"`
+	Deleted       bool        `json:"deleted"`
 	CreatedTime   time.Time   `json:"created_time"`
 	ModifiedTime  time.Time   `json:"modified_time"`
 	Content       PageContent `json:"content"`

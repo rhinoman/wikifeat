@@ -66,6 +66,9 @@ func TestPageCRUD(t *testing.T) {
 	wikiId := getUuid()
 	pageId := getUuid()
 	sPageId := getUuid()
+	commentId := getUuid()
+	sCommentId := getUuid()
+	rCommentId := getUuid()
 	pageSlug := ""
 	wikiRecord := WikiRecord{
 		Name:        "Cafe Project",
@@ -191,6 +194,80 @@ func TestPageCRUD(t *testing.T) {
 			})
 			Convey("Length should be 2", func() {
 				So(len(crumbs), ShouldEqual, 2)
+			})
+		})
+		Convey("When comments are created for a page", func() {
+			firstComment := wikit.Comment{
+				Content: wikit.PageContent{
+					Raw: "This is a comment",
+				},
+			}
+			secondComment := wikit.Comment{
+				Content: wikit.PageContent{
+					Raw: "This is another comment",
+				},
+			}
+			replyComment := wikit.Comment{
+				ParentComment: commentId,
+				Content: wikit.PageContent{
+					Raw: "This is a reply",
+				},
+			}
+			_, err1 := pm.SaveComment(wikiId, pageId, &firstComment,
+				commentId, "", curUser)
+			_, err2 := pm.SaveComment(wikiId, pageId, &secondComment,
+				sCommentId, "", curUser)
+			_, err3 := pm.SaveComment(wikiId, pageId, &replyComment,
+				rCommentId, "", curUser)
+			Convey("Errors should be nil", func() {
+				So(err1, ShouldBeNil)
+				So(err2, ShouldBeNil)
+				So(err3, ShouldBeNil)
+			})
+
+		})
+		Convey("When comments are queried for", func() {
+			comments, err := pm.GetComments(wikiId, pageId, 1, 0, curUser)
+			Convey("Error should be nil", func() {
+				So(err, ShouldBeNil)
+			})
+			numComments := len(comments.Rows)
+			Convey("Should be 3 comments!", func() {
+				So(numComments, ShouldEqual, 3)
+			})
+		})
+		Convey("When child comments are queried for", func() {
+			comments, err := pm.GetChildComments(wikiId, commentId, curUser)
+			Convey("Error should be nil", func() {
+				So(err, ShouldBeNil)
+			})
+			numComments := len(comments.Rows)
+			Convey("Should be 1 comment!", func() {
+				So(numComments, ShouldEqual, 1)
+			})
+		})
+		Convey("When a comment is read", func() {
+			//Read the comment to get the revision
+			readComment := wikit.Comment{}
+			sCommentRev, err := pm.ReadComment(wikiId, sCommentId,
+				&readComment, curUser)
+			Convey("Rev should be set and error should be nil", func() {
+				So(err, ShouldBeNil)
+				So(sCommentRev, ShouldNotEqual, "")
+			})
+			t.Logf("Comment rev: %v\n", sCommentRev)
+
+		})
+		Convey("When a comment is deleted", func() {
+			readComment := wikit.Comment{}
+			sCommentRev, err := pm.ReadComment(wikiId, sCommentId,
+				&readComment, curUser)
+			t.Logf("Comment rev: %v\n", sCommentRev)
+			dRev, err := pm.DeleteComment(wikiId, sCommentId,
+				sCommentRev, curUser)
+			Convey("Rev should be set and error should be nil", func() {
+				So(err, ShouldBeNil)
+				So(dRev, ShouldNotEqual, "")
 			})
 		})
 		Convey("When the Page is Deleted", func() {

@@ -81,6 +81,17 @@ type CommentResponse struct {
 	Comment wikit.Comment `json:"comment"`
 }
 
+type CommentIndexResponse struct {
+	Links     HatLinks         `json:"_links"`
+	TotalRows int              `json:"total_rows"`
+	Offset    int              `json:"offset"`
+	Entries   CommentIndexList `json:"_embedded"`
+}
+
+type CommentIndexList struct {
+	List []CommentResponse `json:"ea:comment"`
+}
+
 var pageUri = "/{wiki-id}/pages"
 
 //Define routes
@@ -187,6 +198,23 @@ func (pc PagesController) AddRoutes(ws *restful.WebService) {
 		Param(ws.PathParameter("comment-id", "Comment identifier").DataType("string")).
 		Param(ws.HeaderParameter("If-Match", "Comment Revision").DataType("string")).
 		Writes(BooleanResponse{}))
+
+	ws.Route(ws.GET(pageUri + "/{page-id}/comments").To(pc.commentIndex).
+		Doc("Get all comments for this page").
+		Operation("index").
+		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
+		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
+		Param(ws.QueryParameter("pageNum", "Page number for pagination").DataType("integer")).
+		Param(ws.QueryParameter("numPerPage", "Number of records to return").DataType("integer")).
+		Writes(CommentIndexResponse{}))
+
+	ws.Route(ws.GET(pageUri + "/{page-id}/comments/{comment-id}/children").To(pc.childComments).
+		Doc("Gets children for a comment").
+		Operation("chldIndex").
+		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
+		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
+		Param(ws.PathParameter("comment-id", "Comment identifier").DataType("string")).
+		Writes(CommentIndexResponse{}))
 
 }
 
@@ -568,6 +596,63 @@ func (pc PagesController) delComment(request *restful.Request,
 
 }
 
+//Gets all comments for a page
+func (pc PagesController) commentIndex(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	wikiId := request.PathParameter("wiki-id")
+	pageId := request.PathParameter("page-id")
+	numPerPage, err := strconv.Atoi(request.QueryParameter("numPerPage"))
+	if err != nil {
+		numPerPage = 50
+	}
+	pageNum, err := strconv.Atoi(request.QueryParameter("pageNum"))
+	if err != nil {
+		pageNum = 1
+	}
+	if wikiId == "" || pageId == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	cList, err := new(PageManager).GetComments(wikiId, pageId, pageNum, numPerPage, curUser)
+	if err != nil {
+		WriteError(err, response)
+		return
+	}
+	SetAuth(response, curUser.Auth)
+	cr := pc.genCommentIndexResponse(curUser, wikiId, pageId, cList)
+	response.WriteEntity(cr)
+}
+
+//Get child comments
+func (pc PagesController) childComments(request *restful.Request,
+	response *restful.Response) {
+	curUser := GetCurrentUser(request, response)
+	if curUser == nil {
+		Unauthenticated(request, response)
+		return
+	}
+	wikiId := request.PathParameter("wiki-id")
+	pageId := request.PathParameter("page-id")
+	commentId := request.PathParameter("comment-id")
+	if wikiId == "" || pageId == "" || commentId == "" {
+		WriteBadRequestError(response)
+		return
+	}
+	cl, err := new(PageManager).GetChildComments(wikiId, commentId, curUser)
+	if err != nil {
+		WriteError(err, response)
+	}
+	SetAuth(response, curUser.Auth)
+	cr := pc.genChildCommentsIndexResponse(curUser, wikiId, pageId, commentId, cl)
+	response.WriteEntity(cr)
+
+}
+
 func (pc PagesController) genRecordResponse(curUser *CurrentUserInfo,
 	wikiId string, pageId string, page *wikit.Page) PageResponse {
 	page.Id = pageId
@@ -588,6 +673,48 @@ func (pc PagesController) genCommentRecordResponse(curUser *CurrentUserInfo,
 		Comment: *comment,
 	}
 	return cr
+}
+
+func (pc PagesController) genCommentIndexResponse(curUser *CurrentUserInfo,
+	wikiId string, pageId string, commentList *wikit.CommentIndexViewResponse) CommentIndexResponse {
+	commentsUri := pc.genPageUri(wikiId, pageId) + "/comments"
+	indexLinks := GenIndexLinks(curUser.User.Roles,
+		"wiki_"+wikiId, commentsUri)
+	var entries []CommentResponse
+	for _, com := range commentList.Rows {
+		entries = append(entries,
+			pc.genCommentRecordResponse(curUser, wikiId, pageId, com.Id, &com.Value))
+	}
+	return CommentIndexResponse{
+		Links:     indexLinks,
+		TotalRows: commentList.TotalRows,
+		Offset:    commentList.Offset,
+		Entries: CommentIndexList{
+			List: entries,
+		},
+	}
+}
+
+func (pc PagesController) genChildCommentsIndexResponse(curUser *CurrentUserInfo,
+	wikiId string, pageId string, commentId string,
+	commentList *wikit.CommentIndexViewResponse) CommentIndexResponse {
+	commentUri := pc.genPageUri(wikiId, pageId) + "/comments/" + commentId
+	indexLinks := HatLinks{
+		Self: &HatLink{Href: commentUri, Method: "GET"},
+	}
+	var entries []CommentResponse
+	for _, com := range commentList.Rows {
+		entries = append(entries,
+			pc.genCommentRecordResponse(curUser, wikiId, pageId, com.Id, &com.Value))
+	}
+	return CommentIndexResponse{
+		Links:     indexLinks,
+		TotalRows: commentList.TotalRows,
+		Offset:    commentList.Offset,
+		Entries: CommentIndexList{
+			List: entries,
+		},
+	}
 }
 
 //This is gnarly
