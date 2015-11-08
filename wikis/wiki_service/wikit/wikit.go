@@ -485,17 +485,42 @@ func (wiki *Wiki) createComment(comment *Comment, id string,
 // Update a comment
 func (wiki *Wiki) updateComment(comment *Comment, id string,
 	rev string) (string, error) {
-	comment.ModifiedTime = time.Now().UTC()
-	if err := comment.Validate(); err != nil {
+	//First, read the comment out of the database
+	readComment := Comment{}
+	if _, err := wiki.db.Read(id, &readComment, nil); err != nil {
 		return "", err
 	} else {
-		return wiki.db.Save(comment, id, rev)
+		readComment.ModifiedTime = time.Now().UTC()
+		readComment.Content = comment.Content
+		if err := readComment.Validate(); err != nil {
+			return "", err
+		} else {
+			return wiki.db.Save(&readComment, id, rev)
+		}
 	}
 }
 
 // Delete a comment
 func (wiki *Wiki) DeleteComment(id string, rev string) (string, error) {
-	return wiki.db.Delete(id, rev)
+	//Get the number of child comments
+	numChildren := wiki.GetNumChildComments(id)
+	if numChildren > 0 {
+		//read the Comment
+		readComment := Comment{}
+		rev, err := wiki.db.Read(id, &readComment, nil)
+		if err != nil {
+			return "", err
+		}
+		readComment.Content = PageContent{
+			Raw:       "Comment Deleted",
+			Formatted: "<p>Comment Deleted</p>",
+		}
+		readComment.ModifiedTime = time.Now().UTC()
+		readComment.Deleted = true
+		return wiki.db.Save(&readComment, id, rev)
+	} else {
+		return wiki.db.Delete(id, rev)
+	}
 }
 
 // Get All Comments for a page
@@ -518,8 +543,6 @@ func (wiki *Wiki) GetCommentsForPage(pageId string, pageNum int,
 	err := wiki.db.GetView("wikit_comments", "getCommentsForPage", &response, theKeys)
 	if err != nil {
 		return nil, err
-	} else if len(response.Rows) <= 0 {
-		return nil, nil
 	} else {
 		//Set total rows to the count
 		response.TotalRows = <-countChan
@@ -538,8 +561,6 @@ func (wiki *Wiki) GetChildComments(commentId string) (*CommentIndexViewResponse,
 	err := wiki.db.GetView("wikit_comments", "getChildComments", &response, theKeys)
 	if err != nil {
 		return nil, err
-	} else if len(response.Rows) <= 0 {
-		return nil, nil
 	} else {
 		response.TotalRows = <-countChan
 		return &response, nil

@@ -557,14 +557,21 @@ func (pc PagesController) updateComment(request *restful.Request,
 		WriteServerError(err, response)
 		return
 	}
-	rev, err = new(PageManager).SaveComment(wikiId, pageId, theComment,
+	pm := new(PageManager)
+	rev, err = pm.SaveComment(wikiId, pageId, theComment,
 		commentId, rev, curUser)
 	if err != nil {
 		WriteError(err, response)
 		return
 	}
 	response.AddHeader("ETag", rev)
-	cr := pc.genCommentRecordResponse(curUser, wikiId, pageId, commentId, theComment)
+	readComment := wikit.Comment{}
+	cr := CommentResponse{}
+	if _, err = pm.ReadComment(wikiId, commentId, &readComment, curUser); err != nil {
+		cr = pc.genCommentRecordResponse(curUser, wikiId, pageId, commentId, theComment)
+	} else {
+		cr = pc.genCommentRecordResponse(curUser, wikiId, pageId, commentId, &readComment)
+	}
 	SetAuth(response, curUser.Auth)
 	response.WriteEntity(cr)
 }

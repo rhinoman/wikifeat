@@ -351,8 +351,8 @@ func (wc WikisController) genWikiLinks(userRoles []string,
 	read := util.HasRole(userRoles, ReadRole(wikiDb))
 	write := util.HasRole(userRoles, WriteRole(wikiDb))
 	pageUri := uri + "/pages"
+	links.Self = &HatLink{Href: uri, Method: "GET"}
 	if admin || read || write {
-		links.Self = &HatLink{Href: uri, Method: "GET"}
 		links.PageIndex = &HatLink{Href: pageUri, Method: "GET"}
 	}
 	if admin || write {
