@@ -50,7 +50,8 @@ define([
         regions: {
             pageToolMenuRegion: "#pageTools",
             pageContentRegion: "#pageContent",
-            pageChildIndexRegion: '#childIndex'
+            pageChildIndexRegion: '#childIndex',
+            pageCommentsRegion: '#pageCommentsContainer'
         },
         bindings: {
             '#editorName': {

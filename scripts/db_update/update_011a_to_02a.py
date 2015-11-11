@@ -14,7 +14,6 @@ import common
 wiki_ddoc = 'wikit_comments'
 
 getCommentsForPage = dict()
-getChildComments = dict()
 
 getCommentsForPage['map'] = """
     function(doc){
@@ -25,16 +24,6 @@ getCommentsForPage['map'] = """
 """
 
 getCommentsForPage['reduce'] = "_count"
-
-getChildComments['map'] = """
-    function(doc){
-        if(doc.type==="comment"){
-            emit([doc.parent_comment, doc.created_time], doc);
-        }
-    }
-"""
-
-getChildComments['reduce'] = "_count"
 
 args = common.parse_args()
 conn = common.get_connection(args.use_ssl, args.couch_server, args.couch_port)
@@ -63,7 +52,6 @@ for wiki in wiki_list:
         ddoc = dict()
         ddoc['views'] = dict()
         ddoc['views']['getCommentsForPage'] = getCommentsForPage
-        ddoc['views']['getChildComments'] = getChildComments
         req_body = json.dumps(ddoc)
         conn.request("PUT", ddoc_uri, body=req_body, headers=put_headers)
         resp = conn.getresponse()

@@ -356,7 +356,6 @@ func TestComments(t *testing.T) {
 	t.Logf("Second comment rev: %v\n", sRev)
 	//Create a comment, replying to the first one
 	replyComment := Comment{
-		ParentComment: theId,
 		Content: PageContent{
 			Raw: "This is a reply",
 		},
@@ -372,22 +371,6 @@ func TestComments(t *testing.T) {
 	if civr.TotalRows != 3 {
 		t.Errorf("Total Rows should be 3, but was: %v", civr.TotalRows)
 	}
-	//Get number of child comments
-	numReplies := theWiki.GetNumChildComments(theId)
-	if numReplies != 1 {
-		t.Errorf("Replies should be 1, but was: %v", numReplies)
-	}
-	numReplies = theWiki.GetNumChildComments(secondId)
-	if numReplies != 0 {
-		t.Errorf("Replies should be 0, but was: %v", numReplies)
-	}
-	//Get child comments
-	cc, err := theWiki.GetChildComments(theId)
-	printError(t, err)
-	if cc.TotalRows != 1 {
-		t.Errorf("Replies should be 1, but was: %v", numReplies)
-	}
-	t.Logf("Reply Comment: %v\n", cc.Rows[0])
 	//now delete it!
 	_, err = theWiki.DeleteComment(theId, uRev)
 	printError(t, err)

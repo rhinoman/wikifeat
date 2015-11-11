@@ -502,25 +502,7 @@ func (wiki *Wiki) updateComment(comment *Comment, id string,
 
 // Delete a comment
 func (wiki *Wiki) DeleteComment(id string, rev string) (string, error) {
-	//Get the number of child comments
-	numChildren := wiki.GetNumChildComments(id)
-	if numChildren > 0 {
-		//read the Comment
-		readComment := Comment{}
-		rev, err := wiki.db.Read(id, &readComment, nil)
-		if err != nil {
-			return "", err
-		}
-		readComment.Content = PageContent{
-			Raw:       "Comment Deleted",
-			Formatted: "<p>Comment Deleted</p>",
-		}
-		readComment.ModifiedTime = time.Now().UTC()
-		readComment.Deleted = true
-		return wiki.db.Save(&readComment, id, rev)
-	} else {
-		return wiki.db.Delete(id, rev)
-	}
+	return wiki.db.Delete(id, rev)
 }
 
 // Get All Comments for a page
@@ -565,14 +547,6 @@ func (wiki *Wiki) GetChildComments(commentId string) (*CommentIndexViewResponse,
 		response.TotalRows = <-countChan
 		return &response, nil
 	}
-}
-
-// Gets the number of first order descendants a comment has
-func (wiki *Wiki) GetNumChildComments(commentId string) int {
-	c := make(chan int)
-	go wiki.getCountForView("wikit_comments", "getChildComments", commentId, c)
-	numComments := <-c
-	return numComments
 }
 
 // Assumes the Reduce function for the view is "_count"

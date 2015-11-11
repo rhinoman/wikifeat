@@ -138,15 +138,6 @@ var commentViews = map[string]View{
 			}`,
 		Reduce: "_count",
 	},
-	"getChildComments": {
-		Map: `
-			function(doc){
-				if(doc.type==="comment"){
-					emit([doc.parent_comment, doc.created_time], doc);
-				}
-			}`,
-		Reduce: "_count",
-	},
 }
 
 //Populate a database with views, etc.

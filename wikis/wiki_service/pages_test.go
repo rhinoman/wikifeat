@@ -208,7 +208,6 @@ func TestPageCRUD(t *testing.T) {
 				},
 			}
 			replyComment := wikit.Comment{
-				ParentComment: commentId,
 				Content: wikit.PageContent{
 					Raw: "This is a reply",
 				},
@@ -234,16 +233,6 @@ func TestPageCRUD(t *testing.T) {
 			numComments := len(comments.Rows)
 			Convey("Should be 3 comments!", func() {
 				So(numComments, ShouldEqual, 3)
-			})
-		})
-		Convey("When child comments are queried for", func() {
-			comments, err := pm.GetChildComments(wikiId, commentId, curUser)
-			Convey("Error should be nil", func() {
-				So(err, ShouldBeNil)
-			})
-			numComments := len(comments.Rows)
-			Convey("Should be 1 comment!", func() {
-				So(numComments, ShouldEqual, 1)
 			})
 		})
 		Convey("When a comment is read", func() {

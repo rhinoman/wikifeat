@@ -169,15 +169,13 @@ type PageValue struct {
 
 // Page comments
 type Comment struct {
-	Id            string      `json:"id"`
-	DocType       string      `json:"type"`
-	OwningPage    string      `json:"owning_page"`
-	ParentComment string      `json:"parent_comment"`
-	Author        string      `json:"author"`
-	Deleted       bool        `json:"deleted"`
-	CreatedTime   time.Time   `json:"created_time"`
-	ModifiedTime  time.Time   `json:"modified_time"`
-	Content       PageContent `json:"content"`
+	Id           string      `json:"id"`
+	DocType      string      `json:"type"`
+	OwningPage   string      `json:"owning_page"`
+	Author       string      `json:"author"`
+	CreatedTime  time.Time   `json:"created_time"`
+	ModifiedTime time.Time   `json:"modified_time"`
+	Content      PageContent `json:"content"`
 }
 
 type CommentIndexViewResponse struct {

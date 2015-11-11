@@ -230,14 +230,6 @@ func (pm *PageManager) GetComments(wiki string, pageId string,
 	return theWiki.GetCommentsForPage(pageId, pageNum, numPerPage)
 }
 
-//Gets a list of child comments
-func (pm *PageManager) GetChildComments(wiki string, commentId string,
-	curUser *CurrentUserInfo) (*wikit.CommentIndexViewResponse, error) {
-	auth := curUser.Auth
-	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
-	return theWiki.GetChildComments(commentId)
-}
-
 //Converts markdown text to html
 func processMarkdown(mdText string, out chan string) {
 	defer func() {

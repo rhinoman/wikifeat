@@ -208,14 +208,6 @@ func (pc PagesController) AddRoutes(ws *restful.WebService) {
 		Param(ws.QueryParameter("numPerPage", "Number of records to return").DataType("integer")).
 		Writes(CommentIndexResponse{}))
 
-	ws.Route(ws.GET(pageUri + "/{page-id}/comments/{comment-id}/children").To(pc.childComments).
-		Doc("Gets children for a comment").
-		Operation("chldIndex").
-		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
-		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
-		Param(ws.PathParameter("comment-id", "Comment identifier").DataType("string")).
-		Writes(CommentIndexResponse{}))
-
 }
 
 func (pc PagesController) genPageUri(wikiId string, pageId string) string {
@@ -633,31 +625,6 @@ func (pc PagesController) commentIndex(request *restful.Request,
 	SetAuth(response, curUser.Auth)
 	cr := pc.genCommentIndexResponse(curUser, wikiId, pageId, cList)
 	response.WriteEntity(cr)
-}
-
-//Get child comments
-func (pc PagesController) childComments(request *restful.Request,
-	response *restful.Response) {
-	curUser := GetCurrentUser(request, response)
-	if curUser == nil {
-		Unauthenticated(request, response)
-		return
-	}
-	wikiId := request.PathParameter("wiki-id")
-	pageId := request.PathParameter("page-id")
-	commentId := request.PathParameter("comment-id")
-	if wikiId == "" || pageId == "" || commentId == "" {
-		WriteBadRequestError(response)
-		return
-	}
-	cl, err := new(PageManager).GetChildComments(wikiId, commentId, curUser)
-	if err != nil {
-		WriteError(err, response)
-	}
-	SetAuth(response, curUser.Auth)
-	cr := pc.genChildCommentsIndexResponse(curUser, wikiId, pageId, commentId, cl)
-	response.WriteEntity(cr)
-
 }
 
 func (pc PagesController) genRecordResponse(curUser *CurrentUserInfo,
