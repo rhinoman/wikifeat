@@ -29,12 +29,14 @@ define([
     'entities/wiki/page',
     'entities/wiki/pages',
     'entities/wiki/breadcrumb',
-    'entities/wiki/history_entries'
+    'entities/wiki/history_entries',
+    'entities/wiki/comments'
 ], function($,_,Backbone,BaseManager,
             WikiModel,WikiCollection,
             FileModel,FileCollection,
             PageModel,PageCollection,
-            BreadcrumbModel,HistoryEntryCollection){
+            BreadcrumbModel,HistoryEntryCollection,
+            CommentCollection){
 
     //Constructor
     var WikiManager = function(){
@@ -111,6 +113,11 @@ define([
         var wikiModel = new WikiModel({id: slug});
         wikiModel.url = "/api/v1/wikis/slug/" + slug;
         return this.fetchDeferred(wikiModel);
+    };
+
+    WikiManager.prototype.getPageComments = function(pageId, wikiId) {
+        var commentCollection = new CommentCollection({},{wikiId: wikiId, pageId: pageId});
+        return this.fetchDeferred(commentCollection);
     };
 
     return WikiManager;

@@ -49,9 +49,15 @@ define([
         return BaseCollection.prototype._prepareModel.call(this, model, options);
     };
 
+    CommentCollection.prototype.url = function(){
+        return "/api/v1/wikis/" + this.wikiId + "/pages/" + this.pageId + "/comments";
+    };
+
     //Pagination state vals
     CommentCollection.prototype.state = {
         firstPage: 1
     };
+
+    return CommentCollection;
 
 });

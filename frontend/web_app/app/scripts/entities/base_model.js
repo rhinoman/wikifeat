@@ -33,9 +33,14 @@ define([
             this.parseLinks(response._links);
             delete response._links;
         }
+        //The revision may be in the Etag header -- for indiviudal records
         var rev = options.xhr.getResponseHeader('Etag');
-        if(typeof rev !== 'undefined'){
+        //...or in the document itself, for collections
+        var docRev = response[this.entityName]._rev;
+        if(typeof rev !== 'undefined' && rev !== null){
             this.revision = rev;
+        } else if (typeof docRev !== 'undefined' && docRev !== null){
+            this.revision = docRev;
         }
         return response[this.entityName];
     };

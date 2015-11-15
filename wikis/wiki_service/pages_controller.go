@@ -23,6 +23,7 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/entities"
 	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/services"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/util"
 	"github.com/rhinoman/wikifeat/wikis/wiki_service/wikit"
 	"net/http"
 	"strconv"
@@ -196,7 +197,6 @@ func (pc PagesController) AddRoutes(ws *restful.WebService) {
 		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
 		Param(ws.PathParameter("page-id", "Page identifier").DataType("string")).
 		Param(ws.PathParameter("comment-id", "Comment identifier").DataType("string")).
-		Param(ws.HeaderParameter("If-Match", "Comment Revision").DataType("string")).
 		Writes(BooleanResponse{}))
 
 	ws.Route(ws.GET(pageUri + "/{page-id}/comments").To(pc.commentIndex).
@@ -579,12 +579,11 @@ func (pc PagesController) delComment(request *restful.Request,
 	wikiId := request.PathParameter("wiki-id")
 	pageId := request.PathParameter("page-id")
 	commentId := request.PathParameter("comment-id")
-	rev := request.HeaderParameter("If-Match")
-	if wikiId == "" || pageId == "" || commentId == "" || rev == "" {
+	if wikiId == "" || pageId == "" || commentId == "" {
 		WriteBadRequestError(response)
 		return
 	}
-	rev, err := new(PageManager).DeleteComment(wikiId, commentId, rev, curUser)
+	rev, err := new(PageManager).DeleteComment(wikiId, commentId, curUser)
 	if err != nil {
 		WriteError(err, response)
 		return
@@ -642,39 +641,46 @@ func (pc PagesController) genCommentRecordResponse(curUser *CurrentUserInfo,
 	wikiId string, pageId string, commentId string, comment *wikit.Comment) CommentResponse {
 	comment.Id = commentId
 	cr := CommentResponse{
-		Links: GenRecordLinks(curUser.User.Roles, "wiki_"+wikiId,
-			pc.genPageUri(wikiId, pageId)+"/comments/"+commentId),
+		Links: pc.genCommentRecordLinks(curUser, "wiki_"+wikiId,
+			pc.genPageUri(wikiId, pageId)+"/comments/"+commentId,
+			comment.Author),
 		Comment: *comment,
 	}
 	return cr
 }
 
+// Permissions are a bit different for comments, so we need a custom function
+func (pc PagesController) genCommentRecordLinks(curUser *CurrentUserInfo,
+	dbName string, commentUri string, commentAuthor string) HatLinks {
+	links := HatLinks{}
+	userRoles := curUser.User.Roles
+	admin := util.HasRole(userRoles, AdminRole(dbName)) ||
+		util.HasRole(userRoles, AdminRole(MainDbName())) ||
+		util.HasRole(userRoles, MasterRole())
+	ownComment := commentAuthor == curUser.User.UserName
+	//Generate the self link
+	links.Self = &HatLink{Href: commentUri, Method: "GET"}
+	//Update links
+	if admin || ownComment {
+		links.Update = &HatLink{Href: commentUri, Method: "PUT"}
+		links.Delete = &HatLink{Href: commentUri, Method: "DELETE"}
+	}
+	return links
+}
+
 func (pc PagesController) genCommentIndexResponse(curUser *CurrentUserInfo,
 	wikiId string, pageId string, commentList *wikit.CommentIndexViewResponse) CommentIndexResponse {
 	commentsUri := pc.genPageUri(wikiId, pageId) + "/comments"
-	indexLinks := GenIndexLinks(curUser.User.Roles,
-		"wiki_"+wikiId, commentsUri)
-	var entries []CommentResponse
-	for _, com := range commentList.Rows {
-		entries = append(entries,
-			pc.genCommentRecordResponse(curUser, wikiId, pageId, com.Id, &com.Value))
-	}
-	return CommentIndexResponse{
-		Links:     indexLinks,
-		TotalRows: commentList.TotalRows,
-		Offset:    commentList.Offset,
-		Entries: CommentIndexList{
-			List: entries,
-		},
-	}
-}
-
-func (pc PagesController) genChildCommentsIndexResponse(curUser *CurrentUserInfo,
-	wikiId string, pageId string, commentId string,
-	commentList *wikit.CommentIndexViewResponse) CommentIndexResponse {
-	commentUri := pc.genPageUri(wikiId, pageId) + "/comments/" + commentId
-	indexLinks := HatLinks{
-		Self: &HatLink{Href: commentUri, Method: "GET"},
+	userRoles := curUser.User.Roles
+	dbName := "wiki_" + wikiId
+	admin := util.HasRole(userRoles, AdminRole(dbName)) ||
+		util.HasRole(userRoles, AdminRole(MainDbName())) ||
+		util.HasRole(userRoles, MasterRole())
+	write := util.HasRole(userRoles, WriteRole(dbName))
+	indexLinks := HatLinks{}
+	indexLinks.Self = &HatLink{Href: commentsUri, Method: "GET"}
+	if admin || write {
+		indexLinks.Create = &HatLink{Href: commentsUri, Method: "POST"}
 	}
 	var entries []CommentResponse
 	for _, com := range commentList.Rows {

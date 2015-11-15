@@ -148,6 +148,7 @@ img {
 
 .page-delete-button {
   color: lightcoral;
+  border: none;
 }
 .page-delete-button:hover {
   color: white;
@@ -174,6 +175,22 @@ form#editPageForm {
   margin: 2px;
   border-radius: 0;
   border: none;
+}
+
+.comment-view #authorAvatarThumb {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-right: 10px;
+  float: left;
+}
+.comment-view .comment-author-info {
+  display: inline-block;
+}
+.comment-view span#commentDatetime {
+  font-style: italic;
+}
+.comment-view span#commentAuthorName {
+  font-weight: bold;
 }
 
 /* User Styles */

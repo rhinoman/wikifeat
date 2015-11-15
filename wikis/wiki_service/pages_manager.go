@@ -20,10 +20,12 @@
 package wiki_service
 
 import (
+	"errors"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/microcosm-cc/bluemonday"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/go-commonmark"
 	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/entities"
 	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/services"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/wikifeat-common/util"
 	"github.com/rhinoman/wikifeat/wikis/wiki_service/wikit"
 	"log"
 	"regexp"
@@ -194,6 +196,12 @@ func (pm *PageManager) SaveComment(wiki string, pageId string, comment *wikit.Co
 	commentId string, commentRev string, curUser *CurrentUserInfo) (string, error) {
 	auth := curUser.Auth
 	theUser := curUser.User
+	//First, if this is an update, check if this user can update the comment
+	if commentRev != "" {
+		if cu := pm.allowedToUpdateComment(wiki, commentId, curUser); cu == false {
+			return "", errors.New("[Error]:403: Not Authorized")
+		}
+	}
 	//Read the content from the comment
 	//parse the markdown to Html
 	out := make(chan string)
@@ -215,10 +223,43 @@ func (pm *PageManager) ReadComment(wiki string, commentId string,
 
 //Delete a comment.  Returns the revision if successful
 func (pm *PageManager) DeleteComment(wiki string, commentId string,
-	commentRev string, curUser *CurrentUserInfo) (string, error) {
+	curUser *CurrentUserInfo) (string, error) {
 	auth := curUser.Auth
 	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
-	return theWiki.DeleteComment(commentId, commentRev)
+	if pm.allowedToUpdateComment(wiki, commentId, curUser) {
+		comment := wikit.Comment{}
+		commentRev, err := pm.ReadComment(wiki, commentId, &comment, curUser)
+		if err != nil {
+			return "", err
+		}
+		return theWiki.DeleteComment(commentId, commentRev)
+	} else {
+		return "", errors.New("[Error]:403: Not Authorized")
+	}
+}
+
+func (pm *PageManager) allowedToUpdateComment(wiki string, commentId string,
+	curUser *CurrentUserInfo) bool {
+	userName := curUser.User.UserName
+	userRoles := curUser.User.Roles
+	auth := curUser.Auth
+	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
+	//First, we need to read the comment record
+	comment := wikit.Comment{}
+	_, err := theWiki.ReadComment(commentId, &comment)
+	if err != nil {
+		return false
+	}
+	//Only admins and the original comment author may update/delete
+	isAdmin := util.HasRole(userRoles, AdminRole(wiki)) ||
+		util.HasRole(userRoles, AdminRole(MainDbName())) ||
+		util.HasRole(userRoles, MasterRole())
+	if comment.Author == userName || isAdmin {
+		return true
+	} else {
+		return false
+	}
+
 }
 
 //Gets a list of all comments for a page

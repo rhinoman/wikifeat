@@ -23,10 +23,59 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'backbone.radio'
-], function($,_,Marionette,Radio){
+    'backbone.radio',
+    'views/page/comment/show_comment',
+    'views/page/comment/edit_comment',
+    'entities/wiki/comment',
+    'text!templates/page/comments.html'
+], function($,_,Marionette,Radio,
+            ShowCommentView, EditCommentView,
+            CommentModel, CommentsTemplate){
 
-    return Marionette.CollectionView.extend({
+    return Marionette.CompositeView.extend({
+        className: "comments-view",
+        template: _.template(CommentsTemplate),
+        childViewContainer: "#commentsContainer",
+        childView: ShowCommentView,
+        wikiId: null,
+        pageId: null,
+
+        events: {
+            'click #postNewCommentButton' : 'createComment'
+        },
+
+        initialize: function(options){
+            options = options || {};
+            if(options.hasOwnProperty('wikiId')){
+                this.wikiId = options.wikiId;
+            }
+            if(options.hasOwnProperty('pageId')){
+                this.pageId = options.pageId;
+            }
+            this.rm = new Marionette.RegionManager();
+            this.editorRegion = this.rm.addRegion("editor","#newCommentEditor");
+            var self = this;
+            Radio.channel('commentsView').on('new:comment', function(comment){
+                self.collection.add(comment);
+            });
+        },
+
+        createComment: function(event){
+            var commentModel = new CommentModel({},{
+                wikiId: this.wikiId,
+                pageId: this.pageId
+            });
+
+            var ecv = new EditCommentView({model: commentModel});
+            this.rm.get('editor').show(ecv);
+        },
+
+        onRender: function(){
+            //disable Post Comment button if you don't have access
+            if(!this.collection.isCreatable){
+                this.$("#postNewCommentButton").css("display","none");
+            }
+        }
 
     });
 

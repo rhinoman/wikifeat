@@ -170,6 +170,7 @@ type PageValue struct {
 // Page comments
 type Comment struct {
 	Id           string      `json:"id"`
+	Rev          string      `json:"_rev,omitempty"`
 	DocType      string      `json:"type"`
 	OwningPage   string      `json:"owning_page"`
 	Author       string      `json:"author"`

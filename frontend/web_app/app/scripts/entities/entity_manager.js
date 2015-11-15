@@ -142,6 +142,18 @@ define([
         return wikiManager.getPageBreadcrumbs(pageId, wikiId);
     });
 
+    wikiChannel.reply("get:page:comments", function(pageId, wikiId){
+        return wikiManager.getPageComments(pageId, wikiId);
+    });
+
+    wikiChannel.reply("save:comment", function(commentModel){
+        return wikiManager.saveEntity(commentModel);
+    });
+
+    wikiChannel.reply("delete:comment", function(commentModel){
+        return wikiManager.deleteEntity(commentModel);
+    });
+
     wikiChannel.reply("get:allFileList", function(wikiId){
         return wikiManager.getAllFileList(wikiId);
     });

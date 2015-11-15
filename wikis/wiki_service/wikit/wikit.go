@@ -532,23 +532,6 @@ func (wiki *Wiki) GetCommentsForPage(pageId string, pageNum int,
 	}
 }
 
-// Gets a list of a comment's first order descendants (i.e., first level of replies)
-func (wiki *Wiki) GetChildComments(commentId string) (*CommentIndexViewResponse, error) {
-	response := CommentIndexViewResponse{}
-	theKeys := SetKeys([]string{commentId, "{}"}, []string{commentId})
-	theKeys.Add("reduce", "false")
-	//Need to get the count for TotalRows
-	countChan := make(chan int)
-	go wiki.getCountForView("wikit_comments", "getChildComments", commentId, countChan)
-	err := wiki.db.GetView("wikit_comments", "getChildComments", &response, theKeys)
-	if err != nil {
-		return nil, err
-	} else {
-		response.TotalRows = <-countChan
-		return &response, nil
-	}
-}
-
 // Assumes the Reduce function for the view is "_count"
 // Result of _count is written to the channel 'c'
 func (wiki *Wiki) getCountForView(ddoc string, view string, key string, c chan int) {

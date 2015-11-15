@@ -252,8 +252,7 @@ func TestPageCRUD(t *testing.T) {
 			sCommentRev, err := pm.ReadComment(wikiId, sCommentId,
 				&readComment, curUser)
 			t.Logf("Comment rev: %v\n", sCommentRev)
-			dRev, err := pm.DeleteComment(wikiId, sCommentId,
-				sCommentRev, curUser)
+			dRev, err := pm.DeleteComment(wikiId, sCommentId, curUser)
 			Convey("Rev should be set and error should be nil", func() {
 				So(err, ShouldBeNil)
 				So(dRev, ShouldNotEqual, "")

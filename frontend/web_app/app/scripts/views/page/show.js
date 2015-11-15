@@ -31,11 +31,12 @@ define([
     'views/page/raw_content',
     'views/page/formatted_content',
     'views/user/user_info_dialog',
+    'views/page/comment/comments',
     'text!templates/page/page_layout.html',
 ], function($,_,Marionette,Moment,Radio,Stickit,
             PageModel,UserModel,ChildIndexView,
             PageToolMenu,RawContentView,FormattedContentView,
-            UserInfoDialog,ShowPageTemplate){
+            UserInfoDialog,CommentsView,ShowPageTemplate){
     'use strict';
 
     return Marionette.LayoutView.extend({
@@ -45,13 +46,14 @@ define([
         wikiModel: null,
         editorModel: null,
         oldRevision: false,
-        pageChildren: 7,
+        pageChildren: $.Promise,
+        pageComments: $.Promise,
         viewMode: 'formatted',
         regions: {
             pageToolMenuRegion: "#pageTools",
             pageContentRegion: "#pageContent",
             pageChildIndexRegion: '#childIndex',
-            pageCommentsRegion: '#pageCommentsContainer'
+            pageCommentsRegion: '#pageComments'
         },
         bindings: {
             '#editorName': {
@@ -81,6 +83,8 @@ define([
                 if(!this.oldRevision) {
                     this.pageChildren = Radio.channel('wikiManager')
                         .request('get:page:children', this.model.id, this.wikiModel.id);
+                    this.pageComments = Radio.channel('wikiManager')
+                        .request('get:page:comments', this.model.id, this.wikiModel.id);
                 }
             }
         },
@@ -131,9 +135,10 @@ define([
                         model: this.model, wikiModel: this.wikiModel
                     }));
                 }
-                //Draw the child page index
+                //Draw the child page index and comments
                 if(this.model.id != "" && !this.oldRevision) {
                     this.pageChildren.done(this.drawChildIndex.bind(this));
+                    this.pageComments.done(this.drawComments.bind(this));
                 } else {
                     this.$("div#childIndex").hide();
                 }
@@ -171,6 +176,16 @@ define([
                 new ChildIndexView({
                     collection: response,
                     wikiModel: this.wikiModel
+                })
+            )
+        },
+
+        drawComments: function(response){
+            this.pageCommentsRegion.show(
+                new CommentsView({
+                    collection: response,
+                    wikiId: this.wikiModel.id,
+                    pageId: this.model.id
                 })
             )
         },

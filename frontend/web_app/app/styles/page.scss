@@ -114,6 +114,7 @@ img{
 
 .page-delete-button {
   color: lightcoral;
+  border: none;
   &:hover {
     color: white;
     background-color: lightcoral;
@@ -140,4 +141,22 @@ form#editPageForm {
   margin:2px;
   border-radius: 0;
   border: none;
+}
+
+.comment-view{
+  #authorAvatarThumb{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 10px;
+    float: left;
+  }
+  .comment-author-info{
+    display: inline-block;
+  }
+  span#commentDatetime{
+    font-style: italic;
+  }
+  span#commentAuthorName{
+    font-weight: bold;
+  }
 }
