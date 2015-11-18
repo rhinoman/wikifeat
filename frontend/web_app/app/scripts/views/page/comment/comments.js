@@ -39,6 +39,7 @@ define([
         childView: ShowCommentView,
         wikiId: null,
         pageId: null,
+        commentsDisabled: false,
 
         events: {
             'click #postNewCommentButton' : 'createComment'
@@ -51,6 +52,9 @@ define([
             }
             if(options.hasOwnProperty('pageId')){
                 this.pageId = options.pageId;
+            }
+            if(options.hasOwnProperty('commentsDisabled')){
+                this.commentsDisabled = options.commentsDisabled;
             }
             this.rm = new Marionette.RegionManager();
             this.editorRegion = this.rm.addRegion("editor","#newCommentEditor");
@@ -72,8 +76,11 @@ define([
 
         onRender: function(){
             //disable Post Comment button if you don't have access
-            if(!this.collection.isCreatable){
+            if(!this.collection.isCreatable || this.commentsDisabled){
                 this.$("#postNewCommentButton").css("display","none");
+            }
+            if(this.commentsDisabled){
+                this.$("div#commentButtons").prepend("<p>Comments are disabled for this page</p>");
             }
         }
 

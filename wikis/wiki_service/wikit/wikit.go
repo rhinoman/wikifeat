@@ -460,9 +460,26 @@ func (wiki *Wiki) ReadComment(commentId string, comment *Comment) (string, error
 func (wiki *Wiki) SaveComment(comment *Comment, id string,
 	rev string, pageId string, author string) (string, error) {
 	if rev == "" {
+		if wiki.commentsDisabled(pageId) == true {
+			return "", &Error{
+				StatusCode: 405,
+				Reason:     "Comments disabled for this page",
+			}
+		}
 		return wiki.createComment(comment, id, pageId, author)
 	} else {
 		return wiki.updateComment(comment, id, rev)
+	}
+}
+
+func (wiki *Wiki) commentsDisabled(pageId string) bool {
+	thePage := Page{}
+	if _, err := wiki.ReadPage(pageId, &thePage); err != nil {
+		log.Printf("[ERROR!!!]: %v\n", err)
+		return true
+	} else {
+		log.Printf("DisableComments: %v\n", thePage.DisableComments)
+		return thePage.DisableComments
 	}
 }
 

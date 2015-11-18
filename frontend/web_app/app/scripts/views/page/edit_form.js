@@ -40,6 +40,9 @@ define([
         bindings: {
             '#inputTitle': {
                 observe: 'title'
+            },
+            '#inputDisableComments':{
+                observe: 'comments_disabled'
             }
         },
         events: {

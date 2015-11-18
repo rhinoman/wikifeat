@@ -185,7 +185,8 @@ define([
                 new CommentsView({
                     collection: response,
                     wikiId: this.wikiModel.id,
-                    pageId: this.model.id
+                    pageId: this.model.id,
+                    commentsDisabled: this.model.get("comments_disabled")
                 })
             )
         },

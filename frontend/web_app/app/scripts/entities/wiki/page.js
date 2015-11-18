@@ -49,6 +49,7 @@ define([
         editor: "Unknown",
         owner: "",
         parent: "",
+        comments_disabled: false,
         title: "Untitled",
         type: "page"
     };

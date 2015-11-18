@@ -31,18 +31,19 @@ type PageContent struct {
 }
 
 type Page struct {
-	Id          string      `json:"id,omitempty"`
-	Slug        string      `json:"slug"`
-	DocType     string      `json:"type"`
-	Title       string      `json:"title"`
-	Owner       string      `json:"owner"`  //a user name
-	LastEditor  string      `json:"editor"` //a user name
-	Timestamp   time.Time   `json:"timestamp"`
-	Content     PageContent `json:"content"`
-	Parent      string      `json:"parent"`                    //For page hierarchy: a document id
-	Lineage     []string    `json:"lineage"`                   //Parental hierarchy of this page
-	OwningPage  string      `json:"owning_page"`               //For page history: a document id
-	Attachments []string    `json:"fileAttachments,omitempty"` //A list of file ids
+	Id              string      `json:"id,omitempty"`
+	Slug            string      `json:"slug"`
+	DocType         string      `json:"type"`
+	Title           string      `json:"title"`
+	Owner           string      `json:"owner"`  //a user name
+	LastEditor      string      `json:"editor"` //a user name
+	Timestamp       time.Time   `json:"timestamp"`
+	Content         PageContent `json:"content"`
+	Parent          string      `json:"parent"`                    //For page hierarchy: a document id
+	Lineage         []string    `json:"lineage"`                   //Parental hierarchy of this page
+	OwningPage      string      `json:"owning_page"`               //For page history: a document id
+	DisableComments bool        `json:"comments_disabled"`         //disallow comments for this page
+	Attachments     []string    `json:"fileAttachments,omitempty"` //A list of file ids
 }
 
 type File struct {

@@ -48,7 +48,16 @@ define([
         initialize: function(options){
             this.model.on('change', this.render, this);
             this.rm = new Marionette.RegionManager();
-            this.editorRegion =  this.rm.addRegion("editor", "#editorContainer");
+            this.editorRegion =  this.rm.addRegion("editor", "#editorContainer_" + this.model.id);
+        },
+
+        templateHelpers: function(){
+            var self = this;
+            return {
+                getIdSuffix: function(){
+                    return self.model.id;
+                }
+            }
         },
 
         editComment: function(event){
