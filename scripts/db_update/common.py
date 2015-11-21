@@ -21,9 +21,12 @@ def parse_args():
                         help='CouchDB admin user')
     parser.add_argument('-p', '--password', dest='adminpass',
                         help='CouchDB admin password')
+    parser.add_argument('-db', '--maindb', dest='main_db',
+                        help='Main Wikifeat database')
     # Note: your python must be compiled with SSL support to use HTTPS
     parser.add_argument('--use_ssl', dest='use_ssl', action='store_true')
     parser.set_defaults(use_ssl=False)
+    parser.set_defaults(main_db="wikifeat_main_db")
 
     args = parser.parse_args()
 

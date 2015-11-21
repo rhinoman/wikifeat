@@ -69,9 +69,7 @@ define([
 
     WikiManager.prototype.getMemberWikiList = function(user){
         var wikiCollection = new WikiCollection();
-        if(typeof user !== 'undefined' && user.id !== 'guest') {
-            wikiCollection.setQueryOptions({memberOnly: true});
-        }
+        wikiCollection.setQueryOptions({memberOnly: true});
         return this.fetchDeferred(wikiCollection);
     };
 
