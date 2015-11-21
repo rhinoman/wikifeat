@@ -168,6 +168,7 @@ define([
                 this.stickit();
                 if(this.model.get('name') !== ''){
                     this.model.set('update', true);
+                    this.$("#avatarImgWrapper").html(this.model.getAvatar());
                     this.$("#inputUsername").prop('disabled','true');
                     this.$('#passwordRow').css('display','none');
                     this.$('#inputPassword').removeAttr('required');
@@ -175,6 +176,9 @@ define([
                 } else {
                     //Ugly hackaround for Firefox's buggy autocomplete behavior
                     this.model.set('update', false);
+                    this.$("#userNameGroup").removeClass('col-lg-10 col-md-10 col-sm-10');
+                    this.$("#userNameGroup").addClass('col-lg-12 col-md-12 col-sm-12');
+                    this.$("#avatarWrapper").css("display","none");
                     this.$('#inputPassword').focus(function(){
                         this.removeAttribute('readonly');
                     });
