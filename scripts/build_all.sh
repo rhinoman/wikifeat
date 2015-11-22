@@ -7,7 +7,7 @@
 CC=gcc
 export CC
 
-VERSION=0.1.1-alpha
+VERSION=0.2.0-alpha
 ARCH=`uname -p`
 OS=`uname`
 BUILDNAME=wikifeat_${VERSION}.${OS}-${ARCH}
@@ -21,6 +21,7 @@ mkdir ../build
 mkdir $BUILD_DIR
 mkdir ${BUILD_DIR}/users
 mkdir ${BUILD_DIR}/scripts
+mkdir ${BUILD_DIR}/scripts/db_update
 mkdir ${BUILD_DIR}/wikis
 mkdir ${BUILD_DIR}/notifications
 mkdir ${BUILD_DIR}/frontend
@@ -48,8 +49,8 @@ cp -p ../scripts/setup_users.sh ${BUILD_DIR}/scripts
 cp -p ../scripts/create_master_user.sh ${BUILD_DIR}/scripts
 cp -p ../scripts/setup.sh ${BUILD_DIR}/scripts
 cp -p ../scripts/get_rev.sh ${BUILD_DIR}/scripts
-cp  ../scripts/db_update/*.py ${BUILD_DIR}/scripts
-cp  ../scripts/db_update/*.md ${BUILD_DIR}/scripts
+cp ../scripts/db_update/*.py ${BUILD_DIR}/scripts/db_update
+cp ../scripts/db_update/*.md ${BUILD_DIR}/scripts/db_update
 # Now make a tarball
 mkdir ../dist
 echo "Creating ${TARNAME}"
