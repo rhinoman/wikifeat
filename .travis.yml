@@ -1,0 +1,9 @@
+language: go
+go:
+ - 1.5
+services:
+ - couchdb
+before_script:
+ - curl -X PUT http://127.0.0.1:5984/_config/admins/adminuser -d '"password"' 
+script:
+ - go test -v ./...
