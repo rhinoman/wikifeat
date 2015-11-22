@@ -35,15 +35,16 @@ define([
     'underscore',
     'marionette',
     'backbone.radio',
+    'views/paginated_table_view',
     'views/page/comment/show_comment',
     'views/page/comment/edit_comment',
     'entities/wiki/comment',
     'text!templates/page/comments.html'
-], function($,_,Marionette,Radio,
+], function($,_,Marionette,Radio,PaginatedTableView,
             ShowCommentView, EditCommentView,
             CommentModel, CommentsTemplate){
 
-    return Marionette.CompositeView.extend({
+    return PaginatedTableView.extend({
         className: "comments-view",
         template: _.template(CommentsTemplate),
         childViewContainer: "#commentsContainer",
@@ -52,7 +53,7 @@ define([
         pageId: null,
         commentsDisabled: false,
 
-        events: {
+        additionalEvents: {
             'click #postNewCommentButton' : 'createComment'
         },
 
@@ -93,6 +94,7 @@ define([
             if(this.commentsDisabled){
                 this.$("div#commentButtons").prepend("<p>Comments are disabled for this page</p>");
             }
+            PaginatedTableView.prototype.onRender.call(this);
         }
 
     });

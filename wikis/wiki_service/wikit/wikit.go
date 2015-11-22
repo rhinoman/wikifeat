@@ -539,7 +539,7 @@ func (wiki *Wiki) DeleteComment(id string, rev string) (string, error) {
 func (wiki *Wiki) GetCommentsForPage(pageId string, pageNum int,
 	numPerPage int) (*CommentIndexViewResponse, error) {
 	response := CommentIndexViewResponse{}
-	theKeys := SetKeys([]string{pageId, "{}"}, []string{pageId})
+	theKeys := SetKeys([]string{pageId}, []string{pageId,"{}"})
 	// This function gets the "count" by calling the reduce function
 	countChan := make(chan int)
 	//Grab the count concurrently
@@ -552,6 +552,7 @@ func (wiki *Wiki) GetCommentsForPage(pageId string, pageNum int,
 		theKeys.Add("skip", strconv.Itoa(skip))
 	}
 	theKeys.Add("reduce", "false")
+	theKeys.Add("descending", "false")
 	err := wiki.db.GetView("wikit_comments", "getCommentsForPage", &response, theKeys)
 	if err != nil {
 		return nil, err

@@ -66,7 +66,8 @@ define([
 
     //Pagination state vals
     CommentCollection.prototype.state = {
-        firstPage: 1
+        firstPage: 1,
+        pageSize: 25
     };
 
     return CommentCollection;
