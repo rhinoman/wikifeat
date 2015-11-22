@@ -1,5 +1,9 @@
-Wikifeat
+
+Wikifeat   
 ========
+
+[![Build Status](https://travis-ci.org/rhinoman/wikifeat.svg?branch=master)](https://travis-ci.org/rhinoman/wikifeat)
+
 
 Wikifeat is an open source collaboration platform built around the ever-popular [Wiki](http://wikipedia.org/wiki/Wiki) concept.
 
