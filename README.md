@@ -22,7 +22,7 @@ See the [Technical Overview][1] for a more detailed introduction.
 Documentation
 -------------
 
-Please see the [Wikifeat](https://www.wikifeat.com) website for more information and documentation.  Documentation is also a work in progress :)
+Please see the [Wikifeat](https://www.wikifeat.com) website for more information and documentation.  Documentation is also a work in progress.
 
 Contributing
 ------------
