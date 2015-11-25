@@ -58,7 +58,7 @@ define([
                     collection: fileList,
                     wikiModel: wikiModel
                 }));
-                window.history.pushState('','', '/app/wikis/' + wikiModel.get('slug') + '/files');
+                Backbone.history.navigate('/wikis/' + wikiModel.get('slug') + '/files');
             });
         }
 

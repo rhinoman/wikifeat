@@ -55,7 +55,7 @@ define([
         if(pageString === ""){
             pageString = pageModel.id;
         }
-        return '/app/wikis/' + wikiString + '/pages/' + pageString;
+        return '/wikis/' + wikiString + '/pages/' + pageString;
     }
 
     var PageController = Marionette.Controller.extend({
@@ -88,7 +88,7 @@ define([
                 } else if(options.hasOwnProperty('history') && options.history === true){
                     Radio.channel('page').trigger('show:history',pageModel, wikiModel);
                 } else {
-                    window.history.pushState('', '', genStateString(wikiModel, pageModel));
+                    Backbone.history.navigate(genStateString(wikiModel, pageModel));
                     var region = Radio.channel('wiki').request('get:pageRegion');
                     region.show(new ShowPageView({model: pageModel, wikiModel: wikiModel}));
                 }
@@ -103,7 +103,7 @@ define([
                 if(revision.get('owning_page') !== revision.id){
                     stateString = stateString + '?revision=' + revision.id
                 }
-                window.history.pushState('','', stateString);
+                Backbone.history.navigate(stateString);
                 region.show(new ShowPageView({model: revision, wikiModel: wikiModel}));
             });
 
@@ -126,7 +126,7 @@ define([
                     pageModel: pageModel
                 }));
             });
-            window.history.pushState('','',genStateString(wikiModel, pageModel) + "/history");
+            Backbone.history.navigate(genStateString(wikiModel, pageModel)+ "/history");
             console.log("Showing history for page: " + pageModel.id)
         },
 
@@ -149,7 +149,7 @@ define([
         },
         //Display the editor interface for this page
         editPage: function(pageModel, wikiModel){
-            window.history.pushState('','', genStateString(wikiModel, pageModel) + "/edit");
+            Backbone.history.navigate(genStateString(wikiModel, pageModel) + "/edit");
             var region = Radio.channel('wiki').request('get:pageRegion');
             region.show(new EditPageView({model: pageModel, wikiModel: wikiModel}));
             console.log("Editing page " + pageModel.id + " of wiki " + wikiModel.id);

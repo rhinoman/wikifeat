@@ -95,7 +95,7 @@ define([
             var wikiModel = new WikiModel();
             var editWikiView = new EditWikiView({model: wikiModel});
             this.wikiLayout.pageViewRegion.show(editWikiView);
-            window.history.pushState('','','/app/wikis/create');
+            Backbone.history.navigate('/wikis/create');
             //Radio.channel('main').trigger('show:content', editWikiView);
         },
 
@@ -107,7 +107,7 @@ define([
             var toolbarView = new WikiToolbarView({model: wikiModel});
             this.wikiLayout.pageViewRegion.show(editWikiView);
             this.wikiLayout.toolbarRegion.show(toolbarView);
-            window.history.pushState('','','/app/wikis/' + wikiModel.get('slug') + '/edit');
+            Backbone.history.navigate('/wikis/' + wikiModel.get('slug') + '/edit');
         },
 
         //Show a page's breadcrumbs
@@ -143,7 +143,6 @@ define([
                         return;
                     }
                     self.initLayout(wikiModel);
-                    window.history.pushState('','','/app/wikis/' + wikiModel.get('slug'));
                     if(typeof pageId !== 'undefined'){
                         Radio.channel('page').trigger(showPageMsg,
                             pageId, wikiModel, options);
@@ -153,6 +152,7 @@ define([
                             pageId, wikiModel);
                     } else {
                         //No home page, show the placeholder template.
+                        Backbone.history.navigate('/wikis/' + wikiModel.get('slug'));
                         console.log("Wiki has no homepage.");
                         Radio.channel('page').trigger('show:placeholder:page', wikiModel);
                     }

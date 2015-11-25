@@ -62,7 +62,7 @@ define([
                     }
                     var asv = new AccountSettingsView({model: curUser});
                     Radio.channel('main').trigger('show:content', asv);
-                    window.history.pushState('','','/app/users/account');
+                    Backbone.history.navigate('/users/account');
                 })
         },
 
@@ -77,7 +77,7 @@ define([
                     }
                     var muv = new ManageUsersView({collection: userList});
                     Radio.channel('main').trigger('show:content', muv);
-                    window.history.pushState('','','/app/users/manage');
+                    Backbone.history.navigate('/users/manage');
                 });
         },
 
@@ -96,8 +96,7 @@ define([
                     );
                     var region = Radio.channel('wiki').request('get:pageRegion');
                     region.show(mmv);
-                    window.history.pushState('','','/app/wikis/' +
-                        wikiModel.get('slug') + '/members');
+                    Backbone.history.navigate('/wikis/' + wikiModel.get('slug') + '/members');
                 });
         }
     });
