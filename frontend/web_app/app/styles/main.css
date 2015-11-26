@@ -96,6 +96,9 @@ div.tool-menu ul.dropdown-menu a#deletePageLink {
   padding: 2px;
   border: 1px solid #888;
 }
+.page-container .page-view #pageToolDropDown {
+  left: -1em;
+}
 
 .raw-view-box {
   margin-top: 20px;

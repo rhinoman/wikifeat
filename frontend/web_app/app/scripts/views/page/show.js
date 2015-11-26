@@ -59,7 +59,6 @@ define([
         oldRevision: false,
         pageChildren: $.Promise,
         pageComments: $.Promise,
-        viewMode: 'formatted',
         regions: {
             pageToolMenuRegion: "#pageTools",
             pageContentRegion: "#pageContent",
@@ -80,14 +79,15 @@ define([
         },
         events: {
             'click a#viewCurrentPageLink': 'showCurrentPage',
-            'click a#editorName': 'showEditorInfo',
-            'click a.page-content-mode-link' : 'changeViewMode'
+            'click a#editorName':          'showEditorInfo',
         },
 
         initialize: function(options){
+            this.model.on('setViewMode', this.render, this);
             if(this.model.get('owning_page') !== this.model.id){
                 this.oldRevision = true;
             }
+            this.model.viewMode = "formatted";
             if(options.hasOwnProperty('wikiModel')){
                 this.wikiModel = options.wikiModel;
                 //Load the list of this page's children
@@ -98,16 +98,6 @@ define([
                         .request('get:page:comments', this.model.id, this.wikiModel.id);
                 }
             }
-        },
-
-        changeViewMode: function(event){
-            event.preventDefault();
-            if(this.viewMode === 'raw'){
-                this.viewMode = 'formatted';
-            } else {
-                this.viewMode = 'raw';
-            }
-            this.render();
         },
 
         showCurrentPage: function(event){
@@ -127,19 +117,10 @@ define([
             var self = this;
             if(typeof this.model !== 'undefined'){
                 this.stickit();
-                if(this.viewMode === 'formatted'){
+                if(this.model.viewMode === 'formatted'){
                     this.pageContentRegion.show(new FormattedContentView({model: this.model}));
-                    this.$("div#pageViewFormat").html(
-                        '<a href="#" class="page-content-mode-link">' +
-                        '<span class="glyphicon glyphicon-eye-open"></span>' +
-                        '&nbsp;View Raw</a>');
-
                 } else {
                     this.pageContentRegion.show(new RawContentView({model: this.model}));
-                    this.$("div#pageViewFormat").html(
-                        '<a href="#" class="page-content-mode-link">' +
-                        '<span class="glyphicon glyphicon-eye-open"></span>' +
-                        '&nbsp;View Formatted</a>')
                 }
                 if(!this.oldRevision) {
                     this.pageToolMenuRegion.show(new PageToolMenu({

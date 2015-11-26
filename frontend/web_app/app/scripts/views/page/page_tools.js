@@ -54,6 +54,7 @@ define([
             "click #editPageLink":     "editPage",
             "click #addChildPageLink": "createChildPage",
             "click #historyPageLink":  "pageHistory",
+            "click #viewModeLink" :    "changeViewMode",
             "click #deletePageLink":   "deletePage"
         },
 
@@ -61,6 +62,7 @@ define([
             if(options.hasOwnProperty('wikiModel')){
                 this.wikiModel = options.wikiModel;
             }
+            //this.model.on('setViewMode', this.render, this);
         },
 
         //Somebody clicked the edit button!
@@ -80,6 +82,17 @@ define([
         pageHistory: function(event){
             event.preventDefault();
             Radio.channel('page').trigger('show:history', this.model, this.wikiModel);
+        },
+
+        //Changes between raw and formatted page view
+        changeViewMode: function(event){
+            event.preventDefault();
+            if(this.model.viewMode === 'raw'){
+                this.model.viewMode = 'formatted';
+            } else {
+                this.model.viewMode = 'raw';
+            }
+            this.model.trigger('setViewMode');
         },
 
         //Delete a page
@@ -127,7 +140,22 @@ define([
                 this.$("#pageToolsMenu ul").append(
                     '<li><a href="#" id="historyPageLink">' +
                     '<span class="glyphicon glyphicon-book"></span>&nbsp;Page History</a></li>'
-                )
+                );
+
+                //Set the view mode list item
+                if(this.model.viewMode === "formatted") {
+                    this.$("#pageToolsMenu ul").append(
+                        '<li><a href="#" id="viewModeLink">' +
+                        '<span class="glyphicon glyphicon-eye-open"></span>' +
+                        '&nbsp;View Raw</li></a>'
+                    );
+                } else {
+                     this.$("#pageToolsMenu ul").append(
+                        '<li><a href="#" id="viewModeLink">' +
+                        '<span class="glyphicon glyphicon-eye-open"></span>' +
+                        '&nbsp;View Formatted</li></a>'
+                    );
+                }
                 if(this.wikiModel.canCreatePage){
                     this.$("#pageToolsMenu ul").append(
                         '<li><a href="#" id="addChildPageLink">' +
