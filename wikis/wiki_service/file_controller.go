@@ -421,12 +421,9 @@ func (fc FileController) genFileRecordLinks(userRoles []string,
 	wikiDb string, uri string) fileLinks {
 	links := fileLinks{}
 	admin := util.HasRole(userRoles, AdminRole(wikiDb))
-	read := util.HasRole(userRoles, ReadRole(wikiDb))
 	write := util.HasRole(userRoles, WriteRole(wikiDb))
-	if admin || read || write {
-		links.Self = &HatLink{Href: uri, Method: "GET"}
-		links.GetAttachment = &HatLink{Href: uri + "/content", Method: "GET"}
-	}
+	links.Self = &HatLink{Href: uri, Method: "GET"}
+	links.GetAttachment = &HatLink{Href: uri + "/content", Method: "GET"}
 	if admin || write {
 		links.Update = &HatLink{Href: uri, Method: "PUT"}
 		links.Delete = &HatLink{Href: uri, Method: "DELETE"}
