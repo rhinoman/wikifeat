@@ -5,7 +5,7 @@ Wikifeat
 [![Build Status](https://travis-ci.org/rhinoman/wikifeat.svg?branch=master)](https://travis-ci.org/rhinoman/wikifeat)
 
 ### Introduction
-Wikifeat is an open source collaboration platform built around the ever-popular [Wiki](http://wikipedia.org/wiki/Wiki) concept.  It is meant to be extensible and highly usable.  Many enterprise collaboration platforms may be powerful and extensible, but they are often difficult to developer for and not friendly to the end user.
+Wikifeat is an open source collaboration platform built around the ever-popular [Wiki](http://wikipedia.org/wiki/Wiki) concept.  It is meant to be extensible and highly usable.  Many enterprise collaboration platforms may be powerful and extensible, but they are often difficult to develop for and have an unfriendly, overly complicated user experience.
 
 ### Goals
 
