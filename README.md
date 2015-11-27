@@ -4,16 +4,33 @@ Wikifeat
 
 [![Build Status](https://travis-ci.org/rhinoman/wikifeat.svg?branch=master)](https://travis-ci.org/rhinoman/wikifeat)
 
+### Introduction
+Wikifeat is an open source collaboration platform built around the ever-popular [Wiki](http://wikipedia.org/wiki/Wiki) concept.  It is meant to be extensible and highly usable.  Many enterprise collaboration platforms may be powerful and extensible, but they are often difficult to developer for and not friendly to the end user.
 
-Wikifeat is an open source collaboration platform built around the ever-popular [Wiki](http://wikipedia.org/wiki/Wiki) concept.
+### Goals
 
-Wikifeat includes a number of features that make it more amenable to enterprise deployments, among them:
+The overarching goals for the Wikifeat project are:
 
-- Allows the creation of an arbitrary number of 'wikis', each with its own access controls and administrators.
-- A microservices architecture that is easily scaled to accommodate more users.
-- An extensible plugin architecture that enables the creation of new backend services as well as front-end functionality.
+- **Usability** - The core Wikifeat system should provide a simple, intuitive wiki experience with a
+clean UI an a simple, easy to learn markup language (i.e., markdown).
+- **Extensibility** - It should be possible to extend Wikifeat with additional services and front-end
+plugins to provide new functionality and integrate Wikifeat with other systems.
+- **Scalability** - It should be possible to horizontally scale a Wikifeat installation without great
+difficulty.
+ 
+### Screenshots
 
-Wikifeat is currently under heavy development and should be considered early-alpha quality software (i.e., not suitable for production).  
+Here's a screenshot demonstrating the Wikifeat interface as well as a plugin embedded in a wiki page (in this case, an OpenLayers map):
+
+![wikifeat_screenshot_sm](https://cloud.githubusercontent.com/assets/1859198/11432240/9207d3b8-9477-11e5-909f-fbf62e627e62.png)
+
+Wiki pages are edited using simple Markdown -- specifically, [Commonmark](http://commonmark.org/).  A screenshot of the editor interface is shown here:
+
+![wikifeat_edit_sm](https://cloud.githubusercontent.com/assets/1859198/11432232/5fb70082-9477-11e5-904c-c3b5a83d0a82.png)
+
+### Status
+
+Wikifeat is currently under heavy development and should be considered alpha quality software (i.e., not suitable for production).  
 
 For an example of a running Wikifeat installation, see https://www.wikifeat.com
 
