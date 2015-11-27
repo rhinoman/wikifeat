@@ -1,1 +1,2 @@
+frontend/web_app/node_modules/** linguist-vendored=true
 frontend/web_app/app/scripts/vendor/** linguist-vendored=true
