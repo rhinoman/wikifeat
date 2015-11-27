@@ -1,2 +1,1 @@
-frontend/web_app/node_modules/* linguist-vendored
-frontend/web_app/app/scripts/vendor/* linguist-vendored
+frontend/web_app/* linguist-vendored
