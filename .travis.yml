@@ -6,10 +6,10 @@ services:
 before_script:
  - curl -X PUT http://127.0.0.1:5984/_config/admins/adminuser -d '"password"' 
 script:
- - sleep 2s
+ - sleep 4s
  - cd scripts
  - sh ./setup_users.sh localhost 5984 adminuser password
- - sleep 2s
+ - sleep 4s
  - cd ..
  - cd users
  - go test -v ./...
