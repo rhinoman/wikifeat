@@ -54,8 +54,8 @@ type Page struct {
 	Content         PageContent `json:"content"`
 	Parent          string      `json:"parent"`                    //For page hierarchy: a document id
 	Lineage         []string    `json:"lineage"`                   //Parental hierarchy of this page
-	OwningPage      string      `json:"owning_page"`               //For page history: a document id
-	DisableComments bool        `json:"comments_disabled"`         //disallow comments for this page
+	OwningPage      string      `json:"owningPage"`                //For page history: a document id
+	DisableComments bool        `json:"commentsDisabled"`          //disallow comments for this page
 	Attachments     []string    `json:"fileAttachments,omitempty"` //A list of file ids
 }
 
@@ -186,10 +186,10 @@ type Comment struct {
 	Id           string      `json:"id"`
 	Rev          string      `json:"_rev,omitempty"`
 	DocType      string      `json:"type"`
-	OwningPage   string      `json:"owning_page"`
+	OwningPage   string      `json:"owningPage"`
 	Author       string      `json:"author"`
-	CreatedTime  time.Time   `json:"created_time"`
-	ModifiedTime time.Time   `json:"modified_time"`
+	CreatedTime  time.Time   `json:"createdTime"`
+	ModifiedTime time.Time   `json:"modifiedTime"`
 	Content      PageContent `json:"content"`
 }
 

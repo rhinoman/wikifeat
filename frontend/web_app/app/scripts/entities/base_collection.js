@@ -54,7 +54,7 @@ define([
             this.isCreatable = response._links.hasOwnProperty('create');
             delete response._links;
             //Paging properties
-            this.state.totalRecords = response.total_rows;
+            this.state.totalRecords = response.totalRows;
             this.state.lastPage = Math.ceil(this.state.totalRecords / this.state.pageSize);
             //this.state.lastPage = this.state.totalPages;
             this.offset = response.offset;
@@ -76,7 +76,7 @@ define([
         queryParams: {
             currentPage: "pageNum",
             pageSize: "numPerPage",
-            totalRecords: "total_rows",
+            totalRecords: "totalRows",
             forResource: null
         }
 

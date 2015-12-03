@@ -58,7 +58,7 @@ type FileResponse struct {
 
 type FileIndexResponse struct {
 	Links         HatLinks      `json:"_links"`
-	TotalRows     int           `json:"total_rows"`
+	TotalRows     int           `json:"totalRows"`
 	PageNum       int           `json:"offset"`
 	FileIndexList FileIndexList `json:"_embedded"`
 }

@@ -84,7 +84,7 @@ define([
 
         initialize: function(options){
             this.model.on('setViewMode', this.render, this);
-            if(this.model.get('owning_page') !== this.model.id){
+            if(this.model.get('owningPage') !== this.model.id){
                 this.oldRevision = true;
             }
             this.model.viewMode = "formatted";
@@ -103,7 +103,7 @@ define([
         showCurrentPage: function(event){
             event.preventDefault();
             Radio.channel('page').trigger('show:page',
-                this.model.get("owning_page"), this.wikiModel)
+                this.model.get("owningPage"), this.wikiModel)
         },
 
         showEditorInfo: function(event){

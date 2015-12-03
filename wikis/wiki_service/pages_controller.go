@@ -67,7 +67,7 @@ type BreadcrumbsResponse struct {
 
 type HistoryResponse struct {
 	Links     HatLinks       `json:"_links"`
-	TotalRows int            `json:"total_rows"`
+	TotalRows int            `json:"totalRows"`
 	Offset    int            `json:"offset"`
 	Entries   HistoryEntries `json:"_embedded"`
 }
@@ -95,7 +95,7 @@ type CommentResponse struct {
 
 type CommentIndexResponse struct {
 	Links     HatLinks         `json:"_links"`
-	TotalRows int              `json:"total_rows"`
+	TotalRows int              `json:"totalRows"`
 	Offset    int              `json:"offset"`
 	Entries   CommentIndexList `json:"_embedded"`
 }

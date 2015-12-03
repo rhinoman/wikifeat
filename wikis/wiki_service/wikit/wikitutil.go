@@ -55,29 +55,36 @@ type View struct {
 
 var wikiViews = map[string]View{
 	"getHistory": {
-		Map: "function(doc) {" +
-			"if(doc.type===\"page\"){" +
-			"emit([doc.owning_page, doc.timestamp], " +
-			"{documentId: doc._id," +
-			"documentRev: doc._rev," +
-			"editor: doc.editor, contentSize: doc.content.raw.length}" +
-			");" +
-			"} }",
+		Map: `
+		function(doc) {
+			if(doc.type==="page"){
+				var owningPage = doc.owningPage || doc.owning_page;
+				emit([owningPage, doc.timestamp],
+					{documentId: doc._id,
+					 documentRev: doc._rev,
+					 editor: doc.editor,
+					 contentSize: doc.content.raw.length}
+				);
+			}
+		}`,
 		Reduce: "_count",
 	},
 	"getIndex": {
 		Map: `
 			function(doc){
-				if(doc.type==="page" && doc._id === doc.owning_page){
-					emit(doc.title, {
-						id: doc._id,
-						slug: doc.slug,
-						title: doc.title, 
-						owner: doc.owner, 
-						editor: doc.editor, 
-						timestamp: doc.timestamp 
-					}); 
-				} 
+				if(doc.type==="page"){
+					var owningPage = doc.owningPage || doc.owning_page;
+					if(doc._id === owningPage){
+						emit(doc.title, {
+							id: doc._id,
+							slug: doc.slug,
+							title: doc.title,
+							owner: doc.owner,
+							editor: doc.editor,
+							timestamp: doc.timestamp
+						});
+					}
+				}
 			}`,
 		Reduce: "_count",
 	},
@@ -91,24 +98,28 @@ var wikiViews = map[string]View{
 		Reduce: "_count",
 	},
 	"getPageBySlug": {
-		Map: "function(doc){" +
-			"if(doc.type===\"page\"){" +
-			"emit(doc.slug, {pageRev: doc._rev, page: doc});" +
-			"}" +
-			"}",
+		Map: `
+			function(doc){
+				if(doc.type==="page"){
+					emit(doc.slug, {pageRev: doc._rev, page: doc});
+				}
+			}`,
 	},
 	"getChildPageIndex": {
 		Map: `
 			function(doc) {
-				if(doc.type==="page" && doc._id === doc.owning_page){
-					emit(doc.parent, {
-						id: doc._id,
-						slug: doc.slug,
-						title: doc.title, 
-						owner: doc.owner, 
-						editor: doc.editor, 
-						timestamp: doc.timestamp
-					});
+				if(doc.type==="page"){
+					var owningPage = doc.owningPage || doc.owning_page;
+				 	if(doc._id === doc.owningPage){
+						emit(doc.parent, {
+							id: doc._id,
+							slug: doc.slug,
+							title: doc.title,
+							owner: doc.owner,
+							editor: doc.editor,
+							timestamp: doc.timestamp
+						});
+					}
 				}
 			}`,
 		Reduce: "_count",
@@ -146,7 +157,8 @@ var commentViews = map[string]View{
 		Map: `
 			function(doc){
 				if(doc.type==="comment"){
-					emit([doc.owning_page, doc.created_time], doc);
+					var owningPage = doc.owningPage || doc.owning_page;
+					emit([owningPage, doc.createdTime], doc);
 				}
 			}`,
 		Reduce: "_count",

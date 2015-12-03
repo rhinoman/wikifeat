@@ -68,23 +68,23 @@
 		},
 		{
 			"ImportPath": "github.com/rhinoman/wikifeat-common/config",
-			"Rev": "9df581ba8573e59b77a745c4a8d99f1d599a28e8"
+			"Rev": "a6301a511e9fe7d61057647fca8b76a9a17626b1"
 		},
 		{
 			"ImportPath": "github.com/rhinoman/wikifeat-common/entities",
-			"Rev": "9df581ba8573e59b77a745c4a8d99f1d599a28e8"
+			"Rev": "a6301a511e9fe7d61057647fca8b76a9a17626b1"
 		},
 		{
 			"ImportPath": "github.com/rhinoman/wikifeat-common/registry",
-			"Rev": "9df581ba8573e59b77a745c4a8d99f1d599a28e8"
+			"Rev": "a6301a511e9fe7d61057647fca8b76a9a17626b1"
 		},
 		{
 			"ImportPath": "github.com/rhinoman/wikifeat-common/services",
-			"Rev": "9df581ba8573e59b77a745c4a8d99f1d599a28e8"
+			"Rev": "a6301a511e9fe7d61057647fca8b76a9a17626b1"
 		},
 		{
 			"ImportPath": "github.com/rhinoman/wikifeat-common/util",
-			"Rev": "9df581ba8573e59b77a745c4a8d99f1d599a28e8"
+			"Rev": "a6301a511e9fe7d61057647fca8b76a9a17626b1"
 		},
 		{
 			"ImportPath": "github.com/smartystreets/goconvey/convey",

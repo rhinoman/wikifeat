@@ -56,7 +56,7 @@ type WikiRecordResponse struct {
 
 type WikiIndexResponse struct {
 	Links         HatLinks      `json:"_links"`
-	TotalRows     int           `json:"total_rows"`
+	TotalRows     int           `json:"totalRows"`
 	PageNum       int           `json:"offset"`
 	WikiIndexList WikiIndexList `json:"_embedded"`
 }

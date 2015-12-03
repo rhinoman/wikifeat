@@ -234,7 +234,7 @@ func (um *UserManager) Update(id string, rev string, updatedUser *User,
 	readUser["modifiedAt"] = nowTime
 	readUser["userPublic"] = updatedUser.Public
 	readUser["userName"] = updatedUser.UserName
-	readUser["password_reset"] = updatedUser.PassResetToken
+	readUser["passwordReset"] = updatedUser.PassResetToken
 	//And save the updated user
 	uRev, err := userDb.Save(&readUser, namestring, rev)
 	if err != nil {

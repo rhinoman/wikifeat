@@ -61,7 +61,7 @@ type User struct {
 	Type           string      `json:"type"`
 	CreatedAt      time.Time   `json:"createdAt,omitempty"`
 	ModifiedAt     time.Time   `json:"modifiedAt,omitempty"`
-	PassResetToken ActionToken `json:"password_reset,omitempty"`
+	PassResetToken ActionToken `json:"passwordReset,omitempty"`
 	//Public fields
 	Public UserPublic `json:"userPublic,omitempty"`
 }

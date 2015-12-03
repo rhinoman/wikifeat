@@ -49,7 +49,7 @@ type UserResponse struct {
 
 type UserListResponse struct {
 	Links     HatLinks `json:"_links"`
-	TotalRows int      `json:"total_rows"`
+	TotalRows int      `json:"totalRows"`
 	PageNum   int      `json:"offset"`
 	UserList  struct {
 		List []UserResponse `json:"ea:user"`

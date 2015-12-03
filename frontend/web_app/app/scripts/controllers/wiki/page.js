@@ -100,7 +100,7 @@ define([
             $.when(pagePromise, revisionPromise).done(function(page, revision){
                 var region = Radio.channel('wiki').request('get:pageRegion');
                 var stateString = genStateString(wikiModel, page);
-                if(revision.get('owning_page') !== revision.id){
+                if(revision.get('owningPage') !== revision.id){
                     stateString = stateString + '?revision=' + revision.id
                 }
                 Backbone.history.navigate(stateString);
