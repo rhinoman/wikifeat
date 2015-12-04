@@ -57,8 +57,8 @@ define([
 
     var ChangePasswordRequest = Backbone.Model.extend({
         defaults: {
-            old_password: "",
-            new_password: ""
+            oldPassword: "",
+            newPassword: ""
         }
     });
 
@@ -121,8 +121,8 @@ define([
     UserManager.prototype.changePassword = function(userModel, oldPassword, newPassword){
         var cpr = new ChangePasswordRequest({
             id: userModel.id,
-            new_password: newPassword,
-            old_password: oldPassword
+            newPassword: newPassword,
+            oldPassword: oldPassword
         });
         cpr.url = userModel.url + "/change_password";
         cpr.revision = userModel.revision;

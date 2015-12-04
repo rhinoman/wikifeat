@@ -74,13 +74,13 @@ type RoleRequest struct {
 }
 
 type ChangePasswordRequest struct {
-	OldPassword string `json:"old_password"`
-	NewPassword string `json:"new_password"`
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
 }
 
 type ResetTokenRequest struct {
 	Token       string `json:"token"`
-	NewPassword string `json:"new_password"`
+	NewPassword string `json:"newPassword"`
 }
 
 func (rr *RoleRequest) roleString() string {
