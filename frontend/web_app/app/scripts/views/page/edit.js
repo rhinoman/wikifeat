@@ -47,7 +47,8 @@ define([
        model: PageModel,
        wikiModel: null,
        regions: {
-           editorContentRegion: "#editorContent"
+           editorContentRegion: "#editorContent",
+           previewContentRegion: "#previewContent"
        },
        events: {
            'click #editLink': 'showEditForm',
@@ -62,31 +63,42 @@ define([
                this.wikiModel = options.wikiModel;
            }
            this.model.on('invalid', this.showError, this);
-           this.wipText.set("data", this.model.get("content").raw)
+           this.wipText.set("data", this.model.get("content").raw);
+           this.editFormView = new EditFormView({
+               model: this.model,
+               wikiModel: this.wikiModel,
+               wipText: this.wipText
+           });
+           this.editPreview = new EditPreview({
+               model: this.model,
+               wipText: this.wipText
+           })
        },
 
        showEditForm: function(event){
            event.preventDefault();
-           this.editorContentRegion.show(new EditFormView({
-               model: this.model,
-               wikiModel: this.wikiModel,
-               wipText: this.wipText
-           }));
+           this.$("div#previewContent").hide();
+           this.$("div#editorContent").show();
            this.$("#previewLink").parent("li").removeClass("active");
            this.$("#editLink").parent("li").addClass("active");
        },
 
        showPreview: function(event){
            event.preventDefault();
-           this.editorContentRegion.show(new EditPreview({
-               model: this.model,
-               wipText: this.wipText
-           }));
+           this.$("div#editorContent").hide();
+           this.wipText.trigger('redisplay');
+           this.$("div#previewContent").show();
            this.$("#editLink").parent("li").removeClass("active");
            this.$("#previewLink").parent("li").addClass("active");
        },
+       onRender: function(){
+
+
+           this.$("div#previewContent").hide();
+       },
        onShow: function(){
-           this.$("#editLink").trigger('click');
-       }
+           this.editorContentRegion.show(this.editFormView);
+           this.previewContentRegion.show(this.editPreview);
+       },
    });
 });

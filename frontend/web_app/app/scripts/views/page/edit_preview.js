@@ -47,16 +47,22 @@ define([
         initialize: function(options){
             if(options.hasOwnProperty('wipText')){
                 this.wipText = options.wipText;
+                this.wipText.on('redisplay', this.updatePreview, this);
             }
+            this.reader = new Commonmark.Parser();
+            this.writer = new Commonmark.HtmlRenderer();
         },
 
         onShow: function(){
             if(this.wipText !== null) {
-                var reader = new Commonmark.Parser();
-                var writer = new Commonmark.HtmlRenderer();
-                var parsedText = reader.parse(this.wipText.get('data'));
-                this.$el.html(writer.render(parsedText));
+                var parsedText = this.reader.parse(this.wipText.get('data'));
+                this.$el.html(this.writer.render(parsedText));
             }
+        },
+
+        updatePreview: function(event){
+            var parsedText = this.reader.parse(this.wipText.get('data'));
+            this.$el.html(this.writer.render(parsedText));
         }
     });
 
