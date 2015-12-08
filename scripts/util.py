@@ -35,9 +35,12 @@ def parse_args():
                         help="Master User first name")
     parser.add_argument('--master_lastname', dest='m_ln',
                         help="Master User last name")
+    parser.add_argument('--skip_master', dest='skip_master', action='store_true',
+                        help="Skip master user setup")
     parser.set_defaults(main_db='wikifeat_main_db')
     parser.set_defaults(avatar_db='user_avatars')
     parser.set_defaults(use_ssl=False)
+    parser.set_defaults(skip_master=False)
 
     args = parser.parse_args()
 

@@ -161,5 +161,6 @@ def create_master_user():
 print(welcome_text)
 setup_main_db()
 setup_user_db()
-create_master_user()
+if args.skip_master is False:
+    create_master_user()
 

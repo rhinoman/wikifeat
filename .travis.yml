@@ -4,11 +4,12 @@ go:
 services:
  - couchdb
 before_script:
- - curl -X PUT http://127.0.0.1:5984/_config/admins/adminuser -d '"password"' 
+ - curl -X PUT http://127.0.0.1:5984/_config/admins/adminuser -d '"password"'
+ - sudo apt-get install python3
 script:
  - sleep 4s
  - cd scripts
- - sh ./setup_users.sh localhost 5984 adminuser password
+ - ./setup.py localhost 5984 --user=adminuser --password=password --skip_master
  - sleep 4s
  - cd ..
  - cd users
