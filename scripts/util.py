@@ -1,0 +1,86 @@
+"""
+    Common utility functions for setup scripts
+"""
+
+import json
+from argparse import ArgumentParser
+import http.client
+
+
+def parse_args():
+    parser = ArgumentParser()
+    parser.add_argument('couch_server', type=str,
+                        help='CouchDB host')
+    parser.add_argument('couch_port', type=int,
+                        help='CouchDB port')
+    parser.add_argument('-u', '--user', dest='adminuser',
+                        help='CouchDB admin user')
+    parser.add_argument('-p', '--password', dest='adminpass',
+                        help='CouchDB admin password')
+    parser.add_argument('-db', '--main_db',
+                        dest='main_db',
+                        help='Main Wikifeat database')
+    # Note: your python must be compiled with SSL support
+    parser.add_argument('--use_ssl', dest='use_ssl', action='store_true',
+                        help="Use SSL to connect to CouchDB.  Your python must "
+                             "have been compiled with SSL support!")
+    parser.add_argument('-adb', '--avatar_db',
+                        dest='avatar_db',
+                        help='User Avatar database')
+    parser.add_argument('--master_username', dest='m_uname',
+                        help="Master User name")
+    parser.add_argument('--master_password', dest='m_password',
+                        help="Master User password")
+    parser.add_argument('--master_firstname', dest='m_fn',
+                        help="Master User first name")
+    parser.add_argument('--master_lastname', dest='m_ln',
+                        help="Master User last name")
+    parser.set_defaults(main_db='wikifeat_main_db')
+    parser.set_defaults(avatar_db='user_avatars')
+    parser.set_defaults(use_ssl=False)
+
+    args = parser.parse_args()
+
+    if args.adminuser is None:
+        args.adminuser = input("Enter CouchDB admin username: ")
+
+    if args.adminpass is None:
+        args.adminpass = input("Enter CouchDB admin password: ")
+
+    return args
+
+
+def get_connection(use_ssl, couch_server, couch_port):
+    if use_ssl:
+        return http.client.HTTPSConnection(couch_server, couch_port)
+    else:
+        return http.client.HTTPConnection(couch_server, couch_port)
+
+
+def load_json_file(filename):
+    with open(filename) as json_file:
+        data = json.load(json_file)
+        return data
+
+
+def get_credentials(user, password):
+    from base64 import b64encode
+    credentials = b64encode(bytes(user + ':' + password, 'utf-8')).decode('utf-8')
+    return credentials
+
+
+def get_headers(credentials):
+    return {
+        'Accept': 'application/json',
+        'Authorization': 'Basic %s' % credentials
+    }
+
+
+def put_headers(credentials):
+    p_headers = get_headers(credentials).copy()
+    p_headers.update({'Content-Type': 'application/json'})
+    return p_headers
+
+
+def decode_response(resp):
+    return json.loads(resp.read().decode('utf-8'))
