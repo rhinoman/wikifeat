@@ -108,7 +108,7 @@ def setup_user_db():
     else:
         print("User config update failed!")
     # Now, set up some views in the user database
-    url = '/_users/_design/_user_queries'
+    url = '/_users/_design/user_queries'
     # Get the user design doc, if it exists
     conn.request("GET", url, headers=gh)
     resp = conn.getresponse()
