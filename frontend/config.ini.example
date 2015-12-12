@@ -16,7 +16,6 @@ registryLocation = http://localhost:2379
 #Frontend specific settings
 webAppDir=web_app/app
 pluginDir=plugins
-homepage=/wikis/main-wiki/pages/main-wiki
 
 [ServiceRegistry]
 #etcd settings, mostly

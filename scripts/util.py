@@ -9,21 +9,10 @@ import http.client
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('couch_server', type=str,
-                        help='CouchDB host')
-    parser.add_argument('couch_port', type=int,
-                        help='CouchDB port')
-    parser.add_argument('-u', '--user', dest='adminuser',
-                        help='CouchDB admin user')
-    parser.add_argument('-p', '--password', dest='adminpass',
-                        help='CouchDB admin password')
+    add_couch_params(parser)
     parser.add_argument('-db', '--main_db',
                         dest='main_db',
                         help='Main Wikifeat database')
-    # Note: your python must be compiled with SSL support
-    parser.add_argument('--use_ssl', dest='use_ssl', action='store_true',
-                        help="Use SSL to connect to CouchDB.  Your python must "
-                             "have been compiled with SSL support!")
     parser.add_argument('-adb', '--avatar_db',
                         dest='avatar_db',
                         help='User Avatar database')
@@ -39,7 +28,6 @@ def parse_args():
                         help="Skip master user setup")
     parser.set_defaults(main_db='wikifeat_main_db')
     parser.set_defaults(avatar_db='user_avatars')
-    parser.set_defaults(use_ssl=False)
     parser.set_defaults(skip_master=False)
 
     args = parser.parse_args()
@@ -51,6 +39,22 @@ def parse_args():
         args.adminpass = input("Enter CouchDB admin password: ")
 
     return args
+
+
+def add_couch_params(parser):
+    parser.add_argument('couch_server', type=str,
+                        help='CouchDB host')
+    parser.add_argument('couch_port', type=int,
+                        help='CouchDB port')
+    parser.add_argument('-u', '--user', dest='adminuser',
+                        help='CouchDB admin user')
+    parser.add_argument('-p', '--password', dest='adminpass',
+                        help='CouchDB admin password')
+    # Note: your python must be compiled with SSL support
+    parser.add_argument('--use_ssl', dest='use_ssl', action='store_true',
+                        help="Use SSL to connect to CouchDB.  Your python must "
+                             "have been compiled with SSL support!")
+    parser.set_defaults(use_ssl=False)
 
 
 def get_connection(use_ssl, couch_server, couch_port):

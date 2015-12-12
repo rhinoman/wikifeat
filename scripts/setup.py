@@ -11,11 +11,11 @@ import util
 
 # Set up some values
 welcome_text = """
-    Wikifeat Setup
-    --------------
-    This script performs initial setup of the Wikifeat system.
-    It will create a few CouchDB databases, set a few configuration options,
-    and populate some design documents.
+Wikifeat Setup
+--------------
+This script performs initial setup of the Wikifeat system.
+It will create a few CouchDB databases, set a few configuration options,
+and populate some design documents.
 """
 
 args = util.parse_args()
