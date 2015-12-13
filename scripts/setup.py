@@ -92,6 +92,24 @@ def setup_main_db():
         print("Main security doc saved successfully.")
     else:
         print("Main security doc save failed.")
+    # Now save the main db design doc
+    main_ddoc_url = main_db_url + '/_design/wiki_query'
+    conn.request("GET", main_ddoc_url, headers=gh)
+    resp = conn.getresponse()
+    existing_ddoc = util.decode_response(resp)
+    main_ddoc = util.load_json_file("ddoc/main_ddoc.json")
+    if resp.getcode() == 200:
+        # Set the rev so we can update
+        print("Main design doc exists.  Updating.")
+        main_ddoc['_rev'] = existing_ddoc['_rev']
+    req_body = json.dumps(main_ddoc)
+    conn.request("PUT", main_ddoc_url, body=req_body, headers=ph)
+    resp = conn.getresponse()
+    util.decode_response(resp)
+    if resp.getcode() == 200 or resp.getcode() == 201:
+        print("Main design doc saved successfully")
+    else:
+        print("Main design doc save failed")
 
 
 def setup_user_db():
@@ -123,7 +141,39 @@ def setup_user_db():
     if resp.getcode() == 200 or resp.getcode() == 201:
         print("User design doc saved successfully.")
     else:
-        print("User desgin doc save failed.")
+        print("User design doc save failed.")
+
+
+def setup_avatar_db():
+    print("Creating the user avatar database")
+    adb = args.avatar_db
+    adb_url = '/' + adb
+    conn.request("PUT", adb_url, headers=ph)
+    resp = conn.getresponse()
+    util.decode_response(resp)
+    if resp.getcode() == 201:
+        print("User Avatar database created.")
+    elif resp.getcode() == 409 or resp.getcode() == 412:
+        print("Avatar database already exists.")
+    else:
+        print("Error creating avatar database.")
+    # Now save the auth document
+    auth_url = adb_url + '/_design/_auth'
+    conn.request("GET", auth_url, headers=gh)
+    resp = conn.getresponse()
+    addoc = util.load_json_file('ddoc/avatar_auth.json')
+    addoc_old = util.decode_response(resp)
+    if resp.getcode() == 200:
+        print("Avatar auth doc already exists.  Updating.")
+        addoc['_rev'] = addoc_old['_rev']
+    req_body = json.dumps(addoc)
+    conn.request("PUT", auth_url, body=req_body, headers=ph)
+    resp = conn.getresponse()
+    util.decode_response(resp)
+    if resp.getcode() == 200 or resp.getcode() == 201:
+        print("Avatar auth doc saved successfully.")
+    else:
+        print("Avatar auth doc save failed.")
 
 
 def create_master_user():
@@ -161,6 +211,7 @@ def create_master_user():
 print(welcome_text)
 setup_main_db()
 setup_user_db()
+setup_avatar_db()
 if args.skip_master is False:
     create_master_user()
 
