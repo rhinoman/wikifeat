@@ -57,6 +57,36 @@ def add_couch_params(parser):
     parser.set_defaults(use_ssl=False)
 
 
+class MasterUserParameters(object):
+    def __init__(self, args=None):
+        if args is not None:
+            self.user = args.m_uname
+            self.password = args.m_password
+            self.firstname = args.m_fn
+            self.lastname = args.m_ln
+            self.skip_master = args.skip_master
+        else:
+            self.user = None
+            self.password = None
+            self.firstname = None
+            self.lastname = None
+            self.skip_master = False
+
+
+class CouchParameters(object):
+    def __init__(self, args=None):
+        if args is not None:
+            self.host = args.couch_server
+            self.port = args.couch_port
+            self.adminuser = args.adminuser
+            self.adminpass = args.adminpass
+            self.use_ssl = args.use_ssl
+        else:
+            self.host = "localhost"
+            self.port = 5984
+            self.use_ssl = False
+
+
 def get_connection(use_ssl, couch_server, couch_port):
     if use_ssl:
         return http.client.HTTPSConnection(couch_server, couch_port)

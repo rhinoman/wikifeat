@@ -106,10 +106,10 @@ def config_service(config, domain_name, node_id, port):
 
 
 def config_database(config, db_params):
-    config['Database']['dbAddr'] = db_params['dbAddr']
-    config['Database']['dbPort'] = db_params['dbPort']
-    config['Database']['dbAdminUser'] = db_params['dbAdminUser']
-    config['Database']['dbAdminPassword'] = db_params['dbAdminPassword']
+    config['Database']['dbAddr'] = db_params.host
+    config['Database']['dbPort'] = db_params.port
+    config['Database']['dbAdminUser'] = db_params.adminuser
+    config['Database']['dbAdminPassword'] = db_params.adminpass
 
 
 def config_all(common_params, db_params):
@@ -121,6 +121,12 @@ def config_all(common_params, db_params):
     print("Configuration complete")
 
 
+def main(domain_name, db_params):
+    common_params = dict()
+    common_params['domainName'] = domain_name
+    config_all(common_params, db_params)
+
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     util.add_couch_params(parser)
@@ -128,19 +134,12 @@ if __name__ == "__main__":
                         help='host domain name')
     parser.set_defaults(domain_name='localhost')
     args = parser.parse_args()
-
     if args.adminuser is None:
         args.adminuser = input("Enter CouchDB admin username: ")
     if args.adminpass is None:
         args.adminpass = input("Enter CouchDB admin password: ")
-    db_params = dict()
-    common_params = dict()
-    db_params['dbAddr'] = args.couch_server
-    db_params['dbPort'] = str(args.couch_port)
-    db_params['dbAdminUser'] = args.adminuser
-    db_params['dbAdminPassword'] = args.adminpass
-    common_params['domainName'] = args.domain_name
-    config_all(common_params, db_params)
+    couch_params = util.CouchParameters(args)
+    main(args.domain_name, couch_params)
 
 
 

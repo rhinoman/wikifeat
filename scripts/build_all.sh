@@ -45,10 +45,11 @@ rm -rf ../frontend/web_app/wikifeat-build
 # Copy some scripts, man
 cp -p ../wf_run_all.sh ${BUILD_DIR}/wf_run_all.sh
 cp -R ../scripts/ddoc ${BUILD_DIR}/scripts
-cp -p ../scripts/setup_users.sh ${BUILD_DIR}/scripts
-cp -p ../scripts/create_master_user.sh ${BUILD_DIR}/scripts
-cp -p ../scripts/setup.sh ${BUILD_DIR}/scripts
-cp -p ../scripts/get_rev.sh ${BUILD_DIR}/scripts
+cp -R ../scripts/libs ${BUILD_DIR}/scripts
+cp -p ../scripts/setup.py ${BUILD_DIR}/scripts
+cp -p ../scripts/util.py ${BUILD_DIR}/scripts
+cp -p ../scripts/config.py ${BUILD_DIR}/scripts
+cp -p ../scripts/install.py ${BUILD_DIR}/scripts
 cp ../scripts/db_update/*.py ${BUILD_DIR}/scripts/db_update
 cp ../scripts/db_update/*.md ${BUILD_DIR}/scripts/db_update
 # Now make a tarball
