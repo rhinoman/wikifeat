@@ -13,7 +13,7 @@ script:
  - sleep 4s
  - cd scripts
  - ./setup.py localhost 5984 --user=adminuser --password=password --skip_master
- - sleep 4s
+ - sleep 6s
  - cd ..
  - cd users
  - go test -v ./...
