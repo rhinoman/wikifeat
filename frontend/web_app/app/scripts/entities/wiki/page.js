@@ -60,7 +60,7 @@ define([
         editor: "Unknown",
         owner: "",
         parent: "",
-        comments_disabled: false,
+        commentsDisabled: false,
         title: "Untitled",
         type: "page"
     };

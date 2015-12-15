@@ -178,7 +178,7 @@ define([
                     collection: response,
                     wikiId: this.wikiModel.id,
                     pageId: this.model.id,
-                    commentsDisabled: this.model.get("comments_disabled")
+                    commentsDisabled: this.model.get("commentsDisabled")
                 })
             )
         },

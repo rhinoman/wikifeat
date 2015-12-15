@@ -53,7 +53,7 @@ define([
                 observe: 'title'
             },
             '#inputDisableComments':{
-                observe: 'comments_disabled'
+                observe: 'commentsDisabled'
             }
         },
         events: {
