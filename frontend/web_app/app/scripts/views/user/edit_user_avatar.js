@@ -77,6 +77,11 @@ define([
             event.preventDefault();
             var self = this;
             //First, save the avatar record
+
+            //This is a bug fix.  Leave it.
+            if(this.model.get("_id") === ""){
+                this.model.set("_id", this.userModel.id);
+            }
             Radio.channel('userManager').request('save:avatar', this.model)
                 .done(function(response){
                     if(response.hasOwnProperty('error')){

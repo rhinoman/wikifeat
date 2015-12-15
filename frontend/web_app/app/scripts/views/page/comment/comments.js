@@ -94,6 +94,11 @@ define([
             if(this.commentsDisabled){
                 this.$("div#commentButtons").prepend("<p>Comments are disabled for this page</p>");
             }
+            if(this.collection.length < 1){
+                this.$("nav#commentsPaginationNav").hide();
+            } else {
+                this.$("nav#commentsPaginationNav").show();
+            }
             PaginatedTableView.prototype.onRender.call(this);
         }
 
