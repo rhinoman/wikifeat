@@ -21,7 +21,7 @@ print(welcome_text)
 print("")
 print("First, we'll need the location and port number for your CouchDB server")
 couchdb_server = input("Enter CouchDB hostname or IP (localhost): ")
-couchdb_port   = input("Enter CouchDB host port number (5984): ")
+couchdb_port = input("Enter CouchDB host port number (5984): ")
 
 couchdb_admin = input("Enter the CouchDB admin username: ")
 if couchdb_admin == "":

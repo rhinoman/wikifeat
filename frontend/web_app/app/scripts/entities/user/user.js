@@ -55,7 +55,7 @@ define([
                 lastName: "",
                 firstName: "",
                 middleName: "",
-                title: "",
+                title: "user",
                 contactInfo: {
                     email: ""
                 },

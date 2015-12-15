@@ -37,16 +37,21 @@ define([
     'underscore',
     'backbone',
     'backbone.radio',
-    'marionette'
-], function($, _, Backbone, Radio, Marionette){
+    'marionette',
+    'views/main/default_home'
+], function($, _, Backbone, Radio, Marionette, DefaultHomeView){
 
     var HomeController =  Marionette.Controller.extend({
         showHome: function(){
             $.ajax({
                 url: "app/home"
             }).done(function(response){
-                if(response.hasOwnProperty('home')){
-                    Backbone.history.navigate(response.home, {trigger: true});
+                if(!response.hasOwnProperty('home') || response.home === null || response.home === ""){
+                    console.log("Loading default home page.");
+                    var homeView = new DefaultHomeView();
+                    Radio.channel('main').trigger("show:content", homeView);
+                } else {
+                    Backbone.history.navigate(response.home, {replace: true, trigger: true});
                 }
             });
         }

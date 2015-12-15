@@ -104,14 +104,18 @@ define([
             if(typeof this.model !== 'undefined'){
                 var userPublic = this.model.get("userPublic");
                 var fullName = userPublic.firstName + " " + userPublic.lastName;
-                var title = userPublic.title;
-                var email = userPublic.contactInfo.email;
+                var title = userPublic.title || "User";
+                var email = userPublic.contactInfo.email || "None";
                 this.$("#pictureWrapper").html(this.model.getAvatar());
                 this.$("#nameField").html(fullName);
                 this.$("#userNameField").html('<span class="glyphicon glyphicon-user"></span>&nbsp;' +
                     this.model.get("name"));
-                this.$("#emailField").html('<span class="glyphicon glyphicon-envelope"></span>&nbsp;' +
-                    '<a href="mailto:' + email + '">' + email + '</a>');
+                if (email !== "None") {
+                    this.$("#emailField").html('<span class="glyphicon glyphicon-envelope"></span>&nbsp;' +
+                        '<a href="mailto:' + email + '">' + email + '</a>');
+                } else {
+                    this.$("#emailField").html("");
+                }
                 this.$("#titleField").html('<span class="glyphicon glyphicon-briefcase"></span>&nbsp;' + title);
 
             }

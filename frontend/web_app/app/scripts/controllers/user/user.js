@@ -57,7 +57,7 @@ define([
             Radio.channel('userManager').request('get:currentUser')
                 .done(function(curUser){
                     if(typeof curUser === 'undefined'){
-                        console.log("Error fetching curretn user.");
+                        console.log("Error fetching current user.");
                         return;
                     }
                     var asv = new AccountSettingsView({model: curUser});

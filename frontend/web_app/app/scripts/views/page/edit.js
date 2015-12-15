@@ -46,6 +46,7 @@ define([
        template: _.template(EditPageTemplate),
        model: PageModel,
        wikiModel: null,
+       homePage: false,
        regions: {
            editorContentRegion: "#editorContent",
            previewContentRegion: "#previewContent"
@@ -62,12 +63,16 @@ define([
            if(options.hasOwnProperty('wikiModel')){
                this.wikiModel = options.wikiModel;
            }
+           if(options.hasOwnProperty('homePage')){
+               this.homePage = options.homePage;
+           }
            this.model.on('invalid', this.showError, this);
            this.wipText.set("data", this.model.get("content").raw);
            this.editFormView = new EditFormView({
                model: this.model,
                wikiModel: this.wikiModel,
-               wipText: this.wipText
+               wipText: this.wipText,
+               homePage: this.homePage
            });
            this.editPreview = new EditPreview({
                model: this.model,
