@@ -174,6 +174,7 @@ func (uc UsersController) Register(container *restful.Container) {
 		Param(usersWebService.QueryParameter("pageNum", "Page Number").DataType("integer")).
 		Param(usersWebService.QueryParameter("numPerPage", "Number of records to return").DataType("integer")).
 		Param(usersWebService.QueryParameter("forResource", "Return users that have of roles associated with a resource").DataType("string")).
+		Param(usersWebService.QueryParameter("searchText", "Returns users that match the search text")).
 		Writes(UserListResponse{}))
 	//Add routes form avatars to the users controller
 	ac.AddRoutes(usersWebService)
@@ -543,6 +544,7 @@ func (uc UsersController) list(request *restful.Request,
 	}
 	ulr := UserListQueryResponse{}
 	forResource := request.QueryParameter("forResource")
+	searchText := request.QueryParameter("searchText")
 	var err error
 	if forResource != "" {
 		//Make sure the user is an admin for the given resource
@@ -555,6 +557,8 @@ func (uc UsersController) list(request *restful.Request,
 			WriteRole(forResource), ReadRole(forResource)}
 		err = new(UserManager).GetUserListForRole(
 			pageNum, limit, rolesArray, &ulr, curUser)
+	} else if searchText != "" {
+		err = new(UserManager).SearchForUsersByName(pageNum, limit, searchText, &ulr, curUser)
 	} else {
 		err = new(UserManager).GetUserList(pageNum, limit, &ulr, curUser)
 	}

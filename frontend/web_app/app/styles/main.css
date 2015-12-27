@@ -230,9 +230,15 @@ div#userInfoModal .avatar-wrapper {
 }
 
 div.table-controls {
-  float: right;
+  display: inline;
+}
+div.table-controls form.search-form {
+  float: left;
+  display: inline;
 }
 div.table-controls button.control-button {
+  float: right;
+  display: inline;
   border: none;
   border-radius: 0;
   color: #1ABC9C;
@@ -538,6 +544,19 @@ div#container div#menuToggle {
 div#container div#content {
   width: 100%;
   position: relative;
+}
+
+.addon-clickable {
+  background-color: white;
+  color: #1ABC9C;
+}
+.addon-clickable:hover {
+  cursor: pointer;
+  background-color: #1ABC9C;
+  color: white;
+}
+.addon-clickable:active {
+  background-color: #16A085;
 }
 
 div#container.toggled {

@@ -196,6 +196,19 @@ div#container{
   }
 }
 
+.addon-clickable{
+  background-color: white;
+  color: $lightShade;
+  &:hover{
+    cursor: pointer;
+    background-color: $lightShade;
+    color: white;
+  }
+  &:active{
+    background-color: $darkShade;
+  }
+}
+
 div#container.toggled{
     padding-left: 260px;
     .sidebar{

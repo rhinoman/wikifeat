@@ -40,8 +40,14 @@ div#userInfoModal{
 }
 
 div.table-controls {
-  float: right;
+  display:inline;
+  form.search-form{
+    float: left;
+    display: inline;
+  }
   button.control-button {
+    float: right;
+    display: inline;
     border: none;
     border-radius: 0;
     color: $lightShade;

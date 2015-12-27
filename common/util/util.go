@@ -139,3 +139,30 @@ func EncodeJsonData(data interface{}) (io.Reader, int, error) {
 		return bytes.NewReader(buf), len(buf), nil
 	}
 }
+
+//Returns a minimum of two integers
+func MinInt(x, y int) int {
+	if x < y {
+		return x
+	} else {
+		return y
+	}
+}
+
+//Returns a maximum of two integers
+func MaxInt(x, y int) int {
+	if x > y {
+		return x
+	} else {
+		return y
+	}
+}
+
+//Returns the Absolute value of an int
+func AbsInt(x int) int {
+	if x < 0 {
+		return -x
+	} else {
+		return x
+	}
+}

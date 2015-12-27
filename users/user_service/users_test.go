@@ -104,6 +104,10 @@ func TestUsers(t *testing.T) {
 		user := entities.User{
 			UserName: "Steven.Smith",
 			Password: "jabberwocky",
+			Public: entities.UserPublic{
+				LastName:  "Smith",
+				FirstName: "Steven",
+			},
 		}
 		registration := user_service.Registration{
 			NewUser: user,
@@ -245,6 +249,15 @@ func TestUsers(t *testing.T) {
 			Convey("Error should be nil and we should have some results", func() {
 				So(err, ShouldBeNil)
 				So(len(userList.Rows) >= 2, ShouldBeTrue)
+				t.Logf("UserListResponse: %v", userList)
+			})
+		})
+		Convey("When a user search is requested", func() {
+			userList := user_service.UserListQueryResponse{}
+			err := um.SearchForUsersByName(1, 5, "Smith", &userList, smithUser())
+			Convey("Error should be nil and we should have some results", func() {
+				So(err, ShouldBeNil)
+				So(len(userList.Rows), ShouldEqual, 2)
 				t.Logf("UserListResponse: %v", userList)
 			})
 		})

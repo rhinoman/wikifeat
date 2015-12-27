@@ -48,14 +48,6 @@ define([
 
         url: "/api/v1/users",
 
-        /*url: function() {
-            var params = {};
-            if (this.resource !== ""){
-                params.forResource = this.resource;
-            }
-            return this.urlRoot + '?' + $.param(params);
-        },*/
-
         resource: "",
 
         comparator: "name",

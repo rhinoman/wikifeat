@@ -50,7 +50,9 @@ define([
         childView: ManageUsersItemView,
         childViewContainer: "#userListContainer",
         additionalEvents: {
-            'click #addUserButton' : 'addUser'
+            'click #addUserButton' : 'addUser',
+            'click a#submitSearchForm': 'searchUsers',
+            'submit #userSearchForm' : 'searchUsers'
         },
         childEvents: {
             'admin:enabled': function(){
@@ -80,6 +82,20 @@ define([
                 self.collection.add(data);
             });
             Radio.channel('main').trigger('show:dialog', editUserDialog);
+        },
+
+        //Search for a user (or users)
+        searchUsers: function(event){
+            event.preventDefault();
+            var self = this;
+            var searchText = this.$("input#searchText").val();
+            var param = {searchText: searchText};
+            Radio.channel('userManager').request("get:allUserList", param)
+                .done(function(data){
+                    if(typeof data !== 'undefined') {
+                        self.collection.reset(data.models);
+                    }
+                });
         }
 
     });

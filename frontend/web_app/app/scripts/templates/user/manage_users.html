@@ -2,6 +2,17 @@
 <hr>
 <div id="alertBox"></div>
 <div class="table-controls">
+    <form class="search-form form-inline" id="userSearchForm" role="form">
+        <div class="form-group">
+            <label class="sr-only">Search</label>
+            <div class="input-group">
+                <input id="searchText" class="form-control" type="text"/>
+                <a class="input-group-addon addon-clickable" id="submitSearchForm">
+                        <span class="glyphicon glyphicon-search"></span>
+                </a>
+            </div>
+        </div>
+    </form>
     <button class="btn control-button" id="addUserButton">
         <span class="plus-prepend">+</span>
         <span class="glyphicon glyphicon-user"></span>&nbsp;Add New User

@@ -305,7 +305,10 @@ func (um *UserManager) ResetPassword(id string, tr *ResetTokenRequest) error {
 	expireTime := user.PassResetToken.Expires
 	nowTime := time.Now().UTC()
 	if tok != tr.Token || nowTime.After(expireTime) {
-		return errors.New("[Error]:400: This token is invalid or expired.")
+		return &couchdb.Error{
+			StatusCode: 400,
+			Reason:     "This token is invalid or expired.",
+		}
 	}
 	cpr := ChangePasswordRequest{NewPassword: tr.NewPassword}
 	rev, err = um.ChangePassword(id, rev, &cpr, GetAdminUser())
@@ -518,6 +521,77 @@ func (um *UserManager) GetUserList(pageNum int, numPerPage int,
 		return err
 	}
 	return nil
+}
+
+// Get a list of users that match the specified searchText
+func (um *UserManager) SearchForUsersByName(pageNum int, numPerPage int,
+	searchText string, ulr *UserListQueryResponse, curUser *CurrentUserInfo) error {
+	if numPerPage == 0 {
+		numPerPage = 25
+	}
+	if pageNum == 0 {
+		pageNum = 1
+	}
+	if !util.IsAnyAdmin(curUser.User.Roles) {
+		return NotAdminError()
+	}
+	numChan := make(chan int, 1)
+	ulrChan := make(chan *UserListQueryResponse, 1)
+	// Get the number of last and first name results that match our query
+	go um.getUserSearchCount(searchText, "usersByName", numChan)
+	// Determine number of last name results we need to grab
+	skip := numPerPage * (pageNum - 1)
+	go um.searchUsers(numPerPage, skip, searchText, "usersByName", ulrChan)
+	nameCount := <-numChan
+	readUlr := <-ulrChan
+	if readUlr == nil {
+		return &couchdb.Error{
+			StatusCode: 500,
+			Reason:     "Internal Error occurred.",
+		}
+	}
+	//Copy the readUlr into the ulr
+	for _, row := range readUlr.Rows {
+		ulr.Rows = append(ulr.Rows, row)
+	}
+	// Total rows is the total number of last name results + the
+	// total number of first name results.
+	ulr.TotalRows = nameCount
+	return nil
+}
+
+func (um *UserManager) getUserSearchCount(searchText, query string, count chan int) {
+	params := url.Values{}
+	params.Add("key", util.QuotifyString(searchText))
+	userDb := Connection.SelectDB("_users", AdminAuth)
+	cr := CountResponse{}
+	err := userDb.GetView("user_queries", query, &cr, &params)
+	if err == nil && len(cr.Rows) > 0 {
+		count <- cr.Rows[0].Value
+	} else {
+		log.Printf("Error reading search count: %v", err)
+		count <- 0
+	}
+}
+
+func (um *UserManager) searchUsers(numRecords int, skip int,
+	searchText string, query string, ulrChan chan *UserListQueryResponse) {
+	params := url.Values{}
+	//	params.Add("startkey", util.QuotifyString(searchText))
+	//	params.Add("endkey", util.QuotifyString(searchText+"Z"))
+	params.Add("key", util.QuotifyString(searchText))
+	params.Add("reduce", "false")
+	params.Add("limit", strconv.Itoa(numRecords))
+	params.Add("skip", strconv.Itoa(skip))
+	userDb := Connection.SelectDB("_users", AdminAuth)
+	ulr := UserListQueryResponse{}
+	err := userDb.GetView("user_queries", query, &ulr, &params)
+	if err == nil {
+		ulrChan <- &ulr
+	} else {
+		log.Printf("Error in search query: %v", err)
+		ulrChan <- nil
+	}
 }
 
 //Get list of users by role(s)
