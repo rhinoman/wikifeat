@@ -57,6 +57,11 @@ define([
             }
         },
 
+        additionalEvents: {
+            'click a#submitSearchForm': 'searchUsers',
+            'submit #userSearchForm': 'searchUsers'
+        },
+
         childEvents: {
             'add:member': function(childView, member){
                 this.memberList.add(member);
@@ -77,6 +82,20 @@ define([
             if(options.hasOwnProperty('memberList')){
                 this.memberList = options.memberList;
             }
+        },
+
+        // Search for a user (or users)
+        searchUsers: function(event){
+            event.preventDefault();
+            var self = this;
+            var searchText = this.$("input#searchText").val();
+            var param = {searchText: searchText};
+            Radio.channel('userManager').request("get:allUserList", param)
+                .done(function(data){
+                    if(typeof data !== "undefined"){
+                        self.collection.reset(data.models);
+                    }
+                });
         },
 
         onShow: function(){
