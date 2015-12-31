@@ -127,7 +127,7 @@ define([
                         return;
                     }
                     self.initLayout(wikiModel);
-                    if(typeof pageId !== 'undefined'){
+                    if(typeof pageId !== 'undefined' && pageId !== null){
                         Radio.channel('page').trigger(showPageMsg,
                             pageId, wikiModel, options);
                     } else if(wikiModel.get('homePageId') != ""){

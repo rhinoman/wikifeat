@@ -80,6 +80,7 @@ define([
         events: {
             'click a#viewCurrentPageLink': 'showCurrentPage',
             'click a#editorName':          'showEditorInfo',
+            'click .page-content a': 'clickPageLink'
         },
 
         initialize: function(options){
@@ -110,6 +111,29 @@ define([
             event.preventDefault();
             var editorInfoDialog = new UserInfoDialog({model: this.editorModel});
             Radio.channel('main').trigger('show:dialog', editorInfoDialog);
+        },
+
+        clickPageLink: function(event){
+            var r = new RegExp('^(?:[a-z]+:)?//');
+            var dest = $(event.currentTarget).attr("href");
+            if(!r.test(dest)){
+                event.preventDefault();
+                //we have an internal link
+                var path = dest.trim().split("/");
+                //The first element is an empty string, so..
+                path.shift();
+                if(path[0] === "wikis"){
+                    //We have a link to a wiki (or wiki page)
+                    console.log("we have a wiki link");
+                    var theWiki = path[1];
+                    var thePage = path[2];
+                    if(theWiki){
+                        Radio.channel('wiki').trigger('show:wiki', theWiki, thePage);
+                    }
+                }
+                //Other possibilities... plugins
+                console.log(path);
+            }
         },
 
         /* on render callback */
