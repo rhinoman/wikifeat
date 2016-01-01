@@ -61,7 +61,7 @@ define([
         //Somebody clicked on a wiki in the navbar
         navigateToWiki: function(event){
             event.preventDefault();
-            Radio.channel('sidebar').trigger('active:link', event.currentTarget);
+            //Radio.channel('sidebar').trigger('active:link', event.currentTarget);
             Radio.channel('wiki').trigger('show:wiki', this.model.get('id'));
             console.log("Navigate to " + this.model.get('name'));
         },

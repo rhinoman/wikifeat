@@ -124,7 +124,6 @@ define([
                 path.shift();
                 if(path[0] === "wikis"){
                     //We have a link to a wiki (or wiki page)
-                    console.log("we have a wiki link");
                     var theWiki = path[1];
                     var thePage = path[2];
                     if(theWiki){
@@ -132,7 +131,6 @@ define([
                     }
                 }
                 //Other possibilities... plugins
-                console.log(path);
             }
         },
 

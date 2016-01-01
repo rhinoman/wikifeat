@@ -80,6 +80,7 @@ define([
             var editWikiView = new EditWikiView({model: wikiModel});
             this.wikiLayout.pageViewRegion.show(editWikiView);
             Backbone.history.navigate('/wikis/create');
+            Radio.channel('sidebar').trigger('active:admin:createWiki');
             //Radio.channel('main').trigger('show:content', editWikiView);
         },
 
@@ -127,6 +128,7 @@ define([
                         return;
                     }
                     self.initLayout(wikiModel);
+                    Radio.channel('sidebar').trigger('active:wiki', wikiModel.get('slug'));
                     if(typeof pageId !== 'undefined' && pageId !== null){
                         Radio.channel('page').trigger(showPageMsg,
                             pageId, wikiModel, options);

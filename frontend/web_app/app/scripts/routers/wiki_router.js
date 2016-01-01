@@ -58,12 +58,14 @@ define([
             },
             showWiki: function(wikiSlug){
                 Radio.channel('wiki').trigger('show:slug:wiki', wikiSlug);
+                this.setActiveWiki(wikiSlug);
             },
             editWiki: function(wikiSlug){
                 Radio.channel('wikiManager').request('get:slug:wiki', wikiSlug)
                     .done(function(wikiModel){
                         Radio.channel('wiki').trigger('edit:wiki', wikiModel);
                     });
+                this.setActiveWiki(wikiSlug);
             },
             wikiFiles: function(wikiSlug){
                 Radio.channel('wikiManager').request('get:slug:wiki', wikiSlug)
@@ -71,6 +73,7 @@ define([
                         Radio.channel('wiki').trigger('init:layout', wikiModel);
                         Radio.channel('file').trigger('manage:files', wikiModel);
                     });
+                this.setActiveWiki(wikiSlug);
             },
             wikiMembers: function(wikiSlug){
                 Radio.channel('wikiManager').request('get:slug:wiki', wikiSlug)
@@ -78,6 +81,7 @@ define([
                         Radio.channel('wiki').trigger('init:layout', wikiModel);
                         Radio.channel('user').trigger('manage:members', wikiModel);
                     });
+                this.setActiveWiki(wikiSlug);
             },
             showRevision: function(wikiSlug, pageSlug, revisionId){
                 Radio.channel('wikiManager').request('get:slug:wiki', wikiSlug)
@@ -86,18 +90,27 @@ define([
                         Radio.channel('page').trigger('show:page:revision',
                             pageSlug,wikiModel,revisionId,{slug:true})
                     });
+                this.setActiveWiki(wikiSlug);
             },
             showPage: function(wikiSlug, pageSlug){
                 Radio.channel('wiki').trigger('show:slug:wiki', wikiSlug, pageSlug);
+                this.setActiveWiki(wikiSlug);
             },
             showPageHistory: function(wikiSlug, pageSlug){
                 Radio.channel('wiki').trigger('show:slug:wiki',
-                    wikiSlug, pageSlug, {history: true})
+                    wikiSlug, pageSlug, {history: true});
+                this.setActiveWiki(wikiSlug);
             },
             editPage: function(wikiSlug, pageSlug){
                 Radio.channel('wiki').trigger('show:slug:wiki',
                     wikiSlug, pageSlug, {edit: true});
+                this.setActiveWiki(wikiSlug);
+            },
+            //utility function, not a route
+            setActiveWiki: function(wikiName){
+                Radio.channel('sidebar').trigger('active:wiki', wikiName);
             }
         }
+
     });
 });

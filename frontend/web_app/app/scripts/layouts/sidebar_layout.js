@@ -55,7 +55,13 @@ define([
             wikiListRegion: "#wikiList"
         },
 
-        onRender: function(){}
+        onRender: function(){},
+
+        setActiveLink: function(link){
+            $(this.el).find('a').removeClass('currentSelection');
+            $(link).addClass('currentSelection');
+        }
+
     });
 
 });

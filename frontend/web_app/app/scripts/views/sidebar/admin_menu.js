@@ -40,30 +40,74 @@ define([
             AdminMenuTemplate){
 
     return Marionette.ItemView.extend({
-        id: 'admin-menu',
         template: _.template(AdminMenuTemplate),
         events: {
             'click a#createWikiLink': 'createWiki',
             'click a#manageUsersLink': 'manageUsers'
         },
+        activeMenu: null,
 
         initialize: function(){
             console.log("displaying admin menu");
         },
 
+        expandMenu: function(){
+            if(!this.isExpanded()) {
+                $(this.el).find("div#adminSubMenu").addClass("in");
+            }
+        },
+
+        isExpanded: function(){
+            return $(this.el).find("div#adminSubMenu").hasClass("in");
+        },
+
+        setManageUsers: function(){
+            this.activeMenu = "manageUsers";
+            var link = $(this.el).find("a#manageUsersLink");
+            if(link){
+                this.setLink(link);
+            }
+        },
+
+        setCreateWiki: function(){
+            this.activeMenu = "createWiki";
+            var link = $(this.el).find("a#createWikiLink");
+            if(link){
+                this.setLink(link);
+            }
+        },
+
         createWiki: function(event){
             event.preventDefault();
-            Radio.channel('sidebar').trigger('active:link', event.currentTarget);
+            //this.setCreateWiki();
             Radio.channel('wiki').trigger('create:wiki');
         },
 
         manageUsers: function(event){
             event.preventDefault();
-            Radio.channel('sidebar').trigger('active:link', event.currentTarget);
+            //this.setManageUsers();
             Radio.channel('user').trigger('manage:users');
         },
 
-        onRender: function(){},
+        setLink: function(link){
+            Radio.channel('sidebar').trigger('active:link', link);
+            this.expandMenu();
+        },
+
+        onRender: function(){
+            if(this.activeMenu !== null){
+                switch(this.activeMenu){
+                    case("manageUsers"):
+                        var link = $(this.el).find("a#manageUsersLink");
+                        this.setLink(link);
+                        break;
+                    case("createWiki"):
+                        var link = $(this.el).find("a#createWikiLink");
+                        this.setLink(link);
+                        break;
+                }
+            }
+        },
 
         onClose: function(){}
 

@@ -33,16 +33,47 @@ define([
     'jquery',
     'underscore',
     'marionette',
+    'backbone.radio',
     'backbone.stickit',
     'bootstrap',
     'views/sidebar/wiki_list_item',
     'text!templates/sidebar/wiki_list.html'
-], function($,_,Marionette,Stickit,Bootstrap,WikiListItemView,WikiListTemplate){
+], function($,_,Marionette,Radio,Stickit,Bootstrap,WikiListItemView,WikiListTemplate){
 
     return Marionette.CompositeView.extend({
         template: _.template(WikiListTemplate),
         childView: WikiListItemView,
-        childViewContainer: "#wikiSubMenu"
+        childViewContainer: "#wikiSubMenu",
+        selectedWiki: null,
+
+        expandMenu: function(){
+            if(!this.isExpanded()) {
+                $(this.el).find("div#wikiSubMenu").addClass("in");
+            }
+        },
+
+        isExpanded: function(){
+            return $(this.el).find("div#wikiSubMenu").hasClass("in");
+        },
+
+        setActiveWikiBySlug: function(slug){
+            var self = this;
+            this.selectedWiki = slug;
+            this.children.each(function(view){
+                if(view.model.get('slug') === self.selectedWiki){
+                    var links = $(view.el).children('a');
+                    if(links.length > 0) {
+                        Radio.channel('sidebar').trigger('active:link', links[0]);
+                        self.expandMenu();
+                    }
+                }
+            });
+        },
+        onRender: function(){
+            if(this.selectedWiki !== null) {
+                this.setActiveWikiBySlug(this.selectedWiki);
+            }
+        }
     });
 
 });

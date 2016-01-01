@@ -77,6 +77,7 @@ define([
                     }
                     var muv = new ManageUsersView({collection: userList});
                     Radio.channel('main').trigger('show:content', muv);
+                    Radio.channel('sidebar').trigger('active:admin:manageUsers');
                     Backbone.history.navigate('/users/manage');
                 });
         },

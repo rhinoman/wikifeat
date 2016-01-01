@@ -55,6 +55,8 @@ define([
     var sideBarLayout = new SidebarLayout();
     var logoView = new LogoView();
     var wikiCollection = new WikiCollection();
+    var adminMenuView = new AdminMenuView();
+    var wikiListView = new WikiListView({collection: wikiCollection});
     var SideBarController = Marionette.Controller.extend({
         drawSideBar: function(){
             //Get the current user data
@@ -79,14 +81,14 @@ define([
                 }
                 sideBarLayout.userMenuRegion.show(userMenuView);
                 if (data.isAdmin() === true){
-                    var adminMenuView = new AdminMenuView();
                     sideBarLayout.adminMenuRegion.show(adminMenuView);
+                } else {
+                    adminMenuView.destroy();
                 }
                 //Get our wiki list
                 wikiChannel.request('get:memberWikiList', data).done(function(data){
                     if(typeof data !== 'undefined') {
                         wikiCollection.reset(data.models);
-                        var wikiListView = new WikiListView({collection: wikiCollection});
                         sideBarLayout.wikiListRegion.show(wikiListView);
                     }
                 });
@@ -110,8 +112,7 @@ define([
             this.drawSideBar();
         },
         setActiveLink: function(link){
-            $(sideBarLayout.el).find('a').removeClass('currentSelection');
-            $(link).addClass('currentSelection');
+            sideBarLayout.setActiveLink(link);
         }
     });
     var sideBarController = new SideBarController();
@@ -134,6 +135,27 @@ define([
     //Remove a wiki from the list (usually called when a wiki is deleted).
     sideBarChannel.on('remove:wiki', function(wikiModel){
         wikiCollection.remove(wikiModel);
+    });
+    //Set an active wiki by slug
+    sideBarChannel.on('active:wiki', function(wiki){
+        //sideBarController.setActiveWikiBySlug(wiki);
+        wikiListView.setActiveWikiBySlug(wiki);
+    });
+    //Expand the Wiki Menu
+    sideBarChannel.on('expand:wikis', function(){
+        wikiListView.expandMenu();
+    });
+    //Set the manage users link
+    sideBarChannel.on('active:admin:manageUsers', function(){
+        if(adminMenuView !== null){
+            adminMenuView.setManageUsers();
+        }
+    });
+    //Set the create wiki link
+    sideBarChannel.on('active:admin:createWiki', function(){
+        if(adminMenuView !== null){
+            adminMenuView.setCreateWiki();
+        }
     });
 
     return sideBarController;
