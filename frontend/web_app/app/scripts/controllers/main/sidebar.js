@@ -56,13 +56,13 @@ define([
     var logoView = new LogoView();
     var wikiCollection = new WikiCollection();
     var adminMenuView = new AdminMenuView();
+    var userMenuView = null;
     var wikiListView = new WikiListView({collection: wikiCollection});
     var SideBarController = Marionette.Controller.extend({
         drawSideBar: function(){
             //Get the current user data
             var currentUser = userChannel.request('get:currentUser');
             currentUser.done(function(data){
-                var userMenuView;
                 if(typeof data === 'undefined') {
                     //Well, something went wrong
                     //This often happens if we have a stale session hanging around.
@@ -157,6 +157,11 @@ define([
             adminMenuView.setCreateWiki();
         }
     });
-
+    //Set the account settings link
+    sideBarChannel.on('active:user:accountSettings', function(){
+        if(userMenuView !== null && userMenuView.setAccountSettings){
+            userMenuView.setAccountSettings();
+        }
+    });
     return sideBarController;
 });

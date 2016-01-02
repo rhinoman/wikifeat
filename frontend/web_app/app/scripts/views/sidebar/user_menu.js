@@ -49,25 +49,46 @@ define([
         model: UserModel,
         bindings: {
             '#userNameText': {
-                observe: 'name',
-                //observe: 'userPublic',
-                //onGet: function(data){
-                //    return data.firstName + " " + data.lastName;
-                //}
+                observe: 'name'
             }
         },
         events: {
             "click a#accountSettingsLink": "accountSettings",
             "click a#logoutLink": "logout"
         },
+        activeMenu: null,
 
         template: _.template(UserMenuTemplate),
 
         /* Account Settings Menu */
         accountSettings: function(event){
             event.preventDefault();
-            Radio.channel('sidebar').trigger('active:link', event.currentTarget);
+            Radio.channel('sidebar').trigger('active:user:accountSettings');
             Radio.channel('user').trigger('user:accountSettings');
+        },
+
+        // Sets the account settings link in the sidebar
+        setAccountSettings: function(){
+            this.activeMenu = "accountSettings";
+            var link = $(this.el).find("a#accountSettingsLink")
+            if(link){
+                this.setLink(link);
+            }
+        },
+
+        setLink: function(link){
+            Radio.channel('sidebar').trigger('active:link', link);
+            this.expandMenu();
+        },
+
+        expandMenu: function(){
+            if(!this.isExpanded()){
+                $(this.el).find("div#userSubMenu").addClass("in");
+            }
+        },
+
+        isExpanded: function(){
+            return $(this.el).find("div#userSubMenu").hasClass("in");
         },
 
         /* Logout the current user */
@@ -81,6 +102,13 @@ define([
             if(typeof this.model !== 'undefined') {
                 this.stickit();
                 this.$("#currentUserThumb").html(this.model.getAvatarThumbnail());
+            }
+            if(this.activeMenu !== null){
+                switch(this.activeMenu){
+                    case("accountSettings"):
+                        this.setAccountSettings();
+                        break;
+                }
             }
         },
 

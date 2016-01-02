@@ -182,8 +182,6 @@ define([
 
         },
 
-
-
         drawChildIndex: function(response){
             this.$("div#childIndex").show();
             this.pageChildIndexRegion.show(

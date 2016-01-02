@@ -58,11 +58,15 @@ define([
                 .done(function(curUser){
                     if(typeof curUser === 'undefined'){
                         console.log("Error fetching current user.");
-                        return;
+                    } else if(curUser.get('name') === 'guest'){
+                        //redirect to home page
+                        window.location = '/app';
+                    } else {
+                        var asv = new AccountSettingsView({model: curUser});
+                        Radio.channel('main').trigger('show:content', asv);
+                        Radio.channel('sidebar').trigger('active:user:accountSettings');
+                        Backbone.history.navigate('/users/account');
                     }
-                    var asv = new AccountSettingsView({model: curUser});
-                    Radio.channel('main').trigger('show:content', asv);
-                    Backbone.history.navigate('/users/account');
                 })
         },
 
