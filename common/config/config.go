@@ -34,6 +34,7 @@ package config
 import (
 	"fmt"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/alyu/configparser"
+	"github.com/rhinoman/wikifeat/common/auth"
 	"log"
 	"strconv"
 )
@@ -77,6 +78,7 @@ var Logger struct {
 }
 
 var Auth struct {
+	Authenticator      auth.AuthType
 	SessionTimeout     int
 	PersistentSessions bool
 	AllowGuest         bool
@@ -126,6 +128,7 @@ func LoadDefaults() {
 	Logger.MaxSize = 10
 	Logger.MaxBackups = 3
 	Logger.MaxAge = 30
+	Auth.Authenticator = auth.Standard
 	Auth.SessionTimeout = 600
 	Auth.PersistentSessions = true
 	Auth.AllowGuest = true
@@ -337,6 +340,8 @@ func setLogConfig(logSection *configparser.Section) {
 func setAuthConfig(authSection *configparser.Section) {
 	for key, value := range authSection.Options() {
 		switch key {
+		case "authenticator":
+			Auth.Authenticator = auth.StringToAuthType(value)
 		case "sessionTimeout":
 			setIntVal(value, &Auth.SessionTimeout)
 		case "persistentSessions":

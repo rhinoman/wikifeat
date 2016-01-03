@@ -34,6 +34,7 @@ import (
 	"errors"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/common/auth"
 	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/util"
@@ -133,9 +134,10 @@ func LogError(request *restful.Request, resp *restful.Response, err error) {
 //Filter function, figures out the current user from the auth header
 func AuthUser(request *restful.Request, resp *restful.Response,
 	chain *restful.FilterChain) {
-	auth, err := GetAuth(request.Request)
+	authenticator := auth.NewAuthenticator(config.Auth.Authenticator)
+	cAuth, err := authenticator.GetAuth(request.Request)
 	if err != nil && config.Auth.AllowGuest {
-		auth = &couchdb.BasicAuth{
+		cAuth = &couchdb.BasicAuth{
 			Username: "guest",
 			Password: "guest",
 		}
@@ -143,84 +145,23 @@ func AuthUser(request *restful.Request, resp *restful.Response,
 		Unauthenticated(request, resp)
 		return
 	}
-	userInfo, err := GetUserFromAuth(auth)
+	userInfo, err := GetUserFromAuth(cAuth)
 	if err != nil {
 		Unauthenticated(request, resp)
 		return
 	}
 	cui := &CurrentUserInfo{
-		Auth: auth,
+		Auth: cAuth,
 		User: userInfo,
 	}
 	request.SetAttribute("currentUser", cui)
 	chain.ProcessFilter(request, resp)
-
-}
-
-//Authenticates Request
-//Returns Auth header from request
-func GetAuth(request *http.Request) (couchdb.Auth, error) {
-	//What kind of authentication type do we have?
-	if request.Header.Get("Authorization") != "" {
-		//We have an authorization header, just use it
-		return &couchdb.PassThroughAuth{
-			AuthHeader: request.Header.Get("Authorization"),
-		}, nil
-	}
-	//Ok, Check for a session cookie
-	//TODO: CHECK FOR EXPIRED COOKIES!!!
-	var sessionToken string
-	var csrfToken string
-	for _, cookie := range request.Cookies() {
-		if cookie.Name == "AuthSession" {
-			sessionToken = cookie.Value
-		}
-		if cookie.Name == "CsrfToken" {
-			csrfToken = cookie.Value
-		}
-	}
-	if sessionToken == "" || csrfToken == "" {
-		return nil, errors.New("Unauthenticated")
-	}
-	//Set the cookie auth
-	cookieAuth := &couchdb.CookieAuth{
-		AuthToken: sessionToken,
-	}
-	//Better check for our Csrf Token
-	csrf := request.Header.Get("X-Csrf-Token")
-	//Csrf token should match the csrf cookie
-	if csrfToken == csrf {
-		//Request is good!
-		return cookieAuth, nil
-	} else {
-		//CSRF is bad, Go away!
-		return nil, errors.New("Unauthenticated")
-	}
 }
 
 //Set Updated auth cookies
-func SetAuth(response *restful.Response, auth couchdb.Auth) {
-	authData := auth.GetUpdatedAuth()
-	if authData == nil {
-		return
-	}
-	if val, ok := authData["AuthSession"]; ok {
-		authCookie := http.Cookie{
-			Name:     "AuthSession",
-			Value:    val,
-			Path:     "/",
-			HttpOnly: true,
-		}
-		//Create a CSRF cookie
-		csrfCookie := http.Cookie{
-			Name:     "CsrfToken",
-			Value:    util.GenHashString(val),
-			Path:     "/",
-			HttpOnly: false,
-		}
-		response.AddHeader("Set-Cookie", authCookie.String())
-		response.AddHeader("Set-Cookie", csrfCookie.String())
-	}
+func SetAuth(response *restful.Response, cAuth couchdb.Auth) {
+	authenticator := auth.NewAuthenticator(config.Auth.Authenticator)
+	authenticator.SetAuth(response.ResponseWriter, cAuth)
 }
 
 //Gets the current user from the header
