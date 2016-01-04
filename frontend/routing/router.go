@@ -54,8 +54,13 @@ var indexHtml string
 
 // Start doing the HTTP server/router thing
 func Start() {
+	curDir, err := util.GetExecDirectory()
+	if err != nil {
+		log.Fatal(err)
+	}
+	indexFile := path.Join(curDir, "/index.html")
 	webAppDir = config.Frontend.WebAppDir
-	finishIndex()
+	finishIndex(indexFile)
 	r := mux.NewRouter()
 	// Serve the login page
 	r.HandleFunc("/login", getLogin).Methods("GET")
@@ -98,13 +103,9 @@ func Start() {
 }
 
 // Opens up the index.html file and adds additional (mostly plugin) elements
-func finishIndex() {
+func finishIndex(filename string) {
 	log.Print("Finishing index file")
-	curDir, err := util.GetExecDirectory()
-	if err != nil {
-		log.Fatal(err)
-	}
-	filename := path.Join(curDir, "/index.html")
+
 	fileReader, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)

@@ -38,6 +38,6 @@ import (
 func TestFinishIndex(t *testing.T) {
 	webAppDir = "../web_app/app"
 	fserv.LoadPluginData("../plugins/plugins.ini")
-	finishIndex()
+	finishIndex("../index.html.template")
 	t.Logf("index html: %v", indexHtml)
 }
