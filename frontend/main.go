@@ -37,14 +37,19 @@ import (
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/common/services"
+	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/frontend/fserv"
 	"github.com/rhinoman/wikifeat/frontend/routing"
 	"log"
 )
 
 func main() {
+	defaultConfig, err := util.DefaultConfigLocation()
+	if err != nil {
+		log.Fatalf("Error settting config file: %v", err)
+	}
 	// Get Command line arguments
-	configFile := flag.String("config", "config.ini", "config file to load")
+	configFile := flag.String("config", defaultConfig, "config file to load")
 	flag.Parse()
 	// Load configuration
 	config.LoadConfig(*configFile)

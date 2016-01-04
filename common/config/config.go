@@ -35,7 +35,9 @@ import (
 	"fmt"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/alyu/configparser"
 	"github.com/rhinoman/wikifeat/common/auth"
+	"github.com/rhinoman/wikifeat/common/util"
 	"log"
+	"path"
 	"strconv"
 )
 
@@ -108,14 +110,18 @@ var Notifications struct {
 
 // Initialize Default values
 func LoadDefaults() {
+	execDir, err := util.GetExecDirectory()
+	if err != nil {
+		log.Fatal(err)
+	}
 	Service.DomainName = "127.0.0.1"
 	Service.RegistryLocation = "http://127.0.0.1:2379"
 	Service.Port = "6000"
 	Service.ApiVersion = "v1"
 	Service.NodeId = "cs1"
 	Service.UseSSL = false
-	Frontend.WebAppDir = "web_app/app"
-	Frontend.PluginDir = "plugins"
+	Frontend.WebAppDir = path.Join(execDir, "web_app/app")
+	Frontend.PluginDir = path.Join(execDir, "plugins")
 	Frontend.Homepage = ""
 	Database.DbAddr = "127.0.0.1"
 	Database.DbPort = "5984"
@@ -224,12 +230,21 @@ func setServiceConfig(serverSection *configparser.Section) {
 
 // Load Frontend configuration options
 func SetFrontendConfig(frontendSection *configparser.Section) {
+	execDir, _ := util.GetExecDirectory()
 	for key, value := range frontendSection.Options() {
 		switch key {
 		case "webAppDir":
-			Frontend.WebAppDir = value
+			if value[0] != '/' {
+				Frontend.WebAppDir = path.Join(execDir, value)
+			} else {
+				Frontend.WebAppDir = value
+			}
 		case "pluginDir":
-			Frontend.PluginDir = value
+			if value[0] != '/' {
+				Frontend.PluginDir = path.Join(execDir, value)
+			} else {
+				Frontend.PluginDir = value
+			}
 		case "homepage":
 			Frontend.Homepage = value
 		}

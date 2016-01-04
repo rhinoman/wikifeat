@@ -40,9 +40,27 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"path"
+	"path/filepath"
 	"strings"
 	"time"
 )
+
+//Returns the directory the executable is running from
+func GetExecDirectory() (string, error) {
+	return filepath.Abs(filepath.Dir(os.Args[0]))
+}
+
+//Returns the "default" config file name and location
+func DefaultConfigLocation() (string, error) {
+	dir, err := GetExecDirectory()
+	if err != nil {
+		return "", err
+	} else {
+		return path.Join(dir, "config.ini"), nil
+	}
+}
 
 //Just a package of utility functions that don't really belong
 //anywhere else

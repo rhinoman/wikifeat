@@ -61,6 +61,7 @@ crashlytics-build.properties
 
 #Other project specific stuff
 config.ini
+frontend/index.html
 default.etcd/
 users/users
 wikis/wikis

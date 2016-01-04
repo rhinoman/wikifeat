@@ -39,6 +39,7 @@ import (
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/services"
+	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/frontend/fserv"
 	"log"
 	"net/http"
@@ -99,7 +100,11 @@ func Start() {
 // Opens up the index.html file and adds additional (mostly plugin) elements
 func finishIndex() {
 	log.Print("Finishing index file")
-	filename := webAppDir + "/index.html"
+	curDir, err := util.GetExecDirectory()
+	if err != nil {
+		log.Fatal(err)
+	}
+	filename := path.Join(curDir, "/index.html")
 	fileReader, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
