@@ -14,4 +14,4 @@ stylesheet = style/ol.css
 version = 1.0
 pluginDir = plugins/ol
 mainScript = ol-plugin.js
-enabled = true
+enabled = false

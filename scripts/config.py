@@ -30,6 +30,10 @@ frontend_config_template = '../frontend/config.ini.example'
 frontend_config_file = '../frontend/config.ini'
 frontend_node_id = 'fe1'
 frontend_port = 8081
+frontend_index_template = '../frontend/index.html.template'
+frontend_index_file = '../frontend/index.html'
+frontend_plugin_template = '../frontend/plugins/plugins.ini.example'
+frontend_plugin_file = '../frontend/plugins/plugins.ini'
 
 
 def config_user_service(common_params, db_params):
@@ -84,6 +88,7 @@ def config_notifications_service(common_params, db_params):
 
 
 def config_frontend_service(common_params, db_params):
+    import shutil
     print("Configuring frontend service...")
     try:
         config = configobj.ConfigObj(
@@ -96,6 +101,8 @@ def config_frontend_service(common_params, db_params):
     config_database(config, db_params)
     with open(frontend_config_file, 'w') as out_file:
         config.write(out_file)
+    shutil.copyfile(frontend_index_template, frontend_index_file)
+    shutil.copyfile(frontend_plugin_template, frontend_plugin_file)
     return True
 
 
