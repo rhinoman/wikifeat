@@ -70,7 +70,7 @@ define([
                     if(typeof response !== 'undefined' && newComment) {
                         Radio.channel('commentsView').trigger('new:comment', response);
                     }
-                    self.cancelButtonClick().bind(self);
+                    self.destroy();
                 })
         },
 

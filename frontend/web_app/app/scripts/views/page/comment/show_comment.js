@@ -59,7 +59,7 @@ define([
         initialize: function(options){
             this.model.on('change', this.render, this);
             this.rm = new Marionette.RegionManager();
-            this.editorRegion =  this.rm.addRegion("editor", "#editorContainer_" + this.model.id);
+            this.rm.addRegion("editor", "#editorContainer_" + this.model.id);
         },
 
         templateHelpers: function(){
@@ -74,10 +74,12 @@ define([
         editComment: function(event){
             var ecv = new EditCommentView({model: this.model});
             this.$("#commentContent").css("display", "none");
-            this.rm.get("editor").show(ecv);
+            var editorRegion = this.rm.get("editor");
+            editorRegion.show(ecv);
             var self = this;
             ecv.on('destroy', function(){
                 self.$("#commentContent").css("display", "block");
+                editorRegion.reset();
             });
         },
 

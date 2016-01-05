@@ -88,8 +88,8 @@ func TestCMarkNodeOps(t *testing.T) {
 	if root.GetNodeTypeString() != "document" {
 		t.Error("Root is wrong type string!")
 	}
-	header1 := commonmark.NewCMarkNode(commonmark.CMARK_NODE_HEADER)
-	if header1.GetNodeType() != commonmark.CMARK_NODE_HEADER {
+	header1 := commonmark.NewCMarkNode(commonmark.CMARK_NODE_HEADING)
+	if header1.GetNodeType() != commonmark.CMARK_NODE_HEADING {
 		t.Error("header1 is wrong type!")
 	}
 	header1.SetHeaderLevel(1)
@@ -102,7 +102,7 @@ func TestCMarkNodeOps(t *testing.T) {
 		t.Error("header1str content is wrong!")
 	}
 	header1.AppendChild(header1str)
-	header2 := commonmark.NewCMarkNode(commonmark.CMARK_NODE_HEADER)
+	header2 := commonmark.NewCMarkNode(commonmark.CMARK_NODE_HEADING)
 	header2str := commonmark.NewCMarkNode(commonmark.CMARK_NODE_TEXT)
 	if header2str.SetLiteral("Another header!") == false {
 		t.Error("SetLiteral returned false for valid input")
@@ -113,6 +113,15 @@ func TestCMarkNodeOps(t *testing.T) {
 		t.Error("Couldn't prepend header to root")
 	}
 	root.AppendChild(header2)
+	custom := commonmark.NewCMarkNode(commonmark.CMARK_NODE_CUSTOM_BLOCK)
+	custom.SetOnEnter("ENTER")
+	custom.SetOnExit("EXIT")
+	if custom.GetOnEnter() != "ENTER" {
+		t.Errorf("OnEnter not set correctly: %v", custom.GetOnEnter())
+	}
+	if custom.GetOnExit() != "EXIT" {
+		t.Errorf("OnExit not set correctly: %v", custom.GetOnExit())
+	}
 	t.Logf("\nXML: %v", root.RenderXML(commonmark.CMARK_OPT_DEFAULT))
 
 	htmlStr := root.RenderHtml(commonmark.CMARK_OPT_DEFAULT)
@@ -262,8 +271,8 @@ func TestCMarkIter(t *testing.T) {
 
 func createTree() *commonmark.CMarkNode {
 	root := commonmark.NewCMarkNode(commonmark.CMARK_NODE_DOCUMENT)
-	header1 := commonmark.NewCMarkNode(commonmark.CMARK_NODE_HEADER)
-	header2 := commonmark.NewCMarkNode(commonmark.CMARK_NODE_HEADER)
+	header1 := commonmark.NewCMarkNode(commonmark.CMARK_NODE_HEADING)
+	header2 := commonmark.NewCMarkNode(commonmark.CMARK_NODE_HEADING)
 	header1str := commonmark.NewCMarkNode(commonmark.CMARK_NODE_TEXT)
 	header2str := commonmark.NewCMarkNode(commonmark.CMARK_NODE_TEXT)
 	header1str.SetLiteral("Header 1!")
