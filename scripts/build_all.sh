@@ -36,7 +36,9 @@ cp ../users/config.ini.example ${BUILD_DIR}/users/config.ini.example
 cp ../wikis/config.ini.example ${BUILD_DIR}/wikis/config.ini.example
 cp ../notifications/config.ini.example ${BUILD_DIR}/notifications/config.ini.example
 cp ../frontend/config.ini.example ${BUILD_DIR}/frontend/config.ini.example
+cp ../frontend/index.html.template ${BUILD_DIR}/frontend/index.html.template
 cp -R ../frontend/plugins ${BUILD_DIR}/frontend/plugins
+rm -f ${BUILD_DIR}/frontend/plugins/plugins.ini
 cp -R ../notifications/templates ${BUILD_DIR}/notifications/templates
 # "Compile" the webapp, then copy it to the build dir
 r.js -o ../frontend/web_app/app/scripts/app.build.js
