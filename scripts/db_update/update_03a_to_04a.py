@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-    Update Wikifeat couchdb databases from 0.3a to 0.3.1a
+    Update Wikifeat couchdb databases from 0.3a to 0.4.0a
     Note: Requires python3
 
     Changes:
