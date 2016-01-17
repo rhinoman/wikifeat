@@ -35,18 +35,18 @@ define([
     'marionette',
     'backbone.radio',
     'backbone.stickit',
-    'markdown',
+    'bootstrap',
+    'markette',
     'entities/wiki/page',
     'views/main/alert',
     'text!templates/page/edit_page_form.html'
-], function($,_,Marionette,Radio,Stickit,Markdown,
+], function($,_,Marionette,Radio,Stickit,Bootstrap,Markette,
             PageModel,AlertView,EditPageFormTemplate){
 
-    return Marionette.ItemView.extend({
+    return Markette.EditorView.extend({
         model: PageModel,
         template: _.template(EditPageFormTemplate),
         wikiModel: null,
-        wipText: null,
         homePage: false,
         bindings: {
             '#inputTitle': {
@@ -59,20 +59,21 @@ define([
         events: {
             'submit form#editPageForm': 'publishChanges',
             'click .page-cancel-button': 'cancelEdit',
-            'change #wmd-input': 'updateWipText'
+            'change textarea#marketteInput': 'updateWipText'
+        },
+        regions: {
+            "editorRegion" : "#editorContainer"
         },
 
         initialize: function(options){
             if(options.hasOwnProperty('wikiModel')){
                 this.wikiModel = options.wikiModel;
             }
-            if(options.hasOwnProperty('wipText')){
-                this.wipText = options.wipText;
-            }
             if(options.hasOwnProperty('homePage')){
                 this.homePage = options.homePage;
             }
             this.model.on('invalid', this.showError, this);
+            Markette.EditorView.prototype.initialize.call(this,options);
         },
 
         // Shows an error message
@@ -91,20 +92,13 @@ define([
             alertView.render();
         },
 
-        updateWipText: function(event){
-            if (this.wipText !== null) {
-                this.wipText.set('data', this.$("#wmd-input").val());
-            }
-        },
-
         //Save page edits to server
         publishChanges: function(event){
             event.preventDefault();
             this.$("#title-input-group").removeClass('has-error');
             var pageContent = _.clone(this.model.get('content'));
-            pageContent.raw = $("#wmd-input").val();
+            pageContent.raw = $("textarea#marketteInput").val();
             this.model.set('content', pageContent);
-
             var self=this;
             Radio.channel('page').request('save:page', this.model)
                 .done(this.afterSave.bind(this));
@@ -156,19 +150,15 @@ define([
             this.$(".alert").css('display','none');
             if(typeof this.model !== 'undefined'){
                 this.stickit();
+                this.setText(this.model.get('content').raw);
             }
-            if(this.wipText !== null) {
-                this.$("#wmd-input").html(this.wipText.get('data'));
-            }
-        },
-
-        onShow: function(){
-            var editor = new Markdown.Editor();
-            editor.run();
+            Markette.EditorView.prototype.onRender.call(this);
+            this.$('[data-toggle="tooltip"]').tooltip();
         },
 
         onClose: function(){
             this.unstickit();
+            Markette.EditorView.prototype.onClose.call(this);
         }
 
 

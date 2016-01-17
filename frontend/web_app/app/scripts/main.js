@@ -46,9 +46,10 @@ require.config({
         'backbone.paginator': 'vendor/backbone.paginator/lib/backbone.paginator',
         moment: 'vendor/moment/moment',
         wikifeat: 'vendor/wikifeat-api/wikifeat-api',
-        'commonmark': 'vendor/commonmark/dist/commonmark',
-        'markdown': 'vendor/wikifeat-pagedown/Markdown.Editor',
-        'markdown-converter': 'vendor/wikifeat-pagedown/Markdown.Converter'
+        commonmark: 'vendor/commonmark/dist/commonmark',
+        markdown: 'vendor/wikifeat-pagedown/Markdown.Editor',
+        'markdown-converter': 'vendor/wikifeat-pagedown/Markdown.Converter',
+        markette: 'vendor/markette/js/markette'
     },
     shim: {
         bootstrap: {
@@ -60,7 +61,7 @@ require.config({
         'markdown-converter': {
             exports: 'Markdown'
         },
-        'markdown': {
+        markdown: {
             deps: [
                 'markdown-converter'
             ],

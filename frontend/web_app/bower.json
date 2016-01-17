@@ -5,7 +5,7 @@
     "James Adam <james@jamesadam.me>"
   ],
   "main": "app/scripts/main.js",
-  "license": "None",
+  "license": "BSD-3-Clause",
   "private": true,
   "ignore": [
     "**/.*",
@@ -17,19 +17,22 @@
   ],
   "dependencies": {
     "jquery": "~2.1.1",
-    "underscore": "~1.6.0",
-    "backbone": "~1.1.2",
     "marionette": "~2.4.4",
-    "backbone.babysitter": "~0.1.5",
+    "underscore": "1.4.4 - 1.8.3",
+    "backbone": "~1.1.2",
     "backbone.radio": "~1.0.2",
     "backbone.basicauth": "~0.4.0",
-    "backbone.stickit": "~0.8.0",
+    "backbone.stickit": "~0.9.2",
     "backbone.paginator": "~2.0.2",
     "bootstrap": "~3.3.1",
     "requirejs": "latest",
     "requirejs-text": "latest",
     "jquery-cookie": "~1.4.1",
     "moment": "~2.9.0",
-    "commonmark": "~0.23"
+    "markette": "latest"
+  },
+  "resolutions": {
+    "underscore": "1.4.4 - 1.8.3",
+    "backbone": "~1.1.2"
   }
 }

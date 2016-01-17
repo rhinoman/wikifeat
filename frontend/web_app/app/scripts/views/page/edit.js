@@ -34,12 +34,12 @@ define([
     'jquery',
     'underscore',
     'marionette',
+    'markette',
     'entities/wiki/page',
     'views/page/edit_form',
-    'views/page/edit_preview',
     'text!templates/page/edit_page.html'
-], function($,_,Marionette,PageModel,EditFormView,
-            EditPreview,EditPageTemplate){
+], function($,_,Marionette,Markette,PageModel,
+            EditFormView,EditPageTemplate){
 
    return Marionette.LayoutView.extend({
        id: "edit-page-view",
@@ -55,9 +55,6 @@ define([
            'click #editLink': 'showEditForm',
            'click #previewLink': 'showPreview'
        },
-       wipText: new Backbone.Model({
-           data: null
-       }),
 
        initialize: function(options){
            if(options.hasOwnProperty('wikiModel')){
@@ -67,17 +64,12 @@ define([
                this.homePage = options.homePage;
            }
            this.model.on('invalid', this.showError, this);
-           this.wipText.set("data", this.model.get("content").raw);
            this.editFormView = new EditFormView({
                model: this.model,
                wikiModel: this.wikiModel,
-               wipText: this.wipText,
                homePage: this.homePage
            });
-           this.editPreview = new EditPreview({
-               model: this.model,
-               wipText: this.wipText
-           })
+           this.editPreview = new Markette.Preview();
        },
 
        showEditForm: function(event){
@@ -91,10 +83,11 @@ define([
        showPreview: function(event){
            event.preventDefault();
            this.$("div#editorContent").hide();
-           this.wipText.trigger('redisplay');
            this.$("div#previewContent").show();
            this.$("#editLink").parent("li").removeClass("active");
            this.$("#previewLink").parent("li").addClass("active");
+           var mdText = this.editFormView.getText();
+           this.editPreview.renderPreview(mdText);
        },
        onRender: function(){
 

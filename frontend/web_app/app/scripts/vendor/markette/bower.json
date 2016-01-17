@@ -1,0 +1,32 @@
+{
+  "name":"markette",
+  "description": "Commonmark editor for Marionette.js",
+  "version": "0.3.1",
+  "authors": [
+    "James Adam<james@jamesadam.me>"
+  ],
+  "main": [
+    "./js/markette.js",
+    "./css/markette.css"
+  ],
+  "license": "BSD-3-Clause",
+  "ignore": [
+    "**/.*",
+    "test",
+    "bower_components",
+    "index.html",
+    "*.md",
+    "*.iml"
+  ],
+  "keywords": [
+    "marionette",
+    "commonmark",
+    "markdown"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "marionette": "~2.4.4",
+    "bootstrap": "~3.3.1",
+    "commonmark": "~0.24"
+  }
+}

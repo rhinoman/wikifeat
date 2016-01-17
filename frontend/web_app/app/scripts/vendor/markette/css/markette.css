@@ -1,0 +1,31 @@
+textarea#marketteInput{
+    font-family: Consolas, Menlo, Monaco, Lucida Console, "Courier New", monospace, serif;
+    width: 100%;
+    margin-top:5px;
+}
+
+button#numberedListButton{
+    height: 100%;
+}
+
+button#numberedListButton{
+}
+
+button#numberedListButton p.li-num{
+    float:left;
+    display: inline;
+    font-size: 0.35em;
+    line-height: 1.25em;
+    margin:0;
+}
+
+span.mk-btn-text{
+    font-weight: bold;
+    font-size: smaller;
+    font-family: "Times New Roman", Times, serif;
+    vertical-align: text-top;
+}
+
+button.markette-btn {
+    border: none;
+}

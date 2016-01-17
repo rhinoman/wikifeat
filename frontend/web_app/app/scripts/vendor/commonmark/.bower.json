@@ -22,14 +22,14 @@
     "markdown",
     "commonmark"
   ],
-  "version": "0.23.0",
-  "_release": "0.23.0",
+  "version": "0.24.0",
+  "_release": "0.24.0",
   "_resolution": {
     "type": "version",
-    "tag": "0.23.0",
-    "commit": "33a946202a7c1112a4dc6cbd0547bf875bdc286d"
+    "tag": "0.24.0",
+    "commit": "f9090bb18d6ca454378af3896c8d77ddb09301ff"
   },
   "_source": "git://github.com/jgm/commonmark.js.git",
-  "_target": "~0.23",
+  "_target": "~0.24",
   "_originalSource": "commonmark"
 }

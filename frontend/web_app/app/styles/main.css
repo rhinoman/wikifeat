@@ -1,6 +1,7 @@
 /* Color Scheme */
 /* Wiki Styles */
 /* Color Scheme */
+@import url(../scripts/vendor/markette/css/markette.css);
 #wiki-toolbar {
   background-color: #333333;
   margin-bottom: 5px;
