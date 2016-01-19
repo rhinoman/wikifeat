@@ -39,9 +39,11 @@ define([
     'markette',
     'entities/wiki/page',
     'views/main/alert',
+    'views/page/edit/insert_link_dialog',
     'text!templates/page/edit_page_form.html'
 ], function($,_,Marionette,Radio,Stickit,Bootstrap,Markette,
-            PageModel,AlertView,EditPageFormTemplate){
+            PageModel,AlertView,InsertLinkDialog,
+            EditPageFormTemplate){
 
     return Markette.EditorView.extend({
         model: PageModel,
@@ -159,6 +161,21 @@ define([
         onClose: function(){
             this.unstickit();
             Markette.EditorView.prototype.onClose.call(this);
+        },
+
+        //Override Link functionality
+        doLink: function(event){
+            var self = this;
+            var ild = new InsertLinkDialog({
+                callback: function(url){
+                    self.$('textarea#marketteInput').focus();
+                    self.doInlineMarkup({
+                        before: '[',
+                        after: '](' + url + ')'
+                    });
+                }
+            });
+            Radio.channel('main').trigger('show:dialog', ild);
         }
 
 

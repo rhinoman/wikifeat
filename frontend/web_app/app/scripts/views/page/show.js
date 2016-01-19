@@ -43,7 +43,7 @@ define([
     'views/page/formatted_content',
     'views/user/user_info_dialog',
     'views/page/comment/comments',
-    'text!templates/page/page_layout.html',
+    'text!templates/page/page_layout.html'
 ], function($,_,Marionette,Moment,Radio,Stickit,
             PageModel,UserModel,ChildIndexView,
             PageToolMenu,RawContentView,FormattedContentView,

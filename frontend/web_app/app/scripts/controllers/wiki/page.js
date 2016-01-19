@@ -37,7 +37,7 @@ define([
     'backbone.radio',
     'entities/wiki/page',
     'views/page/show',
-    'views/page/edit',
+    'views/page/edit/edit',
     'views/page/placeholder',
     'views/page/history'
 ], function($,_,Marionette,Radio,PageModel,

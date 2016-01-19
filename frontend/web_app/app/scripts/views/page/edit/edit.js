@@ -36,7 +36,7 @@ define([
     'marionette',
     'markette',
     'entities/wiki/page',
-    'views/page/edit_form',
+    'views/page/edit/edit_form',
     'text!templates/page/edit_page.html'
 ], function($,_,Marionette,Markette,PageModel,
             EditFormView,EditPageTemplate){
@@ -90,8 +90,6 @@ define([
            this.editPreview.renderPreview(mdText);
        },
        onRender: function(){
-
-
            this.$("div#previewContent").hide();
        },
        onShow: function(){
