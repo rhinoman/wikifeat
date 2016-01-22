@@ -78,6 +78,12 @@ define([
         return this.fetchDeferred(fileModel);
     };
 
+    WikiManager.prototype.getAllPageList = function(wikiId){
+        var pageCollection = new PageCollection();
+        pageCollection.url = "/api/v1/wikis/" + wikiId + "/pages";
+        return this.fetchDeferred(pageCollection);
+    };
+
     WikiManager.prototype.getPage = function(id, wikiId){
         var pageModel = new PageModel({id: id}, {wikiId: wikiId});
         return this.fetchDeferred(pageModel);

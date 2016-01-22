@@ -133,6 +133,10 @@ define([
         return wikiManager.getPage(pageId, wikiId);
     });
 
+    wikiChannel.reply("get:allPageList", function(wikiId){
+        return wikiManager.getAllPageList(wikiId);
+    });
+
     wikiChannel.reply("save:page", function(pageModel){
         return wikiManager.saveEntity(pageModel);
     });
