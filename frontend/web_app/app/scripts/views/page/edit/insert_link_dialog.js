@@ -92,6 +92,7 @@ define([
             var self = this;
             this.wikiList.done(function(data){
                 var select = self.$("select#wikiSelect");
+                select.html('<option value="0">Select Wiki...</option>')
                 if(data !== 'undefined'){
                     _.each(data.models, function(wiki){
                         select.append(self.optionTemplate()({id: wiki.get('id'), name: wiki.get('name')}));
