@@ -81,6 +81,7 @@ func (fc FileController) AddRoutes(ws *restful.WebService) {
 		Doc("Get list of files in this wiki").
 		Operation("index").
 		Param(ws.PathParameter("wiki-id", "Wiki identifier").DataType("string")).
+		Param(ws.QueryParameter("type", "File Type").DataType("string")).
 		Param(ws.QueryParameter("pageNum", "Page Number").DataType("integer")).
 		Param(ws.QueryParameter("numPerPage", "Number of records to return").DataType("integer")).
 		Writes(FileIndexResponse{}))
@@ -169,8 +170,9 @@ func (fc FileController) index(request *restful.Request,
 			pageNum = ln
 		}
 	}
+	fileType := request.QueryParameter("type")
 	wikiId := request.PathParameter("wiki-id")
-	fivr, err := new(FileManager).Index(wikiId, pageNum, limit, curUser)
+	fivr, err := new(FileManager).Index(wikiId, fileType, pageNum, limit, curUser)
 	if err != nil {
 		WriteError(err, response)
 		return

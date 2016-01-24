@@ -181,6 +181,14 @@ form#editPageForm {
   border: none;
 }
 
+div.imgPreviewContainer {
+  display: none;
+}
+
+div.imgPreviewBox {
+  width: 150px;
+}
+
 .comment-view #authorAvatarThumb {
   margin-top: 5px;
   margin-bottom: 5px;

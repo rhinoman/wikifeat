@@ -28,6 +28,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * Created by jcadam on 1/22/16.
+ */
+
 'use strict';
 
 define([
@@ -35,33 +39,37 @@ define([
     'underscore',
     'marionette',
     'backbone.radio',
-    'text!templates/page/insert_link_dialog.html'
-], function($, _, Marionette, Radio,
-            InsertLinkDialogTemplate){
+    'entities/wiki/files',
+    'text!templates/page/insert_image_dialog.html'
+], function($,_,Marionette,Radio,
+            FileCollection,InsertImageDialogTemplate){
 
     var userChannel = Radio.channel('userManager');
     var wikiChannel = Radio.channel('wikiManager');
 
     return Marionette.ItemView.extend({
-        id: "insertLinkDialog",
-        template: _.template(InsertLinkDialogTemplate),
-        events: {
+        id: "insertImageDialog",
+        template: _.template(InsertImageDialogTemplate),
+        events:{
             'click #insertButton': function(){$('#theSubmit').trigger('click')},
-            'change input[type=radio][name=linkOption]': 'radioChange',
-            'change select#wikiSelect': 'wikiSelected',
+            'change input[type=radio][name=imageOption]': 'radioChange',
+            'change select#fileSelect': 'fileSelected',
             'submit form': 'submitForm'
         },
 
         initialize: function(options){
             options = options || {};
             this.callback = options.callback || function(){};
+            this.wikiId = options.wikiId || null;
+            this.fileList = new FileCollection({}, {wikiId: this.wikiId});
+            var dFileList = $.Deferred();
+            dFileList.promise(this.fileList);
             this.currentUser = userChannel.request('get:currentUser');
-            this.wikiList = $.Deferred();
             var self = this;
             this.currentUser.done(function(user){
                 if(typeof user !== 'undefined'){
-                    wikiChannel.request('get:memberWikiList', user).done(function(data){
-                        self.wikiList.resolve(data);
+                    wikiChannel.request('get:imageFileList', self.wikiId).done(function(data){
+                        dFileList.resolve(data);
                     });
                 }
             })
@@ -72,64 +80,60 @@ define([
         },
 
         onRender: function(){
-            this.$("#insertLinkModal").modal();
+            this.$("#insertImageModal").modal();
         },
 
         radioChange: function(event){
             //Get the checked radio button
-            var linkMode = this.linkMode();
+            const linkMode = this.linkMode();
             if(linkMode === 'internal'){
-                this.$("div#externalLinkSelectContainer").hide();
-                this.$("div#internalLinkSelectContainer").show();
-                this.populateInternalFields();
+                this.$("div#externalImageSelectContainer").hide();
+                this.$("div#internalImageSelectContainer").show();
+                var self = this;
+                this.fileList.done(function(data){
+                    var select = self.$("select#fileSelect");
+                    if(data !== 'undefined'){
+                        _.each(data.models, function(file){
+                            select.append(self.optionTemplate()({id: file.get('id'), name: file.get('name')}));
+                        }, self);
+                    }
+                });
             } else if(linkMode === 'external'){
-                this.$("div#internalLinkSelectContainer").hide();
-                this.$("div#externalLinkSelectContainer").show();
+                this.$("div#internalImageSelectContainer").hide();
+                this.$("div#externalImageSelectContainer").show();
             }
         },
 
-        populateInternalFields: function(){
+        fileSelected: function(event){
+            const selectBox = event.currentTarget;
+            const fileId = $(selectBox).val();
             var self = this;
-            this.wikiList.done(function(data){
-                var select = self.$("select#wikiSelect");
-                if(data !== 'undefined'){
-                    _.each(data.models, function(wiki){
-                        select.append(self.optionTemplate()({id: wiki.get('id'), name: wiki.get('name')}));
-                    }, self);
-                }
-            });
-        },
-
-        wikiSelected: function(event){
-            var self = this;
-            var wikiSelect = event.currentTarget;
-            var wikiId = $(wikiSelect).val();
-            this.$("select#pageSelect").empty();
-            wikiChannel.request('get:allPageList', wikiId).done(function(data){
-                var select = self.$("select#pageSelect");
-                if(data !== 'undefined'){
-                    _.each(data.models, function(page){
-                        select.append(self.optionTemplate()({id: page.get('id'), name: page.get('title')}));
-                    })
-                }
+            this.fileList.done(function(fc){
+                const fileModel = fc.get(fileId);
+                const imgLink = fileModel.getContentLink();
+                const imgTag = '<img src="'+ imgLink + '">';
+                self.$('div.imgPreviewContainer').css("display", "block");
+                self.$(".imgPreviewBox").html(imgTag);
             });
         },
 
         submitForm: function(event){
             event.preventDefault();
-            var linkMode = this.linkMode();
+            const linkMode = this.linkMode();
             var theUrl = "http://";
             if(linkMode === 'internal'){
-                var wikiId = this.$("select#wikiSelect").val();
-                var pageId = this.$("select#pageSelect").val();
-                if(wikiId !== "0" && wikiId !== null && pageId !== "0" && pageId !== null) {
-                    theUrl = "/wikis/" + wikiId + "/" + pageId;
-                }
+                const fileId = this.$("select#fileSelect").val();
+                this.fileList.done(function(fc){
+                    const fileModel = fc.get(fileId);
+                    if(typeof fileModel !== 'undefined' && fileModel !== null){
+                        theUrl = fileModel.getContentLink();
+                    }
+                });
             } else if(linkMode === 'external'){
                 theUrl = this.$("#externalUrlField").val();
             }
             this.callback(theUrl);
-            this.$('#insertLinkModal').modal('hide');
+            this.$("#insertImageModal").modal('hide');
         },
 
         linkMode: function(){
@@ -140,6 +144,7 @@ define([
                 return "external";
             }
         }
+
     });
 
 });

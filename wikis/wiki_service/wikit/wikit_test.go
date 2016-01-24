@@ -32,6 +32,7 @@ package wikit_test
 
 import (
 	"bytes"
+	"encoding/hex"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
 	. "github.com/rhinoman/wikifeat/wikis/wiki_service/wikit"
@@ -261,6 +262,8 @@ func TestReadPage(t *testing.T) {
 }
 
 func TestFiles(t *testing.T) {
+	const tinyJpeg = "ffd8ffe000104a46494600010101004800480000ffdb0043000302020302020303030304030304050805050404050a070706080c0a0c0c0b0a0b0b0d0e12100d0e110e0b0b1016101113141515150c0f171816141812141514ffc2000b080002000201011100ffc40014000100000000000000000000000000000007ffda00080101000000011effc400161001010100000000000000000000000000050604ffda0008010100010502a1a15303ff00ffc4001a100003010101010000000000000000000001020304050021ffda0008010100063f02e966cdd2d99f3474d2728caeca88a1880a003f07bfffc40017100100030000000000000000000000000001001121ffda0008010100013f21a27af3de5800006013ffda0008010100000010ff00ffc4001510010100000000000000000000000000000100ffda0008010100013f103fe8904041f2800002ffd9"
+
 	wikiName, user := createTestWiki(t)
 	ba := &couchdb.BasicAuth{user, "password"}
 	theWiki := SelectWiki(connection, wikiName, ba)
@@ -268,6 +271,10 @@ func TestFiles(t *testing.T) {
 	file := File{
 		Name:        "tps_report.txt",
 		Description: "TPS Report 9999",
+	}
+	img := File{
+		Name:        "tps_image.jpg",
+		Description: "TPS IMAGE 9999",
 	}
 	theId := getUuid()
 	rev, err := theWiki.SaveFileRecord(&file, theId, "", "Steve")
@@ -292,16 +299,36 @@ func TestFiles(t *testing.T) {
 		t.Errorf("Content was a lie!")
 	}
 	t.Logf("CONTENT: %v", data)
-	//Get the File index
-	fileIndex, err := theWiki.GetFileIndex(0, 0)
+
+	//Save the image file
+	imgId := getUuid()
+	rev, err = theWiki.SaveFileRecord(&img, imgId, "", "Steve")
 	printError(t, err)
-	if len(fileIndex.Rows) != 1 {
+	t.Logf("Img Rev: %v\n", rev)
+	content, err = hex.DecodeString(tinyJpeg)
+	printError(t, err)
+	contentReader = bytes.NewReader(content)
+	iRev, err := theWiki.SaveFileAttachment(imgId, rev, "tinyjpeg.jpg",
+		"image/jpeg", contentReader)
+	printError(t, err)
+	t.Logf("Updated Image Rev: %v\n", iRev)
+
+	//Get the File index
+	fileIndex, err := theWiki.GetFileIndex("all", 0, 0)
+	printError(t, err)
+	if len(fileIndex.Rows) != 2 {
 		t.Errorf("File index is wrong length: " + strconv.Itoa(len(fileIndex.Rows)))
 	}
-	if fileIndex.Rows[0].Key != "tps_report.txt" {
+	//Get the Image index
+	imgIndex, err := theWiki.GetFileIndex("image", 0, 0)
+	printError(t, err)
+	if len(imgIndex.Rows) != 1 {
+		t.Errorf("Image index is wrong length: " + strconv.Itoa(len(imgIndex.Rows)))
+	}
+	if imgIndex.Rows[0].Key != "tps_image.jpg" {
 		t.Errorf("File Record has wrong name! " + fileIndex.Rows[0].Key)
 	}
-	if fileIndex.Rows[0].Value.Description != "TPS Report 9999" {
+	if imgIndex.Rows[0].Value.Description != "TPS IMAGE 9999" {
 		t.Errorf("Description is wrong! " + fileIndex.Rows[0].Value.Description)
 	}
 	dRev, err := theWiki.DeleteFileRecord(theId, uRev)

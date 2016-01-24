@@ -55,7 +55,7 @@ conn.request("GET", '/_all_dbs', headers=get_headers)
 db_list = common.decode_response(conn.getresponse())
 wiki_list = [db for db in db_list if db[0:5] == "wiki_"]
 
-# Update the wiiki dbs
+# Update the wiki dbs
 for wiki in wiki_list:
     print("Examining " + wiki)
     # Fetch design doc

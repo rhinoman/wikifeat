@@ -173,6 +173,10 @@ define([
         return wikiManager.getAllFileList(wikiId);
     });
 
+    wikiChannel.reply("get:imageFileList", function(wikiId){
+        return wikiManager.getImageFileList(wikiId);
+    });
+
     wikiChannel.reply("get:file", function(fileId, wikiId){
         return wikiManager.getFile(fileId, wikiId);
     });

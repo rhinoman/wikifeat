@@ -40,11 +40,11 @@ import (
 type FileManager struct{}
 
 //Gets a list of all 'files' in a wiki
-func (fm *FileManager) Index(wiki string, pageNum int, numPerPage int,
+func (fm *FileManager) Index(wiki string, fileType string, pageNum int, numPerPage int,
 	curUser *CurrentUserInfo) (*wikit.FileIndexViewResponse, error) {
 	auth := curUser.Auth
 	theWiki := wikit.SelectWiki(Connection, wikiDbString(wiki), auth)
-	return theWiki.GetFileIndex(pageNum, numPerPage)
+	return theWiki.GetFileIndex(fileType, pageNum, numPerPage)
 }
 
 //Saves a File Record (not the attachment)

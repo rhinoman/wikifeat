@@ -104,7 +104,7 @@ func TestFileCRUD(t *testing.T) {
 	}
 	t.Logf("File Att Rev: %v", aRev)
 	//Test GetIndex
-	fileIndex, err := fm.Index(wikiId, 0, 0, curUser)
+	fileIndex, err := fm.Index(wikiId, "", 0, 0, curUser)
 	if err != nil {
 		t.Error(err)
 	}

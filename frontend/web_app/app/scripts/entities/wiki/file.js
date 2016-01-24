@@ -86,9 +86,24 @@ define([
         return null;
     };
 
+    FileModel.prototype.isImageFile = function(){
+        var fileData = this.getFileData();
+        if(fileData !== null){
+            const mimeType = fileData.content_type;
+            if(mimeType.substring(0,6) === 'image/'){
+                return true;
+            }
+        }
+        return false;
+    };
+
     FileModel.prototype.getDownloadLink = function(){
+        return this.getContentLink() + "&download=true";
+    };
+
+    FileModel.prototype.getContentLink = function(){
         var filename = this.getFilename();
-        return this.url + "/content?attName=" + filename + "&download=true";
+        return this.url + "/content?attName=" + filename;
     };
 
     //Takes a FormData object and uploads it as the File's 'content'

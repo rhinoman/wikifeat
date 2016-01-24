@@ -40,10 +40,11 @@ define([
     'entities/wiki/page',
     'views/main/alert',
     'views/page/edit/insert_link_dialog',
+    'views/page/edit/insert_image_dialog',
     'text!templates/page/edit_page_form.html'
 ], function($,_,Marionette,Radio,Stickit,Bootstrap,Markette,
             PageModel,AlertView,InsertLinkDialog,
-            EditPageFormTemplate){
+            InsertImageDialog,EditPageFormTemplate){
 
     return Markette.EditorView.extend({
         model: PageModel,
@@ -176,8 +177,23 @@ define([
                 }
             });
             Radio.channel('main').trigger('show:dialog', ild);
-        }
+        },
 
+        //Override Image functionality
+        doImage: function(event){
+            var self = this;
+            var imd = new InsertImageDialog({
+                callback: function(url){
+                    self.$('textarea#marketteInput').focus();
+                    self.doInlineMarkup({
+                        before: '![',
+                        after: '](' + url + ')'
+                    });
+                },
+                wikiId: this.wikiModel.get('id')
+            });
+            Radio.channel('main').trigger('show:dialog', imd);
+        }
 
     });
 

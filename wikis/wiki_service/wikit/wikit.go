@@ -395,7 +395,7 @@ func (wiki *Wiki) GetPageIndex() (PageIndex, error) {
 
 //Gets a list of all files in a wiki
 //Retus the File List or an error
-func (wiki *Wiki) GetFileIndex(pageNum int,
+func (wiki *Wiki) GetFileIndex(fileType string, pageNum int,
 	numPerPage int) (*FileIndexViewResponse, error) {
 	response := FileIndexViewResponse{}
 	params := url.Values{}
@@ -407,7 +407,14 @@ func (wiki *Wiki) GetFileIndex(pageNum int,
 		params.Add("skip", strconv.Itoa(skip))
 	}
 	params.Add("reduce", "false")
-	err := wiki.db.GetView("wikit", "getFileIndex", &response, &params)
+	view := "getFileIndex"
+	switch fileType {
+	case "image":
+		view = "getImageFileIndex"
+	default:
+		view = "getFileIndex"
+	}
+	err := wiki.db.GetView("wikit", view, &response, &params)
 	if err != nil {
 		return nil, err
 	} else {
@@ -539,7 +546,7 @@ func (wiki *Wiki) DeleteComment(id string, rev string) (string, error) {
 func (wiki *Wiki) GetCommentsForPage(pageId string, pageNum int,
 	numPerPage int) (*CommentIndexViewResponse, error) {
 	response := CommentIndexViewResponse{}
-	theKeys := SetKeys([]string{pageId}, []string{pageId,"{}"})
+	theKeys := SetKeys([]string{pageId}, []string{pageId, "{}"})
 	// This function gets the "count" by calling the reduce function
 	countChan := make(chan int)
 	//Grab the count concurrently

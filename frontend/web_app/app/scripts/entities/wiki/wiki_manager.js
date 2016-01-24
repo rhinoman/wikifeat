@@ -67,6 +67,12 @@ define([
         return this.fetchDeferred(fileCollection);
     };
 
+    WikiManager.prototype.getImageFileList = function(wikiId){
+        var fileCollection = new FileCollection({},{wikiId: wikiId});
+        fileCollection.url = "/api/v1/wikis/" + wikiId + "/files?type=image";
+        return this.fetchDeferred(fileCollection);
+    };
+
     WikiManager.prototype.getMemberWikiList = function(user){
         var wikiCollection = new WikiCollection();
         wikiCollection.setQueryOptions({memberOnly: true});

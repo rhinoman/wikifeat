@@ -97,6 +97,19 @@ var wikiViews = map[string]View{
 			}`,
 		Reduce: "_count",
 	},
+	"getImageFileIndex": {
+		Map: `
+			function(doc){
+				if(doc.type==="file"){
+					const att=doc._attachments;
+					const contentType=att[Object.keys(att)[0]].content_type;
+					if(contentType.substring(0,6)==="image/"){
+						emit(doc.name,doc);
+					}
+				}
+			}`,
+		Reduce: "_count",
+	},
 	"getPageBySlug": {
 		Map: `
 			function(doc){
