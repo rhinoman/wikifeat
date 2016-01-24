@@ -113,6 +113,18 @@ func TestCMarkNodeOps(t *testing.T) {
 		t.Error("Couldn't prepend header to root")
 	}
 	root.AppendChild(header2)
+	//Replace a Node
+	header3 := commonmark.NewCMarkNode(commonmark.CMARK_NODE_HEADING)
+	header3str := commonmark.NewCMarkNode(commonmark.CMARK_NODE_TEXT)
+	header3.AppendChild(header3str)
+	header3.SetHeaderLevel(2)
+	if header3str.SetLiteral("Replacement header!") == false {
+		t.Error("SetLiteral returned false for valid input")
+	}
+	if header3.Replace(header2) == false {
+		t.Error("Couldn't Replace Node!")
+	}
+	//Custom nodes
 	custom := commonmark.NewCMarkNode(commonmark.CMARK_NODE_CUSTOM_BLOCK)
 	custom.SetOnEnter("ENTER")
 	custom.SetOnExit("EXIT")
@@ -125,10 +137,14 @@ func TestCMarkNodeOps(t *testing.T) {
 	t.Logf("\nXML: %v", root.RenderXML(commonmark.CMARK_OPT_DEFAULT))
 
 	htmlStr := root.RenderHtml(commonmark.CMARK_OPT_DEFAULT)
-	if htmlStr != "<h1>I'm the main header!</h1>\n<h2>Another header!</h2>\n" {
+	if htmlStr != "<h1>I'm the main header!</h1>\n<h2>Replacement header!</h2>\n" {
 		t.Error("htmlStr is wrong!")
 	}
 	t.Logf("Html Text: %v", htmlStr)
+	//Replace again
+	if header2.Replace(header3) == false {
+		t.Error("replaced node was freed prematurely.")
+	}
 	//Rearrange...
 	header1.InsertBefore(header2)
 	t.Logf("\nXML: %v", root.RenderXML(commonmark.CMARK_OPT_DEFAULT))
@@ -204,7 +220,7 @@ func TestCMarkCodeBlocks(t *testing.T) {
 	t.Logf("\nXML: %v", root.RenderXML(commonmark.CMARK_OPT_DEFAULT))
 	htmlString := root.RenderHtml(commonmark.CMARK_OPT_DEFAULT)
 	t.Logf("\nHtml String: %v\n", htmlString)
-	if htmlString != "<pre><code>int main(){\n return 0;\n }</code></pre>\n" {
+	if htmlString != "<pre><code class=\"language-c\">int main(){\n return 0;\n }</code></pre>\n" {
 		t.Error("htmlString isn't right!")
 	}
 	root.Free()

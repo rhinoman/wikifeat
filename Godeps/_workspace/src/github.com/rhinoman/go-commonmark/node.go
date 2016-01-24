@@ -389,6 +389,13 @@ func (node *CMarkNode) InsertAfter(sibling *CMarkNode) bool {
 	return success(C.cmark_node_insert_after(node.node, sibling.node))
 }
 
+// Replaces 'oldNode' with 'newNode' and unlinks 'oldnode' (but does
+// not free its memory).
+// Returns true on success, false on failure.
+func (newNode *CMarkNode) Replace(oldNode *CMarkNode) bool {
+	return success(C.cmark_node_replace(oldNode.node, newNode.node))
+}
+
 //Prepend a child node
 func (node *CMarkNode) PrependChild(child *CMarkNode) bool {
 	return success(C.cmark_node_prepend_child(node.node, child.node))
