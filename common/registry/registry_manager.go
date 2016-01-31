@@ -56,12 +56,13 @@ var random = rand.New(rand.NewSource(time.Now().Unix()))
 
 var client *etcd.Client
 var kapi etcd.KeysAPI
-var etcdPrefix = "/wikifeat"
-var UsersLocation = etcdPrefix + "/services/users/"
-var WikisLocation = etcdPrefix + "/services/wikis/"
-var NotificationsLocation = etcdPrefix + "/services/notifications/"
-var FrontEndLocation = etcdPrefix + "/services/frontend/"
-var PluginsLocation = etcdPrefix + "/plugin/"
+var EtcdPrefix = "/wikifeat"
+var UsersLocation = EtcdPrefix + "/services/users/"
+var WikisLocation = EtcdPrefix + "/services/wikis/"
+var NotificationsLocation = EtcdPrefix + "/services/notifications/"
+var FrontEndLocation = EtcdPrefix + "/services/frontend/"
+var AuthLocation = EtcdPrefix + "/services/auth"
+var PluginsLocation = EtcdPrefix + "/plugin/"
 var ttl time.Duration
 
 func protocolString() string {
@@ -70,6 +71,10 @@ func protocolString() string {
 	} else {
 		return "http://"
 	}
+}
+
+func getEtcdClient() *etcd.Client {
+	return client
 }
 
 func hostUrl() string {
@@ -171,12 +176,17 @@ func fetchServiceLists() {
 	if err != nil {
 		log.Println("Error fetching frontend services: " + err.Error())
 	}
+	authNodes, err := getServiceNodes(AuthLocation)
+	if err != nil {
+		log.Println("Error fetching auth services: " + err.Error())
+	}
 	serviceCache.Lock()
 	defer serviceCache.Unlock()
 	serviceCache.m["users"] = userNodes
 	serviceCache.m["wikis"] = wikiNodes
 	serviceCache.m["notifications"] = notificationNodes
 	serviceCache.m["frontend"] = frontendNodes
+	serviceCache.m["auth"] = authNodes
 }
 
 //Read nodes from an etcd response

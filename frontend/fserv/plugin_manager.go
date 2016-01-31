@@ -67,7 +67,7 @@ func GetPluginData(pluginName string) (*PluginData, error) {
 	}
 }
 
-// Creates a new Default PLuginData struct
+// Creates a new Default PluginData struct
 func NewPluginData() *PluginData {
 	return &PluginData{
 		Name:       "Unnamed",

@@ -9,8 +9,7 @@
  *  * Redistributions of source code must retain the above copyright notice,
  *  this list of conditions and the following disclaimer.
  *  * Redistributions in binary form must reproduce the above copyright
- *  notice, this list of conditions and the following disclaimer in the
- *  documentation and/or other materials provided with the distribution.
+ *  notice, this list of conditions and the following disclaimer in the *  documentation and/or other materials provided with the distribution.
  *  * Neither the name of Wikifeat nor the names of its contributors may be used
  *  to endorse or promote products derived from this software without
  *  specific prior written permission.
@@ -92,7 +91,7 @@ type CurrentUserInfo struct {
 	User  *User
 }
 
-//Notificaiton request for the Notification Service
+//Notification request for the Notification Service
 type NotificationRequest struct {
 	To      string            `json:"to_email"`
 	Subject string            `json:"subject"`
