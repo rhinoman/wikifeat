@@ -68,6 +68,7 @@ users/users
 wikis/wikis
 frontend/frontend
 notifications/notifications
+auth/auth
 build/
 dist/
 *.log
