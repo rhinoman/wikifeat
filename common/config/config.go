@@ -81,7 +81,7 @@ var Logger struct {
 
 var Auth struct {
 	Authenticator      string
-	SessionTimeout     int
+	SessionTimeout     uint64
 	PersistentSessions bool
 	AllowGuest         bool
 	MinPasswordLength  int
@@ -358,7 +358,7 @@ func setAuthConfig(authSection *configparser.Section) {
 		case "authenticator":
 			Auth.Authenticator = strings.ToLower(value)
 		case "sessionTimeout":
-			setIntVal(value, &Auth.SessionTimeout)
+			setUint64Val(value, &Auth.SessionTimeout)
 		case "persistentSessions":
 			Auth.PersistentSessions = stringToBool(value)
 		case "allowGuestAccess":

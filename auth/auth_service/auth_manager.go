@@ -31,8 +31,12 @@
 package auth_service
 
 import (
+	"encoding/json"
+	etcd "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/coreos/etcd/client"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/golang.org/x/net/context"
 	. "github.com/rhinoman/wikifeat/common/auth"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/common/util"
 	"time"
 )
@@ -40,6 +44,8 @@ import (
 // Authentication Manager
 
 type AuthManager struct{}
+
+var sessionsLocation = registry.EtcdPrefix + "/sessions/"
 
 //Get an autheticator
 func (am *AuthManager) getAuthenticator(authType string) Authenticator {
@@ -53,7 +59,15 @@ func (am *AuthManager) getAuthenticator(authType string) Authenticator {
 func (am *AuthManager) Create(username string,
 	password string, authType string) (*Session, error) {
 	authenticator := am.getAuthenticator(authType)
-	return authenticator.CreateSession(username, password)
+	sess, err := authenticator.CreateSession(username, password)
+	if err != nil {
+		return nil, err
+	}
+	if err = am.registerSession(sess); err != nil {
+		return nil, err
+	} else {
+		return sess, nil
+	}
 }
 
 //Destroy a session (i.e., logout)
@@ -72,6 +86,23 @@ func (am *AuthManager) GetSession(sessionId string) (*Session, error) {
 //generate a new session and return the token
 func (am *AuthManager) UpdateSession(sessionId string) (string, error) {
 	return "", nil
+}
+
+//Store the session to etcd
+func (am *AuthManager) registerSession(sess *Session) error {
+	kapi := registry.GetEtcdKeyAPI()
+	ttl := time.Duration(config.Auth.SessionTimeout) * time.Second
+	sessBytes, err := json.Marshal(sess)
+	sessStr := string(sessBytes)
+	if err != nil {
+		return err
+	}
+	_, err = kapi.Set(context.Background(), sessionsLocation+sess.Id, sessStr,
+		&etcd.SetOptions{TTL: ttl})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func NewSession(user string, authType string) *Session {

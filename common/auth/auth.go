@@ -53,6 +53,13 @@ type AuthError struct {
 	Reason    string
 }
 
+func UnauthenticatedError() error {
+	return &AuthError{
+		ErrorCode: 401,
+		Reason:    "Invalid username or password",
+	}
+}
+
 func (err *AuthError) Error() string {
 	return fmt.Sprintf("[Error]:%v: %v", err.ErrorCode, err.Reason)
 }

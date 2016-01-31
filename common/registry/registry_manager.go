@@ -61,7 +61,7 @@ var UsersLocation = EtcdPrefix + "/services/users/"
 var WikisLocation = EtcdPrefix + "/services/wikis/"
 var NotificationsLocation = EtcdPrefix + "/services/notifications/"
 var FrontEndLocation = EtcdPrefix + "/services/frontend/"
-var AuthLocation = EtcdPrefix + "/services/auth"
+var AuthLocation = EtcdPrefix + "/services/auth/"
 var PluginsLocation = EtcdPrefix + "/plugin/"
 var ttl time.Duration
 
@@ -73,8 +73,8 @@ func protocolString() string {
 	}
 }
 
-func getEtcdClient() *etcd.Client {
-	return client
+func GetEtcdKeyAPI() etcd.KeysAPI {
+	return kapi
 }
 
 func hostUrl() string {

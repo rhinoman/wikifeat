@@ -32,22 +32,15 @@ package auth_service
 import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	. "github.com/rhinoman/wikifeat/common/auth"
+	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"net/http"
 )
 
 /**
- * With a StandardAuthenticator, we're just going against CouchDB directly
- * for Authentication
+ * Standard Authenticator - we authenticate against CouchDB users directly
  */
 type StandardAuthenticator struct{}
-
-func (sta StandardAuthenticator) unauthError() error {
-	return &AuthError{
-		ErrorCode: 401,
-		Reason:    "Unauthenticated",
-	}
-}
 
 func (sta StandardAuthenticator) GetAuth(req *http.Request) (couchdb.Auth, error) {
 
@@ -60,14 +53,14 @@ func (sta StandardAuthenticator) GetAuth(req *http.Request) (couchdb.Auth, error
 	//Ok, check for a session cookie
 	sessCookie, err := req.Cookie("AuthSession")
 	if err != nil {
-		return nil, sta.unauthError()
+		return nil, UnauthenticatedError()
 	}
 	//TODO: CHECK FOR EXPIRED COOKIES?
 	sessionToken := sessCookie.Value
 	csrfErr := sta.checkCsrf(req)
 	if sessionToken == "" || csrfErr != nil {
 		//Bad user, no cookie
-		return nil, sta.unauthError()
+		return nil, UnauthenticatedError()
 	}
 	//Return the cookie auth
 	return &couchdb.CookieAuth{
@@ -100,7 +93,18 @@ func (sta StandardAuthenticator) SetAuth(rw http.ResponseWriter, cAuth couchdb.A
 }
 
 func (sta StandardAuthenticator) CreateSession(username, password string) (*Session, error) {
-	return nil, nil
+	//Let's validate the user's credentials against CouchDB
+	ba := &couchdb.BasicAuth{
+		Username: username,
+		Password: password,
+	}
+	authInfo, err := services.Connection.GetAuthInfo(ba)
+	if err != nil || authInfo == nil {
+		return nil, UnauthenticatedError()
+	} else if !authInfo.Ok || authInfo.UserCtx.Name == "" {
+		return nil, UnauthenticatedError()
+	}
+	return NewSession(username, "standard"), nil
 }
 
 func (sta StandardAuthenticator) DestroySession(sessionId string) error {
@@ -112,9 +116,9 @@ func (sta StandardAuthenticator) checkCsrf(request *http.Request) error {
 	csrfCookie, err := request.Cookie("CsrfToken")
 	ourCsrf := request.Header.Get("X-Csrf-Token")
 	if err != nil || ourCsrf == "" {
-		return sta.unauthError()
+		return UnauthenticatedError()
 	} else if token := csrfCookie.Value; token != ourCsrf {
-		return sta.unauthError()
+		return UnauthenticatedError()
 	} else {
 		return nil
 	}

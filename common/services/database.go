@@ -170,7 +170,7 @@ func InitDb() {
 	}
 	err = Connection.SetConfig("couch_httpd_auth",
 		"timeout",
-		strconv.Itoa(config.Auth.SessionTimeout),
+		strconv.FormatUint(config.Auth.SessionTimeout, 10),
 		AdminAuth)
 	if err != nil {
 		log.Fatalf("Error! %v", err)

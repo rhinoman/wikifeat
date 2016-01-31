@@ -58,6 +58,9 @@ func TestSessions(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	if sess.User != "John.Smith" {
+		t.Error("Username in session not set!")
+	}
 	t.Logf("Session: %v", sess)
 	defer afterTest(t)
 
