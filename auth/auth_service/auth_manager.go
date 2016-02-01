@@ -32,12 +32,17 @@ package auth_service
 
 import (
 	"encoding/json"
+	"errors"
 	etcd "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/coreos/etcd/client"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/golang.org/x/net/context"
 	. "github.com/rhinoman/wikifeat/common/auth"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/registry"
+	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
+	"net/http"
 	"time"
 )
 
@@ -63,7 +68,7 @@ func (am *AuthManager) Create(username string,
 	if err != nil {
 		return nil, err
 	}
-	if err = am.registerSession(sess); err != nil {
+	if err = am.saveSession(sess); err != nil {
 		return nil, err
 	} else {
 		return sess, nil
@@ -74,22 +79,86 @@ func (am *AuthManager) Create(username string,
 func (am *AuthManager) Destroy(session *Session) error {
 	authType := session.AuthType
 	authenticator := am.getAuthenticator(authType)
-	return authenticator.DestroySession(session.Id)
+	err := authenticator.DestroySession(session.Id)
+	if err != nil {
+		return err
+	}
+	//Remove the session node from etcd
+	kapi := registry.GetEtcdKeyAPI()
+	sessionLocation := sessionsLocation + session.Id
+	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+	_, err = kapi.Delete(ctx, sessionLocation, nil)
+	return err
 }
 
 //Get a session
-func (am *AuthManager) GetSession(sessionId string) (*Session, error) {
-	return nil, nil
+func (am *AuthManager) ReadSession(sessionId string) (*Session, error) {
+	kapi := registry.GetEtcdKeyAPI()
+	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+	sessionLocation := sessionsLocation + sessionId
+	resp, err := kapi.Get(ctx, sessionLocation, &etcd.GetOptions{Recursive: false})
+	if err != nil {
+		return nil, err
+	}
+	sess, err := am.processResponse(resp)
+	if err != nil {
+		return nil, err
+	} else {
+		return sess, nil
+	}
 }
 
 //Update session
-//generate a new session and return the token
-func (am *AuthManager) UpdateSession(sessionId string) (string, error) {
-	return "", nil
+//generate a new sessionId and return the new session
+func (am *AuthManager) UpdateSession(sessionId string) (*Session, error) {
+	curSession, err := am.ReadSession(sessionId)
+	if err != nil {
+		return nil, err
+	}
+	username := curSession.User
+	authType := curSession.AuthType
+	if username == "" {
+		return nil, UnauthenticatedError()
+	}
+	//Fetch the user object
+	user, err := getUser(username)
+	if err != nil {
+		return nil, UnauthenticatedError()
+	}
+	userCtx := couchdb.UserContext{
+		Name:  username,
+		Roles: user.Roles,
+	}
+	newSession := NewSession(&userCtx, authType)
+	err = am.saveSession(newSession)
+	if err != nil {
+		return nil, err
+	} else {
+		return newSession, nil
+	}
+}
+
+// Takes an etcd response and extracts the Session
+func (am *AuthManager) processResponse(resp *etcd.Response) (*Session, error) {
+	node := resp.Node
+	if node.Dir {
+		return nil, errors.New("Session node is a directory?!")
+	}
+	value := []byte(node.Value)
+	if len(value) == 0 {
+		return nil, errors.New("Session value is empty")
+	}
+	session := Session{}
+	err := json.Unmarshal(value, &session)
+	if err != nil {
+		return nil, err
+	} else {
+		return &session, nil
+	}
 }
 
 //Store the session to etcd
-func (am *AuthManager) registerSession(sess *Session) error {
+func (am *AuthManager) saveSession(sess *Session) error {
 	kapi := registry.GetEtcdKeyAPI()
 	ttl := time.Duration(config.Auth.SessionTimeout) * time.Second
 	sessBytes, err := json.Marshal(sess)
@@ -105,7 +174,37 @@ func (am *AuthManager) registerSession(sess *Session) error {
 	return nil
 }
 
-func NewSession(user string, authType string) *Session {
+//Produce an auth object from the given request
+func (am *AuthManager) GetAuth(req *http.Request, authType string) (*couchdb.ProxyAuth, error) {
+	authenticator := am.getAuthenticator(authType)
+	sessionId, err := authenticator.GetSessionId(req)
+	if err != nil {
+		return nil, UnauthenticatedError()
+	}
+	//get the session
+	session, err := am.ReadSession(sessionId)
+	if err != nil {
+		return nil, UnauthenticatedError()
+	} else {
+		return &couchdb.ProxyAuth{
+			Username:  session.User,
+			Roles:     session.Roles,
+			AuthToken: sessionId,
+		}, nil
+	}
+}
+
+func getUser(username string) (*entities.User, error) {
+	user := entities.User{}
+	_, err := services.Connection.GetUser(username, &user, services.AdminAuth)
+	if err != nil {
+		return nil, err
+	} else {
+		return &user, nil
+	}
+}
+
+func NewSession(userCtx *couchdb.UserContext, authType string) *Session {
 	token := util.GenToken()
 	createdAt := time.Now().UTC()
 	sessionTimeout := time.Duration(config.Auth.SessionTimeout) * time.Second
@@ -113,7 +212,8 @@ func NewSession(user string, authType string) *Session {
 	return &Session{
 		Id:        token,
 		AuthType:  authType,
-		User:      user,
+		User:      userCtx.Name,
+		Roles:     userCtx.Roles,
 		CreatedAt: createdAt,
 		ExpiresAt: expiresAt,
 	}

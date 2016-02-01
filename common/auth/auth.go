@@ -37,8 +37,8 @@ import (
 )
 
 type Authenticator interface {
-	// Reads Auth information/headers from a request and returns a CouchDB auth
-	GetAuth(*http.Request) (couchdb.Auth, error)
+	// Reads Auth information/headers from a request and returns a session Id
+	GetSessionId(*http.Request) (string, error)
 	// Updates authentication information in the http response before sending it down
 	// Usually, this is used to update Auth cookies, CSRF tokens, etc.
 	SetAuth(http.ResponseWriter, couchdb.Auth)
@@ -67,6 +67,7 @@ func (err *AuthError) Error() string {
 type Session struct {
 	Id        string    `json:"id"`
 	User      string    `json:"user"`
+	Roles     []string  `json:"roles"`
 	AuthType  string    `json:"authType"`
 	ExpiresAt time.Time `json:"expiresAt"`
 	CreatedAt time.Time `json:"createdAt"`

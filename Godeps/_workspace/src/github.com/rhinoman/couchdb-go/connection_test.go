@@ -75,7 +75,26 @@ func TestBasicAuth(t *testing.T) {
 	} else if resp == nil {
 		t.Logf("Response was nil")
 		t.Fail()
-	} else {
+	}
+}
+
+func TestProxyAuth(t *testing.T) {
+	client := &http.Client{}
+	pAuth := ProxyAuth{
+		Username: "adminuser",
+		Roles:    []string{"admin", "master", "_admin"},
+	}
+	c := connection{
+		url:    serverUrl,
+		client: client,
+	}
+	resp, err := c.request("GET", "/", nil, nil, &pAuth)
+	if err != nil {
+		t.Logf("Error: %v", err)
+		t.Fail()
+	} else if resp == nil {
+		t.Logf("Response was nil")
+		t.Fail()
 	}
 }
 

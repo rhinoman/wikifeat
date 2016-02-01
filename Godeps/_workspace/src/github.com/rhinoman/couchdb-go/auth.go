@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 //Basic interface for Auth
@@ -36,6 +37,13 @@ type CookieAuth struct {
 	UpdatedAuthToken string
 }
 
+//Proxy authentication
+type ProxyAuth struct {
+	Username  string
+	Roles     []string
+	AuthToken string
+}
+
 //Adds Basic Authentication headers to an http request
 func (ba *BasicAuth) AddAuthHeaders(req *http.Request) {
 	authString := []byte(ba.Username + ":" + ba.Password)
@@ -53,6 +61,15 @@ func (ca *CookieAuth) AddAuthHeaders(req *http.Request) {
 	authString := "AuthSession=" + ca.AuthToken
 	req.Header.Set("Cookie", authString)
 	req.Header.Set("X-CouchDB-WWW-Authenticate", "Cookie")
+}
+
+func (pa *ProxyAuth) AddAuthHeaders(req *http.Request) {
+	req.Header.Set("X-Auth-CouchDB-Username", pa.Username)
+	rolesString := strings.Join(pa.Roles, ",")
+	req.Header.Set("X-Auth-CouchDB-Roles", rolesString)
+	if pa.AuthToken != "" {
+		req.Header.Set("X-Auth-CouchDB-Token", pa.AuthToken)
+	}
 }
 
 //Update Auth Data
@@ -74,6 +91,9 @@ func (ca *CookieAuth) updateAuth(resp *http.Response) {
 //do nothing for pass through
 func (pta *PassThroughAuth) updateAuth(resp *http.Response) {}
 
+//do nothing for proxy auth
+func (pa *ProxyAuth) updateAuth(resp *http.Response) {}
+
 //Get Updated Auth
 //Does nothing for BasicAuth
 func (ba *BasicAuth) GetUpdatedAuth() map[string]string {
@@ -94,6 +114,11 @@ func (ca *CookieAuth) GetUpdatedAuth() map[string]string {
 	return am
 }
 
+//do nothing for Proxy Auth
+func (pa *ProxyAuth) GetUpdatedAuth() map[string]string {
+	return nil
+}
+
 //Return a Debug string
 
 func (ba *BasicAuth) DebugString() string {
@@ -109,5 +134,10 @@ func (ca *CookieAuth) DebugString() string {
 		ca.AuthToken, ca.UpdatedAuthToken)
 }
 
+func (pa *ProxyAuth) DebugString() string {
+	return fmt.Sprintf("Username: %v, Roles: %v, AuthToken: %v",
+		pa.Username, pa.Roles, pa.AuthToken)
+}
+
 //TODO: Add support for other Authentication methods supported by Couch:
-//OAuth, Proxy, etc.
+//OAuth, etc.

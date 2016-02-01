@@ -42,30 +42,21 @@ import (
  */
 type StandardAuthenticator struct{}
 
-func (sta StandardAuthenticator) GetAuth(req *http.Request) (couchdb.Auth, error) {
-
-	//What kind of authentication type do we have?
-	if req.Header.Get("Authorization") != "" {
-		return &couchdb.PassThroughAuth{
-			AuthHeader: req.Header.Get("Authorization"),
-		}, nil
-	}
+// Very simple for the standard auth, the AuthSession cookie value *is* the session id
+func (sta StandardAuthenticator) GetSessionId(req *http.Request) (string, error) {
 	//Ok, check for a session cookie
 	sessCookie, err := req.Cookie("AuthSession")
 	if err != nil {
-		return nil, UnauthenticatedError()
+		return "", UnauthenticatedError()
 	}
-	//TODO: CHECK FOR EXPIRED COOKIES?
 	sessionToken := sessCookie.Value
-	csrfErr := sta.checkCsrf(req)
-	if sessionToken == "" || csrfErr != nil {
+	//csrfErr := sta.checkCsrf(req)
+	if sessionToken == "" {
 		//Bad user, no cookie
-		return nil, UnauthenticatedError()
+		return "", UnauthenticatedError()
 	}
-	//Return the cookie auth
-	return &couchdb.CookieAuth{
-		AuthToken: sessionToken,
-	}, nil
+	//Return the sessionId
+	return sessionToken, nil
 }
 
 func (sta StandardAuthenticator) SetAuth(rw http.ResponseWriter, cAuth couchdb.Auth) {
@@ -92,6 +83,7 @@ func (sta StandardAuthenticator) SetAuth(rw http.ResponseWriter, cAuth couchdb.A
 	}
 }
 
+// Create a new session by validating against a user's couchdb credentials
 func (sta StandardAuthenticator) CreateSession(username, password string) (*Session, error) {
 	//Let's validate the user's credentials against CouchDB
 	ba := &couchdb.BasicAuth{
@@ -104,9 +96,10 @@ func (sta StandardAuthenticator) CreateSession(username, password string) (*Sess
 	} else if !authInfo.Ok || authInfo.UserCtx.Name == "" {
 		return nil, UnauthenticatedError()
 	}
-	return NewSession(username, "standard"), nil
+	return NewSession(&authInfo.UserCtx, "standard"), nil
 }
 
+// The StandardAuthenticator need do nothing here.
 func (sta StandardAuthenticator) DestroySession(sessionId string) error {
 	return nil
 }
