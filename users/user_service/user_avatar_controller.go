@@ -48,7 +48,7 @@ type avatarLinks struct {
 	HatLinks
 	SaveImage          *HatLink `json:"saveImage,omitempty"`
 	GetLargeAvatar     *HatLink `json:"getLargeAvatar,omitempty"`
-	GetThumbnailAvatar *HatLink `json:"getThumbnailAvatar",omitempty"`
+	GetThumbnailAvatar *HatLink `json:"getThumbnailAvatar,omitempty"`
 }
 
 type AvatarResponse struct {
