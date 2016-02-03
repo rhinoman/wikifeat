@@ -38,6 +38,7 @@ import (
 	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/users/user_service"
+	"net/http"
 	"testing"
 	"time"
 )
@@ -105,5 +106,45 @@ func TestSessions(t *testing.T) {
 		readSession.ExpiresAt != sess.ExpiresAt {
 		t.Error("Sessions are not equal!")
 	}
+	// Test GetAuth
+	req, err := http.NewRequest("GET", "http://localhost", nil)
+	if err != nil {
+		t.Error(err)
+	}
+	authCookie := &http.Cookie{
+		Name:     "AuthSession",
+		Value:    readSession.Id,
+		Path:     "/",
+		HttpOnly: true,
+	}
+	req.AddCookie(authCookie)
+	auth, err := am.GetAuth(req, "standard")
+	if err != nil {
+		t.Error(err)
+	}
+	auth.AddAuthHeaders(req)
+	t.Logf("Auth Headers: %v", req.Header)
+	//Try to make a request with this auth
+	readUser := entities.User{}
+	_, err = services.Connection.GetUser("John.Smith", &readUser, auth)
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("USER: %v", readUser)
+	if len(readUser.Roles) == 0 {
+		t.Error("Couldn't read user roles")
+	}
+	// Test UpdateSession
+	updatedSession, err := am.UpdateSession(sess.Id)
+	if err != nil {
+		t.Error(err)
+	}
+	if updatedSession.User != sess.User {
+		t.Error("User of updated session wrong")
+	}
+	if updatedSession.Id == sess.Id {
+		t.Error("Id not updated")
+	}
+	t.Logf("New Session: %v", updatedSession)
 
 }

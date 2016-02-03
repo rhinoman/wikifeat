@@ -52,7 +52,7 @@ type AuthManager struct{}
 
 var sessionsLocation = registry.EtcdPrefix + "/sessions/"
 
-//Get an autheticator
+//Get an authenticator
 func (am *AuthManager) getAuthenticator(authType string) Authenticator {
 	switch authType {
 	default:
@@ -175,7 +175,7 @@ func (am *AuthManager) saveSession(sess *Session) error {
 }
 
 //Produce an auth object from the given request
-func (am *AuthManager) GetAuth(req *http.Request, authType string) (*couchdb.ProxyAuth, error) {
+func (am *AuthManager) GetAuth(req *http.Request, authType string) (*WikifeatAuth, error) {
 	authenticator := am.getAuthenticator(authType)
 	sessionId, err := authenticator.GetSessionId(req)
 	if err != nil {
@@ -186,10 +186,9 @@ func (am *AuthManager) GetAuth(req *http.Request, authType string) (*couchdb.Pro
 	if err != nil {
 		return nil, UnauthenticatedError()
 	} else {
-		return &couchdb.ProxyAuth{
-			Username:  session.User,
-			Roles:     session.Roles,
-			AuthToken: sessionId,
+		return &WikifeatAuth{
+			Username: session.User,
+			Roles:    session.Roles,
 		}, nil
 	}
 }

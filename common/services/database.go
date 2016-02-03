@@ -47,6 +47,9 @@ var Connection *couchdb.Connection
 //The couchdb Admin credentials
 var AdminAuth couchdb.Auth
 
+//The couchdb server secret
+var CouchSecret string
+
 //The name of the main database
 var MainDb string
 
@@ -162,16 +165,22 @@ func InitDb() {
 	AvatarDb = config.Users.AvatarDb
 	//Set DB Configuration options
 	err = Connection.SetConfig("couch_httpd_auth",
-		"allow_persistent_cookies",
-		strconv.FormatBool(config.Auth.PersistentSessions),
+		"proxy_use_secret", "true", AdminAuth)
+	if err != nil {
+		log.Fatalf("Error! %v", err)
+	}
+	err = Connection.SetConfig("httpd",
+		"authentication_handlers",
+		"{couch_httpd_auth, default_authentication_handler},"+
+			"{couch_httpd_auth, proxy_authentication_handler},"+
+			"{couch_httpd_auth, cookie_authentication_handler}",
 		AdminAuth)
 	if err != nil {
 		log.Fatalf("Error! %v", err)
 	}
-	err = Connection.SetConfig("couch_httpd_auth",
-		"timeout",
-		strconv.FormatUint(config.Auth.SessionTimeout, 10),
-		AdminAuth)
+	//Get the server secret
+	CouchSecret, err = Connection.GetConfigOption("couch_httpd_auth",
+		"secret", AdminAuth)
 	if err != nil {
 		log.Fatalf("Error! %v", err)
 	}

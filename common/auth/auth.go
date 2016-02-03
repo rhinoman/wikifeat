@@ -30,9 +30,14 @@
 package auth
 
 import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/common/services"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -77,4 +82,33 @@ type UserLoginCredentials struct {
 	Username string `json:"name"`
 	Password string `json:"password"`
 	AuthType string `json:"auth_type"`
+}
+
+// Implements couchdb-go Auth interface
+type WikifeatAuth struct {
+	couchdb.ProxyAuth
+	Username string
+	Roles    []string
+}
+
+func (wa *WikifeatAuth) AddAuthHeaders(req *http.Request) {
+	req.Header.Set("X-Auth-CouchDB-Username", wa.Username)
+	rolesString := strings.Join(wa.Roles, ",")
+	req.Header.Set("X-Auth-CouchDB-Roles", rolesString)
+	// Compute the Auth Token
+	secret := services.CouchSecret
+	mac := hmac.New(sha1.New, []byte(secret))
+	mac.Write([]byte(wa.Username))
+	authToken := string(hex.EncodeToString(mac.Sum(nil)))
+	req.Header.Set("X-Auth-CouchDB-Token", authToken)
+}
+
+func (wa *WikifeatAuth) updateAuth(resp *http.Response) {}
+
+func (wa *WikifeatAuth) GetUpdatedAuth() map[string]string {
+	return nil
+}
+
+func (wa *WikifeatAuth) DebugString() string {
+	return fmt.Sprintf("Username: %v, Roles: %v", wa.Username, wa.Roles)
 }

@@ -535,6 +535,26 @@ func TestSetConfig(t *testing.T) {
 	errorify(t, err)
 }
 
+func TestGetConfig(t *testing.T) {
+	conn := getConnection(t)
+	val, err := conn.GetConfigOption("couch_httpd_auth", "authentication_db", adminAuth)
+	errorify(t, err)
+	if val != "_users" {
+		t.Error("The auth db is wrong: %v", val)
+	}
+	t.Logf("The auth db is : %v", val)
+	val, err = conn.GetConfigOption("couch_httpd_auth", "auth_cache_size", adminAuth)
+	if val != "50" {
+		t.Error("The auth cache size is wrong: %v", val)
+	}
+	t.Logf("Auth cache size is : %v", val)
+	val, err = conn.GetConfigOption("httpd", "allow_jsonp", adminAuth)
+	if val != "false" {
+		t.Error("allow jsonp value is wrong: %v", val)
+	}
+	t.Logf("Allow JSONP is : %v", val)
+}
+
 func TestDesignDocs(t *testing.T) {
 	conn := getConnection(t)
 	dbName := createTestDb(t)

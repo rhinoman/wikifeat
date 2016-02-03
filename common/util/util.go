@@ -35,6 +35,7 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha1"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -156,6 +157,14 @@ func EncodeJsonData(data interface{}) (io.Reader, int, error) {
 	} else {
 		return bytes.NewReader(buf), len(buf), nil
 	}
+}
+
+func EncodeBase64Url(data []byte) string {
+	b64 := base64.StdEncoding.EncodeToString(data)
+	b64 = strings.Replace(b64, "+", "-", -1)
+	b64 = strings.Replace(b64, "/", "_", -1)
+	b64 = strings.Replace(b64, "=", "", -1)
+	return b64
 }
 
 //Returns a minimum of two integers

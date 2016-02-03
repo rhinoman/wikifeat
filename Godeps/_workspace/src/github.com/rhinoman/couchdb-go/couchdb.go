@@ -115,6 +115,25 @@ func (conn *Connection) SetConfig(section string,
 	return err
 }
 
+//Gets a CouchDB configuration option
+func (conn *Connection) GetConfigOption(section string,
+	option string, auth Auth) (string, error) {
+	url, err := buildUrl("_config", section, option)
+	if err != nil {
+		return "", err
+	}
+	resp, err := conn.request("GET", url, nil, nil, auth)
+	var val interface{}
+	parseBody(resp, &val)
+	if num, ok := val.(int); ok == true {
+		return strconv.Itoa(num), nil
+	}
+	if str, ok := val.(string); ok == true {
+		return str, nil
+	}
+	return "", nil
+}
+
 type UserRecord struct {
 	Name     string   `json:"name"`
 	Password string   `json:"password,omitempty"`
