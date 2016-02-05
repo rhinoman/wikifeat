@@ -35,7 +35,7 @@ func (conn *connection) request(method, path string,
 	}
 	resp, err := conn.processResponse(0, req)
 	if err == nil && resp != nil && auth != nil {
-		auth.updateAuth(resp)
+		auth.UpdateAuth(resp)
 	}
 	return resp, err
 }

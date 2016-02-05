@@ -32,14 +32,12 @@ package auth_service
 
 import "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 import . "github.com/rhinoman/wikifeat/common/services"
-import "github.com/rhinoman/wikifeat/common/auth"
+import (
+	"github.com/rhinoman/wikifeat/common/auth"
+	"net/http"
+)
 
 type AuthController struct{}
-
-type SessionResponse struct {
-	Links   HatLinks     `json:"_links"`
-	Session auth.Session `json:"session"`
-}
 
 var authWebService *restful.WebService
 
@@ -66,33 +64,97 @@ func (ac AuthController) Register(container *restful.Container) {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	authWebService.Route(authWebService.POST("").To(ac.create).
+	authWebService.Route(authWebService.GET("").To(ac.getAuth).
+		Doc("Get authentication").
+		Operation("getAuth").
+		Writes(auth.WikifeatAuth{}))
+
+	authWebService.Route(authWebService.POST("/session").To(ac.create).
 		Doc("Create a Session").
 		Operation("create").
 		Reads(auth.UserLoginCredentials{}).
-		Writes(SessionResponse{}))
+		Writes(BooleanResponse{}))
+
+	authWebService.Route(authWebService.DELETE("/session").To(ac.del).
+		Doc("Destroy a Session").
+		Operation("del").
+		Writes(BooleanResponse{}))
+
+	container.Add(authWebService)
 
 }
 
+// Creates a session and sets a cookie in the http response
 func (ac AuthController) create(request *restful.Request,
 	response *restful.Response) {
 	credentials := auth.UserLoginCredentials{}
-	err := request.ReadEntity(credentials)
+	err := request.ReadEntity(&credentials)
 	if err != nil {
-		WriteServerError(err, response)
+		Unauthenticated(request, response)
+		return
 	}
 	am := new(AuthManager)
 	sess, err := am.Create(credentials.Username,
 		credentials.Password, credentials.AuthType)
-	sr := ac.genSessionResponse(sess)
-	response.WriteEntity(sr)
+	if err != nil {
+		Unauthenticated(request, response)
+		return
+	}
+	authCookie := ac.genAuthCookie(sess)
+	response.Header().Add("Set-Cookie", authCookie.String())
+	response.WriteEntity(BooleanResponse{Success: true})
 }
 
-func (ac AuthController) genSessionResponse(session *auth.Session) SessionResponse {
-	links := HatLinks{}
-	links.Self = &HatLink{Href: ac.sessionUri(session.Id)}
-	return SessionResponse{
-		Links:   links,
-		Session: *session,
+// Destroys a session
+func (ac AuthController) del(request *restful.Request,
+	response *restful.Response) {
+	am := new(AuthManager)
+	//Get the session id
+	sessId, err := am.GetSessionId(request.Request)
+	if err != nil {
+		Unauthenticated(request, response)
+		return
 	}
+	//Read the session
+	sess, err := am.ReadSession(sessId)
+	if err != nil {
+		Unauthenticated(request, response)
+		return
+	}
+	if err = am.Destroy(sess); err != nil {
+		WriteError(err, response)
+	} else {
+		//Clear the session cookie
+		theCookie := http.Cookie{
+			Name:     "AuthSession",
+			Value:    "",
+			Path:     "/",
+			HttpOnly: true,
+		}
+		response.AddHeader("Set-Cookie", theCookie.String())
+		response.WriteEntity(BooleanResponse{Success: true})
+	}
+}
+
+// Takes a session Id and returns an Auth object
+func (ac AuthController) getAuth(request *restful.Request,
+	response *restful.Response) {
+	req := request.Request
+	am := new(AuthManager)
+	wfAuth, err := am.GetAuth(req)
+	if err != nil {
+		WriteServerError(err, response)
+		return
+	}
+	response.WriteEntity(wfAuth)
+}
+
+func (ac AuthController) genAuthCookie(session *auth.Session) http.Cookie {
+	return http.Cookie{
+		Name:     "AuthSession",
+		Value:    session.Id,
+		Path:     "/",
+		HttpOnly: true,
+	}
+
 }

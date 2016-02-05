@@ -35,8 +35,8 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/gorilla/mux"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/golang.org/x/net/html"
-	"github.com/rhinoman/wikifeat/common/auth"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
@@ -196,8 +196,7 @@ func getResetPassword(w http.ResponseWriter, r *http.Request) {
 // Authenticate a user
 // Returns CurrentUserInfo if authenticated, error if not
 func AuthUser(r *http.Request) (*entities.CurrentUserInfo, error) {
-	authenticator := auth.NewAuthenticator(config.Auth.Authenticator)
-	cAuth, err := authenticator.GetAuth(r)
+	cAuth, err := services.GetAuth(r)
 	if err != nil && config.Auth.AllowGuest {
 		cAuth = &couchdb.BasicAuth{
 			Username: "guest",
@@ -206,7 +205,7 @@ func AuthUser(r *http.Request) (*entities.CurrentUserInfo, error) {
 	} else if err != nil {
 		return nil, err
 	}
-	userInfo, err := services.GetUserFromAuth(cAuth)
+	userInfo, err := database.GetUserFromAuth(cAuth)
 	if err != nil {
 		return nil, err
 	}

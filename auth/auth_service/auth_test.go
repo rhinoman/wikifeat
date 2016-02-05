@@ -34,9 +34,9 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/auth/auth_service"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/registry"
-	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/users/user_service"
 	"net/http"
 	"testing"
@@ -53,10 +53,10 @@ var user = entities.User{
 func setup(t *testing.T) {
 	config.LoadDefaults()
 	config.ServiceRegistry.CacheRefreshInterval = 1000
-	services.InitDb()
+	database.InitDb()
 	//This will cause the registry manager to complain, but we don't
 	//really need the service being registered here.
-	registry.Init("TestAuth", "/services/test/auth")
+	registry.Init("TestAuth", "/database/test/auth")
 	//We need to create a user in order to have any sessions, so
 	registration := user_service.Registration{
 		NewUser: user,
@@ -72,13 +72,13 @@ func afterTest(t *testing.T) {
 		Username: "John.Smith",
 		Password: "password",
 	}
-	userDoc, _ := services.GetUserFromAuth(auth)
+	userDoc, _ := database.GetUserFromAuth(auth)
 	curUser := &entities.CurrentUserInfo{
 		Auth: auth,
 		User: userDoc,
 	}
 	um.Delete(user.UserName, curUser)
-	services.DeleteDb(services.MainDbName())
+	database.DeleteDb(database.MainDbName())
 }
 
 func TestSessions(t *testing.T) {
@@ -118,7 +118,7 @@ func TestSessions(t *testing.T) {
 		HttpOnly: true,
 	}
 	req.AddCookie(authCookie)
-	auth, err := am.GetAuth(req, "standard")
+	auth, err := am.GetAuth(req)
 	if err != nil {
 		t.Error(err)
 	}
@@ -126,7 +126,7 @@ func TestSessions(t *testing.T) {
 	t.Logf("Auth Headers: %v", req.Header)
 	//Try to make a request with this auth
 	readUser := entities.User{}
-	_, err = services.Connection.GetUser("John.Smith", &readUser, auth)
+	_, err = database.Connection.GetUser("John.Smith", &readUser, auth)
 	if err != nil {
 		t.Error(err)
 	}

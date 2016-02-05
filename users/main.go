@@ -36,8 +36,8 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/registry"
-	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/users/user_service"
 	"log"
@@ -67,7 +67,7 @@ func main() {
 	wsContainer.EnableContentEncoding(true)
 	uc := user_service.UsersController{}
 	uc.Register(wsContainer)
-	services.InitDb()
+	database.InitDb()
 	registry.Init("Users", registry.UsersLocation)
 	httpAddr := ":" + config.Service.Port
 	if config.Service.UseSSL == true {

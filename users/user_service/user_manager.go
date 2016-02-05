@@ -36,9 +36,10 @@ import (
 	"errors"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/common/config"
+	. "github.com/rhinoman/wikifeat/common/database"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/registry"
-	. "github.com/rhinoman/wikifeat/common/services"
+	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"log"
 	"net/http"
@@ -311,14 +312,14 @@ func (um *UserManager) ResetPassword(id string, tr *ResetTokenRequest) error {
 		}
 	}
 	cpr := ChangePasswordRequest{NewPassword: tr.NewPassword}
-	rev, err = um.ChangePassword(id, rev, &cpr, GetAdminUser())
+	rev, err = um.ChangePassword(id, rev, &cpr, services.GetAdminUser())
 	if err != nil {
 		return err
 	}
 	//Now, expire the token
 	user.PassResetToken.Token = ""
 	user.PassResetToken.Expires = nowTime
-	_, err = um.Update(id, rev, &user, GetAdminUser())
+	_, err = um.Update(id, rev, &user, services.GetAdminUser())
 	return err
 }
 
@@ -451,7 +452,7 @@ func (um *UserManager) RequestPasswordReset(id string) error {
 	user.PassResetToken.Expires = expireTime
 	//Now save the user
 	log.Println("Saving reset token to user document")
-	rev, err = um.Update(id, rev, &user, GetAdminUser())
+	rev, err = um.Update(id, rev, &user, services.GetAdminUser())
 	if err != nil {
 		return err
 	}

@@ -34,7 +34,9 @@ import (
 	"errors"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/common/auth"
 	"github.com/rhinoman/wikifeat/common/config"
+	. "github.com/rhinoman/wikifeat/common/database"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/util"
 	"log"
@@ -130,16 +132,6 @@ func LogError(request *restful.Request, resp *restful.Response, err error) {
 	log.Printf("[ERROR] %v : %v : %v %v", err, remoteAddr, method, url)
 }
 
-func GetAuth(req *http.Request) (couchdb.Auth, error) {
-	//Check for Basic Auth
-	if req.Header.Get("Authorization") != "" {
-		return &couchdb.PassThroughAuth{
-			AuthHeader: req.Header.Get("Authorization"),
-		}, nil
-	}
-	return nil, nil
-}
-
 //Filter function, figures out the current user from the auth header
 func AuthUser(request *restful.Request, resp *restful.Response,
 	chain *restful.FilterChain) {
@@ -166,6 +158,17 @@ func AuthUser(request *restful.Request, resp *restful.Response,
 	}
 	request.SetAttribute("currentUser", cui)
 	chain.ProcessFilter(request, resp)
+}
+
+func GetAuth(request *http.Request) (couchdb.Auth, error) {
+	if bAuth := auth.GetBasicAuth(request); bAuth != nil {
+		return bAuth, nil
+	}
+	if wAuth, err := auth.GetAuth(request); err != nil {
+		return nil, err
+	} else {
+		return wAuth, nil
+	}
 }
 
 //Set Updated auth cookies

@@ -37,8 +37,8 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
 	"github.com/rhinoman/wikifeat/auth/auth_service"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/registry"
-	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"log"
 	"net/http"
@@ -65,7 +65,7 @@ func main() {
 	wsContainer.Router(restful.CurlyRouter{})
 	//Enable Gzip
 	wsContainer.EnableContentEncoding(true)
-	services.InitDb()
+	database.InitDb()
 	registry.Init("Auth", registry.AuthLocation)
 	ac := auth_service.AuthController{}
 	ac.Register(wsContainer)

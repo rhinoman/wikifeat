@@ -35,8 +35,8 @@ import (
 	"flag"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/registry"
-	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/frontend/fserv"
 	"github.com/rhinoman/wikifeat/frontend/routing"
@@ -54,7 +54,7 @@ func main() {
 	// Load configuration
 	config.LoadConfig(*configFile)
 	fserv.LoadPluginData(config.Frontend.PluginDir + "/plugins.ini")
-	services.InitDb()
+	database.InitDb()
 	// Set up the core logger
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   config.Logger.LogFile,

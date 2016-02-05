@@ -34,8 +34,9 @@ import (
 	"bytes"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/nfnt/resize"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	. "github.com/rhinoman/wikifeat/common/database"
 	. "github.com/rhinoman/wikifeat/common/entities"
-	. "github.com/rhinoman/wikifeat/common/services"
+	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"image"
 	_ "image/gif"
@@ -135,7 +136,7 @@ func (uam *UserAvatarManager) SaveImage(id string, rev string, attType string,
 	if err != nil {
 		return "", err
 	}
-	theUri := ApiPrefix() + "/users" + avatarUri
+	theUri := services.ApiPrefix() + "/users" + avatarUri
 	user.Public.Avatar = strings.Replace(theUri+"/image", "{user-id}", id, 1)
 	user.Public.AvatarThumbnail = strings.Replace(theUri+"/thumbnail", "{user-id}", id, 1)
 	if uRev, err = um.Update(id, uRev, &user, curUser); err != nil {

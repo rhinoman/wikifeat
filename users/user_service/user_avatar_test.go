@@ -34,8 +34,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/entities"
-	"github.com/rhinoman/wikifeat/common/services"
 	. "github.com/rhinoman/wikifeat/users/user_service"
 	"io/ioutil"
 	"testing"
@@ -44,14 +44,14 @@ import (
 var tinyJpeg = "ffd8ffe000104a46494600010101004800480000ffdb0043000302020302020303030304030304050805050404050a070706080c0a0c0c0b0a0b0b0d0e12100d0e110e0b0b1016101113141515150c0f171816141812141514ffc2000b080002000201011100ffc40014000100000000000000000000000000000007ffda00080101000000011effc400161001010100000000000000000000000000050604ffda0008010100010502a1a15303ff00ffc4001a100003010101010000000000000000000001020304050021ffda0008010100063f02e966cdd2d99f3474d2728caeca88a1880a003f07bfffc40017100100030000000000000000000000000001001121ffda0008010100013f21a27af3de5800006013ffda0008010100000010ff00ffc4001510010100000000000000000000000000000100ffda0008010100013f103fe8904041f2800002ffd9"
 
 func setAvatarDbSecurity() error {
-	db := services.Connection.SelectDB(services.AvatarDb, services.AdminAuth)
+	db := database.Connection.SelectDB(database.AvatarDb, database.AdminAuth)
 	fmt.Println("Fetching Security document")
 	sec, err := db.GetSecurity()
 	if err != nil {
 		return err
 	}
-	sec.Admins.Roles = []string{services.AdminRole(services.MainDb),
-		services.MasterRole()}
+	sec.Admins.Roles = []string{database.AdminRole(database.MainDb),
+		database.MasterRole()}
 	sec.Members.Roles = []string{"all_users", "guest"}
 	fmt.Println("Setting Security for Avatar Database")
 	return db.SaveSecurity(*sec)
@@ -61,7 +61,7 @@ func TestUserAvatars(t *testing.T) {
 	setup()
 	uam := new(UserAvatarManager)
 	//Create the user Avatar Db
-	err := services.CreateDb(services.AvatarDb)
+	err := database.CreateDb(database.AvatarDb)
 	if err != nil {
 		t.Error(err)
 	}
@@ -69,11 +69,11 @@ func TestUserAvatars(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	defer services.DeleteDb(services.AvatarDb)
-	defer services.DeleteDb(services.MainDb)
+	defer database.DeleteDb(database.AvatarDb)
+	defer database.DeleteDb(database.MainDb)
 	smithUser := func() *entities.CurrentUserInfo {
 		smithAuth := &couchdb.BasicAuth{Username: "Steven.Smith", Password: "jabberwocky"}
-		smith, err := services.GetUserFromAuth(smithAuth)
+		smith, err := database.GetUserFromAuth(smithAuth)
 		if err != nil {
 			t.Error(err)
 			return &entities.CurrentUserInfo{}

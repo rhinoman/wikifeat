@@ -2,6 +2,9 @@
 
 WIKIPATH=$GOPATH/src/github.com/rhinoman/wikifeat
 
+cd $WIKIPATH/auth
+./auth&
+sleep 2
 cd $WIKIPATH/users
 ./users&
 sleep 2

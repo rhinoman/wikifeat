@@ -159,6 +159,12 @@ func EncodeJsonData(data interface{}) (io.Reader, int, error) {
 	}
 }
 
+//Decodes a json response body and returns a struct
+func DecodeJsonData(body io.Reader, result interface{}) error {
+	decoder := json.NewDecoder(body)
+	return decoder.Decode(result)
+}
+
 func EncodeBase64Url(data []byte) string {
 	b64 := base64.StdEncoding.EncodeToString(data)
 	b64 = strings.Replace(b64, "+", "-", -1)

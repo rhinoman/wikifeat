@@ -55,7 +55,7 @@
 		},
 		{
 			"ImportPath": "github.com/rhinoman/couchdb-go",
-			"Rev": "5cd7e5f2521a934735d19da4dbbe61fc4a932d21"
+			"Rev": "c8de65280d35a8c6baace118df307f7d6f61d0b3"
 		},
 		{
 			"ImportPath": "github.com/rhinoman/go-commonmark",

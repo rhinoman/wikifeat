@@ -35,18 +35,15 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	"github.com/rhinoman/wikifeat/common/services"
+	"github.com/rhinoman/wikifeat/common/database"
+	"github.com/rhinoman/wikifeat/common/registry"
+	"github.com/rhinoman/wikifeat/common/util"
 	"net/http"
 	"strings"
 	"time"
 )
 
 type Authenticator interface {
-	// Reads Auth information/headers from a request and returns a session Id
-	GetSessionId(*http.Request) (string, error)
-	// Updates authentication information in the http response before sending it down
-	// Usually, this is used to update Auth cookies, CSRF tokens, etc.
-	SetAuth(http.ResponseWriter, couchdb.Auth)
 	// Creates a new session (i.e., logs a user in)
 	CreateSession(string, string) (*Session, error)
 	// Destroys a session (i.e., logs a user out)
@@ -86,9 +83,8 @@ type UserLoginCredentials struct {
 
 // Implements couchdb-go Auth interface
 type WikifeatAuth struct {
-	couchdb.ProxyAuth
-	Username string
-	Roles    []string
+	Username string   `json:"name"`
+	Roles    []string `json:"roles"`
 }
 
 func (wa *WikifeatAuth) AddAuthHeaders(req *http.Request) {
@@ -96,14 +92,14 @@ func (wa *WikifeatAuth) AddAuthHeaders(req *http.Request) {
 	rolesString := strings.Join(wa.Roles, ",")
 	req.Header.Set("X-Auth-CouchDB-Roles", rolesString)
 	// Compute the Auth Token
-	secret := services.CouchSecret
+	secret := database.CouchSecret
 	mac := hmac.New(sha1.New, []byte(secret))
 	mac.Write([]byte(wa.Username))
 	authToken := string(hex.EncodeToString(mac.Sum(nil)))
 	req.Header.Set("X-Auth-CouchDB-Token", authToken)
 }
 
-func (wa *WikifeatAuth) updateAuth(resp *http.Response) {}
+func (wa *WikifeatAuth) UpdateAuth(resp *http.Response) {}
 
 func (wa *WikifeatAuth) GetUpdatedAuth() map[string]string {
 	return nil
@@ -111,4 +107,70 @@ func (wa *WikifeatAuth) GetUpdatedAuth() map[string]string {
 
 func (wa *WikifeatAuth) DebugString() string {
 	return fmt.Sprintf("Username: %v, Roles: %v", wa.Username, wa.Roles)
+}
+
+func AddCsrfCookie(rw http.ResponseWriter, sessToken string) {
+	csrfCookie := http.Cookie{
+		Name:     "CsrfToken",
+		Value:    util.GenHashString(sessToken),
+		Path:     "/",
+		HttpOnly: false,
+	}
+	rw.Header().Add("Set-Cookie", csrfCookie.String())
+}
+
+func CheckCsrf(request *http.Request) error {
+	//Check CSRF token
+	csrfCookie, err := request.Cookie("CsrfToken")
+	ourCsrf := request.Header.Get("X-Csrf-Token")
+	if err != nil || ourCsrf == "" {
+		return UnauthenticatedError()
+	} else if token := csrfCookie.Value; token != ourCsrf {
+		return UnauthenticatedError()
+	} else {
+		return nil
+	}
+}
+
+func GetBasicAuth(req *http.Request) couchdb.Auth {
+	//Check first for Basic Auth
+	if req.Header.Get("Authorization") != "" {
+		return &couchdb.PassThroughAuth{
+			AuthHeader: req.Header.Get("Authorization"),
+		}
+	} else {
+		return nil
+	}
+}
+
+func GetAuth(req *http.Request) (couchdb.Auth, error) {
+	//Attempt to load auth from auth service
+	authEndpoint, err := registry.GetServiceLocation("auth")
+	if err != nil {
+		return nil, err
+	}
+	reqUrl := authEndpoint + "/api/v1/auth"
+	request, err := http.NewRequest("GET", reqUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+	client := &http.Client{}
+	sessCookie, err := req.Cookie("AuthSession")
+	if err != nil {
+		return nil, err
+	}
+	request.Header.Add("Set-Cookie", sessCookie.String())
+	request.Header.Add("Accept", "application/json")
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	//The response body should contain our Auth object
+	auth := WikifeatAuth{}
+	if err = util.DecodeJsonData(resp.Body, &auth); err != nil {
+		return nil, err
+	} else {
+		return &auth, nil
+	}
 }

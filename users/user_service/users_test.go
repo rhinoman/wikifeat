@@ -35,8 +35,8 @@ import (
 	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/smartystreets/goconvey/convey"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/entities"
-	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/users/user_service"
 	"testing"
@@ -53,7 +53,7 @@ var um = new(user_service.UserManager)
 
 func setup() {
 	config.LoadDefaults()
-	services.InitDb()
+	database.InitDb()
 }
 
 func getUuid() string {
@@ -67,7 +67,7 @@ func grabUser(id string, user *entities.User, auth couchdb.Auth) (string, error)
 }
 
 func getCurUser(auth couchdb.Auth) *entities.CurrentUserInfo {
-	userDoc, err := services.GetUserFromAuth(auth)
+	userDoc, err := database.GetUserFromAuth(auth)
 	if err != nil {
 		fmt.Printf("\nERROR: %v\n", err)
 	}
@@ -80,10 +80,10 @@ func getCurUser(auth couchdb.Auth) *entities.CurrentUserInfo {
 
 func TestUsers(t *testing.T) {
 	setup()
-	defer services.DeleteDb(services.MainDb)
+	defer database.DeleteDb(database.MainDb)
 	smithUser := func() *entities.CurrentUserInfo {
 		smithAuth := &couchdb.BasicAuth{Username: "Steven.Smith", Password: "jabberwocky"}
-		smith, err := services.GetUserFromAuth(smithAuth)
+		smith, err := database.GetUserFromAuth(smithAuth)
 		if err != nil {
 			t.Error(err)
 			return &entities.CurrentUserInfo{}

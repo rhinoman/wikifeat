@@ -36,8 +36,8 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/registry"
-	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/notifications/notification_service"
 	"log"
@@ -68,7 +68,7 @@ func main() {
 	//Register the notifications controller
 	nc := notification_service.NotificationsController{}
 	nc.Register(wsContainer)
-	services.InitDb()
+	database.InitDb()
 	//Register with the service registry
 	registry.Init("Notifications", registry.NotificationsLocation)
 	httpAddr := ":" + config.Service.Port

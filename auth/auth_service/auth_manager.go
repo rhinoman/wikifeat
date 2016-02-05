@@ -38,9 +38,9 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/golang.org/x/net/context"
 	. "github.com/rhinoman/wikifeat/common/auth"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/registry"
-	"github.com/rhinoman/wikifeat/common/services"
 	"github.com/rhinoman/wikifeat/common/util"
 	"net/http"
 	"time"
@@ -175,9 +175,8 @@ func (am *AuthManager) saveSession(sess *Session) error {
 }
 
 //Produce an auth object from the given request
-func (am *AuthManager) GetAuth(req *http.Request, authType string) (*WikifeatAuth, error) {
-	authenticator := am.getAuthenticator(authType)
-	sessionId, err := authenticator.GetSessionId(req)
+func (am *AuthManager) GetAuth(req *http.Request) (*WikifeatAuth, error) {
+	sessionId, err := am.GetSessionId(req)
 	if err != nil {
 		return nil, UnauthenticatedError()
 	}
@@ -193,9 +192,26 @@ func (am *AuthManager) GetAuth(req *http.Request, authType string) (*WikifeatAut
 	}
 }
 
+// extracts the session Id from the http request headers
+func (am *AuthManager) GetSessionId(req *http.Request) (string, error) {
+	//Ok, check for a session cookie
+	sessCookie, err := req.Cookie("AuthSession")
+	if err != nil {
+		return "", UnauthenticatedError()
+	}
+	sessionToken := sessCookie.Value
+	//csrfErr := sta.checkCsrf(req)
+	if sessionToken == "" {
+		//Bad user, no cookie
+		return "", UnauthenticatedError()
+	}
+	//Return the sessionId
+	return sessionToken, nil
+}
+
 func getUser(username string) (*entities.User, error) {
 	user := entities.User{}
-	_, err := services.Connection.GetUser(username, &user, services.AdminAuth)
+	_, err := database.Connection.GetUser(username, &user, database.AdminAuth)
 	if err != nil {
 		return nil, err
 	} else {

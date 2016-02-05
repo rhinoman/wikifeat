@@ -25,3 +25,7 @@ _testmain.go
 
 #Misc junk
 *.swp
+
+#Idea stuff
+.idea/
+*.iml

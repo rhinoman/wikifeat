@@ -12,7 +12,7 @@ type Auth interface {
 	//Adds authentication headers to a request
 	AddAuthHeaders(*http.Request)
 	//Extracts Updated auth info from Couch Response
-	updateAuth(*http.Response)
+	UpdateAuth(*http.Response)
 	//Sets updated auth (headers, cookies, etc.) in an http response
 	//For the update function, the map keys are cookie and/or header names
 	GetUpdatedAuth() map[string]string
@@ -77,10 +77,10 @@ func (pa *ProxyAuth) AddAuthHeaders(req *http.Request) {
 //it is available to an application
 
 //do nothing for basic auth
-func (ba *BasicAuth) updateAuth(resp *http.Response) {}
+func (ba *BasicAuth) UpdateAuth(resp *http.Response) {}
 
 //Couchdb returns updated AuthSession tokens
-func (ca *CookieAuth) updateAuth(resp *http.Response) {
+func (ca *CookieAuth) UpdateAuth(resp *http.Response) {
 	for _, cookie := range resp.Cookies() {
 		if cookie.Name == "AuthSession" {
 			ca.UpdatedAuthToken = cookie.Value
@@ -89,10 +89,10 @@ func (ca *CookieAuth) updateAuth(resp *http.Response) {
 }
 
 //do nothing for pass through
-func (pta *PassThroughAuth) updateAuth(resp *http.Response) {}
+func (pta *PassThroughAuth) UpdateAuth(resp *http.Response) {}
 
 //do nothing for proxy auth
-func (pa *ProxyAuth) updateAuth(resp *http.Response) {}
+func (pa *ProxyAuth) UpdateAuth(resp *http.Response) {}
 
 //Get Updated Auth
 //Does nothing for BasicAuth

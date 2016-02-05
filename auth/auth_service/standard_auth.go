@@ -32,8 +32,7 @@ package auth_service
 import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	. "github.com/rhinoman/wikifeat/common/auth"
-	"github.com/rhinoman/wikifeat/common/services"
-	"github.com/rhinoman/wikifeat/common/util"
+	"github.com/rhinoman/wikifeat/common/database"
 	"net/http"
 )
 
@@ -41,23 +40,6 @@ import (
  * Standard Authenticator - we authenticate against CouchDB users directly
  */
 type StandardAuthenticator struct{}
-
-// Very simple for the standard auth, the AuthSession cookie value *is* the session id
-func (sta StandardAuthenticator) GetSessionId(req *http.Request) (string, error) {
-	//Ok, check for a session cookie
-	sessCookie, err := req.Cookie("AuthSession")
-	if err != nil {
-		return "", UnauthenticatedError()
-	}
-	sessionToken := sessCookie.Value
-	//csrfErr := sta.checkCsrf(req)
-	if sessionToken == "" {
-		//Bad user, no cookie
-		return "", UnauthenticatedError()
-	}
-	//Return the sessionId
-	return sessionToken, nil
-}
 
 func (sta StandardAuthenticator) SetAuth(rw http.ResponseWriter, cAuth couchdb.Auth) {
 	authData := cAuth.GetUpdatedAuth()
@@ -71,15 +53,7 @@ func (sta StandardAuthenticator) SetAuth(rw http.ResponseWriter, cAuth couchdb.A
 			Path:     "/",
 			HttpOnly: true,
 		}
-		//Create a CSRF cookie
-		csrfCookie := http.Cookie{
-			Name:     "CsrfToken",
-			Value:    util.GenHashString(val),
-			Path:     "/",
-			HttpOnly: false,
-		}
 		rw.Header().Add("Set-Cookie", authCookie.String())
-		rw.Header().Add("Set-Cookie", csrfCookie.String())
 	}
 }
 
@@ -90,7 +64,7 @@ func (sta StandardAuthenticator) CreateSession(username, password string) (*Sess
 		Username: username,
 		Password: password,
 	}
-	authInfo, err := services.Connection.GetAuthInfo(ba)
+	authInfo, err := database.Connection.GetAuthInfo(ba)
 	if err != nil || authInfo == nil {
 		return nil, UnauthenticatedError()
 	} else if !authInfo.Ok || authInfo.UserCtx.Name == "" {
@@ -102,17 +76,4 @@ func (sta StandardAuthenticator) CreateSession(username, password string) (*Sess
 // The StandardAuthenticator need do nothing here.
 func (sta StandardAuthenticator) DestroySession(sessionId string) error {
 	return nil
-}
-
-func (sta StandardAuthenticator) checkCsrf(request *http.Request) error {
-	//Check CSRF token
-	csrfCookie, err := request.Cookie("CsrfToken")
-	ourCsrf := request.Header.Get("X-Csrf-Token")
-	if err != nil || ourCsrf == "" {
-		return UnauthenticatedError()
-	} else if token := csrfCookie.Value; token != ourCsrf {
-		return UnauthenticatedError()
-	} else {
-		return nil
-	}
 }
