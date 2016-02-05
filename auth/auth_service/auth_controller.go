@@ -101,7 +101,7 @@ func (ac AuthController) create(request *restful.Request,
 		return
 	}
 	authCookie := ac.genAuthCookie(sess)
-	response.Header().Add("Set-Cookie", authCookie.String())
+	response.AddHeader("Set-Cookie", authCookie.String())
 	response.WriteEntity(BooleanResponse{Success: true})
 }
 

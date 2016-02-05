@@ -51,7 +51,7 @@
       };
       $.ajax({
         type: "POST",
-        url: "api/v1/users/login",
+        url: "api/v1/auth/session",
         data: JSON.stringify(loginCredentials),
         contentType: "application/json",
         dataType: "json"

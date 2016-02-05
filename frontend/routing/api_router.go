@@ -39,6 +39,7 @@ import (
 func handleApiRoutes(ar *mux.Router) {
 	ar.PathPrefix("/users").HandlerFunc(userHandler)
 	ar.PathPrefix("/wikis").HandlerFunc(wikiHandler)
+	ar.PathPrefix("/auth").HandlerFunc(authHandler)
 }
 
 func userHandler(w http.ResponseWriter, r *http.Request) {
@@ -53,6 +54,15 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 func wikiHandler(w http.ResponseWriter, r *http.Request) {
 	if endpoint, err := registry.GetServiceLocation("wikis"); err != nil {
 		log.Println("No Available Wiki Services!")
+		w.WriteHeader(http.StatusServiceUnavailable)
+	} else {
+		reverseProxy(endpoint, w, r)
+	}
+}
+
+func authHandler(w http.ResponseWriter, r *http.Request) {
+	if endpoint, err := registry.GetServiceLocation("auth"); err != nil {
+		log.Println("No Available Auth Services!")
 		w.WriteHeader(http.StatusServiceUnavailable)
 	} else {
 		reverseProxy(endpoint, w, r)

@@ -159,7 +159,7 @@ func GetAuth(req *http.Request) (couchdb.Auth, error) {
 	if err != nil {
 		return nil, err
 	}
-	request.Header.Add("Set-Cookie", sessCookie.String())
+	request.AddCookie(sessCookie)
 	request.Header.Add("Accept", "application/json")
 	resp, err := client.Do(request)
 	if err != nil {
