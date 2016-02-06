@@ -135,10 +135,9 @@ func LogError(request *restful.Request, resp *restful.Response, err error) {
 //Filter function, figures out the current user from the auth header
 func AuthUser(request *restful.Request, resp *restful.Response,
 	chain *restful.FilterChain) {
-	//authenticator := auth.NewAuthenticator(config.Auth.Authenticator)
 	//Check for a basic auth header
 	cAuth, err := GetAuth(request.Request)
-	if err != nil && config.Auth.AllowGuest {
+	if err == http.ErrNoCookie && config.Auth.AllowGuest {
 		cAuth = &couchdb.BasicAuth{
 			Username: "guest",
 			Password: "guest",
@@ -166,6 +165,8 @@ func GetAuth(request *http.Request) (couchdb.Auth, error) {
 	}
 	if wAuth, err := auth.GetAuth(request); err != nil {
 		return nil, err
+	} else if csrfErr := auth.CheckCsrf(request); csrfErr != nil {
+		return nil, err
 	} else {
 		return wAuth, nil
 	}
@@ -173,6 +174,7 @@ func GetAuth(request *http.Request) (couchdb.Auth, error) {
 
 //Set Updated auth cookies
 func SetAuth(response *restful.Response, cAuth couchdb.Auth) {
+	auth.SetAuth(response.ResponseWriter, cAuth)
 	//authenticator := auth.NewAuthenticator(config.Auth.Authenticator)
 	//authenticator.SetAuth(response.ResponseWriter, cAuth)
 }
@@ -193,6 +195,8 @@ func Unauthenticated(request *restful.Request, response *restful.Response) {
 	LogError(request, response, errors.New("Unauthenticated"))
 	response.AddHeader("Content-Type", "text/plain")
 	response.WriteErrorString(401, "Unauthenticated")
+	//Clear any Auth cookies that might be hanging around
+	auth.ClearAuth(response.ResponseWriter)
 }
 
 func WriteIllegalRequestError(response *restful.Response) {

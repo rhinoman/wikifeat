@@ -33,29 +33,12 @@ import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	. "github.com/rhinoman/wikifeat/common/auth"
 	"github.com/rhinoman/wikifeat/common/database"
-	"net/http"
 )
 
 /**
  * Standard Authenticator - we authenticate against CouchDB users directly
  */
 type StandardAuthenticator struct{}
-
-func (sta StandardAuthenticator) SetAuth(rw http.ResponseWriter, cAuth couchdb.Auth) {
-	authData := cAuth.GetUpdatedAuth()
-	if authData == nil {
-		return
-	}
-	if val, ok := authData["AuthSession"]; ok {
-		authCookie := http.Cookie{
-			Name:     "AuthSession",
-			Value:    val,
-			Path:     "/",
-			HttpOnly: true,
-		}
-		rw.Header().Add("Set-Cookie", authCookie.String())
-	}
-}
 
 // Create a new session by validating against a user's couchdb credentials
 func (sta StandardAuthenticator) CreateSession(username, password string) (*Session, error) {

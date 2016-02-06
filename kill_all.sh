@@ -5,3 +5,4 @@ pgrep wikis | xargs kill
 pgrep users | xargs kill
 pgrep notifications | xargs kill
 pgrep frontend | xargs kill
+pgrep auth | xargs kill

@@ -45,7 +45,7 @@ define([
     var UserController = Marionette.Controller.extend({
         logout: function(){
             $.ajax({
-                url: "/api/v1/users/login",
+                url: "/api/v1/auth/session",
                 type: "DELETE"
             }).done(function(msg){
                 console.log("logout: " + msg);

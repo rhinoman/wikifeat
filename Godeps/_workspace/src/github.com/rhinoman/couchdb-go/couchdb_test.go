@@ -595,6 +595,12 @@ func TestDesignDocs(t *testing.T) {
 	} else {
 		t.Logf("Rev of design doc: %v\n", rev)
 	}
+	//Now, read the design doc
+	readDdoc := DesignDocument{}
+	_, err = db.Read("_design/colors", &readDdoc, nil)
+	if err != nil {
+		errorify(t, err)
+	}
 	result := ViewResponse{}
 	//now try to query the view
 	err = db.GetView("colors", "find_all_magenta", &result, nil)

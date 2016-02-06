@@ -197,7 +197,7 @@ func getResetPassword(w http.ResponseWriter, r *http.Request) {
 // Returns CurrentUserInfo if authenticated, error if not
 func AuthUser(r *http.Request) (*entities.CurrentUserInfo, error) {
 	cAuth, err := services.GetAuth(r)
-	if err != nil && config.Auth.AllowGuest {
+	if err == http.ErrNoCookie && config.Auth.AllowGuest {
 		cAuth = &couchdb.BasicAuth{
 			Username: "guest",
 			Password: "guest",

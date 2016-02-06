@@ -73,6 +73,7 @@ build/
 dist/
 *.log
 .sass-cache/
+clean_build.sh
 
 #PYTHON
 __pycache__

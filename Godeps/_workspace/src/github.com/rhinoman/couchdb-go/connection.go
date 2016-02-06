@@ -167,12 +167,21 @@ func parseError(resp *http.Response) error {
 
 //smooshes url segments together
 func buildString(pathSegments []string) string {
+	pathSegments = makeSegments(pathSegments)
 	urlString := ""
 	for _, pathSegment := range pathSegments {
 		urlString += "/"
 		urlString += url.QueryEscape(pathSegment)
 	}
 	return urlString
+}
+
+func makeSegments(pathSegments []string) []string {
+	segments := []string{}
+	for _, segment := range pathSegments {
+		segments = append(segments, strings.Split(segment, "/")...)
+	}
+	return segments
 }
 
 //Build Url

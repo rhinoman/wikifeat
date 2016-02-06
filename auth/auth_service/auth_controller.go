@@ -102,6 +102,7 @@ func (ac AuthController) create(request *restful.Request,
 	}
 	authCookie := ac.genAuthCookie(sess)
 	response.AddHeader("Set-Cookie", authCookie.String())
+	auth.AddCsrfCookie(response.ResponseWriter, sess.Id)
 	response.WriteEntity(BooleanResponse{Success: true})
 }
 
@@ -125,13 +126,7 @@ func (ac AuthController) del(request *restful.Request,
 		WriteError(err, response)
 	} else {
 		//Clear the session cookie
-		theCookie := http.Cookie{
-			Name:     "AuthSession",
-			Value:    "",
-			Path:     "/",
-			HttpOnly: true,
-		}
-		response.AddHeader("Set-Cookie", theCookie.String())
+		auth.ClearAuth(response.ResponseWriter)
 		response.WriteEntity(BooleanResponse{Success: true})
 	}
 }

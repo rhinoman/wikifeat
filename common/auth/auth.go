@@ -35,6 +35,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/common/util"
@@ -83,8 +84,9 @@ type UserLoginCredentials struct {
 
 // Implements couchdb-go Auth interface
 type WikifeatAuth struct {
-	Username string   `json:"name"`
-	Roles    []string `json:"roles"`
+	Username  string   `json:"name"`
+	Roles     []string `json:"roles"`
+	NextToken string   `json:"next_token"`
 }
 
 func (wa *WikifeatAuth) AddAuthHeaders(req *http.Request) {
@@ -102,7 +104,11 @@ func (wa *WikifeatAuth) AddAuthHeaders(req *http.Request) {
 func (wa *WikifeatAuth) UpdateAuth(resp *http.Response) {}
 
 func (wa *WikifeatAuth) GetUpdatedAuth() map[string]string {
-	return nil
+	ua := make(map[string]string)
+	if wa.NextToken != "" {
+		ua["AuthSession"] = wa.NextToken
+	}
+	return ua
 }
 
 func (wa *WikifeatAuth) DebugString() string {
@@ -144,6 +150,11 @@ func GetBasicAuth(req *http.Request) couchdb.Auth {
 }
 
 func GetAuth(req *http.Request) (couchdb.Auth, error) {
+	//Check if we have a session cookie first
+	sessCookie, err := req.Cookie("AuthSession")
+	if err != nil {
+		return nil, err
+	}
 	//Attempt to load auth from auth service
 	authEndpoint, err := registry.GetServiceLocation("auth")
 	if err != nil {
@@ -155,10 +166,6 @@ func GetAuth(req *http.Request) (couchdb.Auth, error) {
 		return nil, err
 	}
 	client := &http.Client{}
-	sessCookie, err := req.Cookie("AuthSession")
-	if err != nil {
-		return nil, err
-	}
 	request.AddCookie(sessCookie)
 	request.Header.Add("Accept", "application/json")
 	resp, err := client.Do(request)
@@ -173,4 +180,36 @@ func GetAuth(req *http.Request) (couchdb.Auth, error) {
 	} else {
 		return &auth, nil
 	}
+}
+
+func SetAuth(rw http.ResponseWriter, ca couchdb.Auth) {
+	authData := ca.GetUpdatedAuth()
+	if authData == nil {
+		return
+	}
+	ttl := time.Duration(config.Auth.SessionTimeout) * time.Second
+	if val, ok := authData["AuthSession"]; ok {
+		authCookie := http.Cookie{
+			Name:     "AuthSession",
+			Value:    val,
+			Expires:  time.Now().Add(ttl),
+			Path:     "/",
+			HttpOnly: true,
+		}
+		rw.Header().Add("Set-Cookie", authCookie.String())
+		AddCsrfCookie(rw, util.GenHashString(val))
+	}
+}
+
+func ClearAuth(rw http.ResponseWriter) {
+	//Clear the session cookie
+	theCookie := http.Cookie{
+		Name:     "AuthSession",
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Now().Add(-100 * time.Hour),
+		MaxAge:   -1,
+		HttpOnly: true,
+	}
+	rw.Header().Add("Set-Cookie", theCookie.String())
 }
