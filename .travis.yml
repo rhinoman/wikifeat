@@ -25,15 +25,15 @@ script:
  - cd ..
  - cd users
  - go test -v ./...
- - sleep 1s
+ - sleep 2s
  - cd ../wikis
  - go test -v ./...
- - sleep 1s
+ - sleep 2s
  - cd ../notifications
  - go test -v ./...
- - sleep 1s
+ - sleep 2s
  - cd ../frontend
  - go test -v ./...
- - sleep 1s
+ - sleep 2s
  - cd ../auth
  - go test -v ./...

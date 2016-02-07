@@ -47,7 +47,6 @@ require.config({
         moment: 'vendor/moment/moment',
         wikifeat: 'vendor/wikifeat-api/wikifeat-api',
         commonmark: 'vendor/commonmark/dist/commonmark',
-        markdown: 'vendor/wikifeat-pagedown/Markdown.Editor',
         'markdown-converter': 'vendor/wikifeat-pagedown/Markdown.Converter',
         markette: 'vendor/markette/js/markette'
     },
@@ -57,15 +56,6 @@ require.config({
                 'jquery'
             ],
             exports: '$.fn.popover'
-        },
-        'markdown-converter': {
-            exports: 'Markdown'
-        },
-        markdown: {
-            deps: [
-                'markdown-converter'
-            ],
-            exports: 'Markdown'
         }
     },
     map: {

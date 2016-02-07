@@ -39,10 +39,11 @@ define([
     'entities/wiki/comment',
     'views/main/confirm_dialog',
     'views/page/comment/edit_comment',
+    'util/common_events',
     'text!templates/page/show_comment.html'
 ], function($,_,Marionette,Moment,Radio,
             CommentModel,ConfirmDialog,
-            EditCommentView,
+            EditCommentView,CommonEvents,
             ShowCommentTemplate){
 
     return Marionette.ItemView.extend({
@@ -54,7 +55,7 @@ define([
         events: {
             'click #deleteCommentButton' : 'deleteComment',
             'click #editCommentButton' : 'editComment',
-            'click .comment-content a' : 'clickCommentLink'
+            'click .comment-content a' : 'handleLinkClick'
         },
 
         initialize: function(options){
@@ -105,25 +106,8 @@ define([
                 .trigger('show:dialog', confirmDialog);
         },
 
-        clickCommentLink: function(event){
-            var r = new RegExp('^(?:[a-z]+:)?//');
-            var dest = $(event.currentTarget).attr("href");
-            if(!r.test(dest)){
-                event.preventDefault();
-                //we have an internal link
-                var path = dest.trim().split("/");
-                //The first element is an empty string, so..
-                path.shift();
-                if(path[0] === "wikis"){
-                    //We have a link to a wiki (or wiki page)
-                    var theWiki = path[1];
-                    var thePage = path[2];
-                    if(theWiki){
-                        Radio.channel('wiki').trigger('show:wiki', theWiki, thePage);
-                    }
-                }
-                //Other possibilities... plugins
-            }
+        handleLinkClick: function(event){
+            CommonEvents.handleLinkClick(event);
         },
 
         onRender: function(){
@@ -153,8 +137,6 @@ define([
                     });
             }
         },
-
-        onClose: function(){}
 
     });
 

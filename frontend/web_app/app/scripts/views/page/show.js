@@ -43,11 +43,13 @@ define([
     'views/page/formatted_content',
     'views/user/user_info_dialog',
     'views/page/comment/comments',
+    'util/common_events',
     'text!templates/page/page_layout.html'
 ], function($,_,Marionette,Moment,Radio,Stickit,
             PageModel,UserModel,ChildIndexView,
             PageToolMenu,RawContentView,FormattedContentView,
-            UserInfoDialog,CommentsView,ShowPageTemplate){
+            UserInfoDialog,CommentsView,CommonEvents,
+            ShowPageTemplate){
     'use strict';
 
     return Marionette.LayoutView.extend({
@@ -80,7 +82,7 @@ define([
         events: {
             'click a#viewCurrentPageLink': 'showCurrentPage',
             'click a#editorName':          'showEditorInfo',
-            'click .page-content a':       'clickPageLink'
+            'click .page-content a':       'handleLinkClick'
         },
 
         initialize: function(options){
@@ -111,27 +113,6 @@ define([
             event.preventDefault();
             var editorInfoDialog = new UserInfoDialog({model: this.editorModel});
             Radio.channel('main').trigger('show:dialog', editorInfoDialog);
-        },
-
-        clickPageLink: function(event){
-            var r = new RegExp('^(?:[a-z]+:)?//');
-            var dest = $(event.currentTarget).attr("href");
-            if(!r.test(dest)){
-                event.preventDefault();
-                //we have an internal link
-                var path = dest.trim().split("/");
-                //The first element is an empty string, so..
-                path.shift();
-                if(path[0] === "wikis"){
-                    //We have a link to a wiki (or wiki page)
-                    var theWiki = path[1];
-                    var thePage = path[2];
-                    if(theWiki){
-                        Radio.channel('wiki').trigger('show:wiki', theWiki, thePage);
-                    }
-                }
-                //Other possibilities... plugins
-            }
         },
 
         /* on render callback */
@@ -178,8 +159,8 @@ define([
             }
         },
 
-        onShow: function(){
-
+        handleLinkClick: function(event){
+            CommonEvents.handleLinkClick(event);
         },
 
         drawChildIndex: function(response){
