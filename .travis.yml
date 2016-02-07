@@ -10,7 +10,8 @@ addons:
 before_script:
 # SET COUCHDB ADMIN PASSWORD
  - curl -X PUT http://127.0.0.1:5984/_config/admins/adminuser -d '"password"'
-   curl -X PUT http://127.0.0.1:5984/_config/httpd/socket_options --user adminuser:password -d '"[{recbuf, 262144}, {sndbuf, 262144}, {nodelay, true}]"'
+ - sleep 2s
+ - curl -X PUT http://127.0.0.1:5984/_config/httpd/socket_options --user adminuser:password -d '"[{recbuf, 262144}, {sndbuf, 262144}, {nodelay, true}]"'
 # INSTALL ETCD
  - curl -L  https://github.com/coreos/etcd/releases/download/v2.2.5/etcd-v2.2.5-linux-amd64.tar.gz -o etcd-v2.2.5-linux-amd64.tar.gz
  - tar xzvf etcd-v2.2.5-linux-amd64.tar.gz
