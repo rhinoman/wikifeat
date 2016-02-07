@@ -185,15 +185,25 @@ func (am *AuthManager) GetAuth(req *http.Request) (*WikifeatAuth, error) {
 	if err != nil {
 		return nil, UnauthenticatedError()
 	}
-	//Generate the next session token
-	nextSession, err := am.UpdateSession(sessionId)
-	if err != nil {
-		return nil, UnauthenticatedError()
+	//Should we generate a new session token?
+	ttl := time.Duration(config.Auth.SessionTimeout) * time.Second
+	if session.ExpiresAt.Sub(time.Now()) < ttl/2 {
+		//Ok, generate a new token
+		nextSession, err := am.UpdateSession(sessionId)
+		if err != nil {
+			return nil, UnauthenticatedError()
+		} else {
+			return &WikifeatAuth{
+				Username:  session.User,
+				Roles:     session.Roles,
+				NextToken: nextSession.Id,
+			}, nil
+		}
 	} else {
 		return &WikifeatAuth{
 			Username:  session.User,
 			Roles:     session.Roles,
-			NextToken: nextSession.Id,
+			NextToken: session.Id,
 		}, nil
 	}
 }

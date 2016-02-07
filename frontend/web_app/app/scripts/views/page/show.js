@@ -80,7 +80,7 @@ define([
         events: {
             'click a#viewCurrentPageLink': 'showCurrentPage',
             'click a#editorName':          'showEditorInfo',
-            'click .page-content a': 'clickPageLink'
+            'click .page-content a':       'clickPageLink'
         },
 
         initialize: function(options){

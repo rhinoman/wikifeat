@@ -126,6 +126,10 @@ func AddCsrfCookie(rw http.ResponseWriter, sessToken string) {
 }
 
 func CheckCsrf(request *http.Request) error {
+	//Don't bother for Read methods (GET, et. al.,)
+	if request.Method == "GET" || request.Method == "HEAD" || request.Method == "OPTIONS" {
+		return nil
+	}
 	//Check CSRF token
 	csrfCookie, err := request.Cookie("CsrfToken")
 	ourCsrf := request.Header.Get("X-Csrf-Token")
@@ -154,6 +158,8 @@ func GetAuth(req *http.Request) (couchdb.Auth, error) {
 	sessCookie, err := req.Cookie("AuthSession")
 	if err != nil {
 		return nil, err
+	} else if sessCookie.Value == "" {
+		return nil, http.ErrNoCookie
 	}
 	//Attempt to load auth from auth service
 	authEndpoint, err := registry.GetServiceLocation("auth")

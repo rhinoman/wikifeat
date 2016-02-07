@@ -164,8 +164,10 @@ func GetAuth(request *http.Request) (couchdb.Auth, error) {
 		return bAuth, nil
 	}
 	if wAuth, err := auth.GetAuth(request); err != nil {
+		log.Printf("Auth Err: %v\n", err)
 		return nil, err
 	} else if csrfErr := auth.CheckCsrf(request); csrfErr != nil {
+		log.Printf("BAD CSRF: %v\n", err)
 		return nil, err
 	} else {
 		return wAuth, nil
