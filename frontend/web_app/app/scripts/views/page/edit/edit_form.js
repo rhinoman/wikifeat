@@ -156,7 +156,7 @@ define([
                 this.setText(this.model.get('content').raw);
             }
             Markette.EditorView.prototype.onRender.call(this);
-            this.$('[data-toggle="tooltip"]').tooltip();
+            this.$('[data-toggle="tooltip"]').tooltip({container: this.el});
         },
 
         onClose: function(){
