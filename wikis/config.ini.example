@@ -30,7 +30,7 @@ useSSL = false
 dbAdminUser = adminuser
 dbAdminPassword = password
 #Database action timeout (in milliseconds)
-dbTimeout = 3000
+dbTimeout = 4000
 mainDb = wikifeat_main_db
 
 [Logging]
