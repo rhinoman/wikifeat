@@ -16,6 +16,7 @@ before_script:
  - cd etcd-v2.2.5-linux-amd64
  - ./etcd&
  - sleep 4s
+ - cd ..
 script:
  - sleep 4s
  - cd scripts
