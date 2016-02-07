@@ -21,19 +21,19 @@ script:
  - sleep 4s
  - cd scripts
  - ./setup.py localhost 5984 --user=adminuser --password=password --skip_master
- - sleep 6s
+ - sleep 8s
  - cd ..
  - cd users
  - go test -v ./...
- - sleep 2s
+ - sleep 3s
  - cd ../wikis
  - go test -v ./...
- - sleep 2s
+ - sleep 3s
  - cd ../notifications
  - go test -v ./...
- - sleep 2s
+ - sleep 3s
  - cd ../frontend
  - go test -v ./...
- - sleep 2s
+ - sleep 3s
  - cd ../auth
  - go test -v ./...
