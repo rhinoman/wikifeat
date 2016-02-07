@@ -65,15 +65,19 @@ frontend/index.html
 frontend/plugins/plugins.ini
 default.etcd/
 users/users
+users/wikifeat-users
 wikis/wikis
+wikis/wikifeat-wikis
 frontend/frontend
+frontend/wikifeat-frontend
 notifications/notifications
+notifications/wikifeat-notifications
 auth/auth
+auth/wikifeat-auth
 build/
 dist/
 *.log
 .sass-cache/
-clean_build.sh
 
 #PYTHON
 __pycache__

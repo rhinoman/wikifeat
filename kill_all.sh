@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Find all running Wikifeat services and kill them
-pgrep wikis | xargs kill
-pgrep users | xargs kill
-pgrep notifications | xargs kill
-pgrep frontend | xargs kill
-pgrep auth | xargs kill
+pgrep wikifeat-wikis | xargs kill
+pgrep wikifeat-users | xargs kill
+pgrep wikifeat-notifications | xargs kill
+pgrep wikifeat-frontend | xargs kill
+pgrep wikifeat-auth | xargs kill

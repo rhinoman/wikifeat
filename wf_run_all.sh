@@ -3,16 +3,16 @@
 WIKIPATH=$GOPATH/src/github.com/rhinoman/wikifeat
 
 cd $WIKIPATH/auth
-./auth&
+./wikifeat-auth&
 sleep 2
 cd $WIKIPATH/users
-./users&
+./wikifeat-users&
 sleep 2
 cd $WIKIPATH/wikis
-./wikis&
+./wikifeat-wikis&
 sleep 2
 cd $WIKIPATH/notifications
-./notifications&
+./wikifeat-notifications&
 sleep 2
 cd $WIKIPATH/frontend
-./frontend&
+./wikifeat-frontend&
