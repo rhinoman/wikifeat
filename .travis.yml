@@ -8,7 +8,14 @@ addons:
     packages:
     - python3
 before_script:
+# SET COUCHDB ADMIN PASSWORD
  - curl -X PUT http://127.0.0.1:5984/_config/admins/adminuser -d '"password"'
+# INSTALL ETCD
+ - curl -L  https://github.com/coreos/etcd/releases/download/v2.2.5/etcd-v2.2.5-linux-amd64.tar.gz -o etcd-v2.2.5-linux-amd64.tar.gz
+ - tar xzvf etcd-v2.2.5-linux-amd64.tar.gz
+ - cd etcd-v2.2.5-linux-amd64
+ - ./etcd&
+ - sleep 4s
 script:
  - sleep 4s
  - cd scripts
@@ -25,4 +32,7 @@ script:
  - go test -v ./...
  - sleep 2s
  - cd ../frontend
+ - go test -v ./...
+ - sleep 2s
+ - cd ../auth
  - go test -v ./...

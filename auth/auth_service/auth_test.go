@@ -122,9 +122,6 @@ func TestSessions(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if auth.NextToken == "" || auth.NextToken == readSession.Id {
-		t.Error("Next token not generated correctly.")
-	}
 	auth.AddAuthHeaders(req)
 	t.Logf("Auth Headers: %v", req.Header)
 	//Try to make a request with this auth
