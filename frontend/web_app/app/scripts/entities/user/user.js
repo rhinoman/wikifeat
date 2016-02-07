@@ -100,6 +100,11 @@ define([
             this.isResourceAdmin(resource);
     };
 
+    // Is the user a guest?
+    UserModel.prototype.isGuest = function(){
+        return this.get("name") === "guest";
+    };
+
     // Does user have the given role?
     UserModel.prototype.hasRole = function(role){
         if(this.has("roles")){

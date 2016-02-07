@@ -63,12 +63,10 @@ define([
         initLayout: function(wikiModel){
             this.wikiLayout = new WikiLayout();
             var breadcrumbView = new BreadcrumbsView({collection: this.breadcrumbs});
-            var toolbarView = new WikiToolbarView();
             Radio.channel('main').trigger('show:content', this.wikiLayout);
-            toolbarView.model = wikiModel;
-            this.wikiLayout.toolbarRegion.show(toolbarView);
             this.breadcrumbs.reset();
             this.wikiLayout.breadcrumbRegion.show(breadcrumbView);
+            this.showToolbar(wikiModel);
         },
 
         //Create a new wiki
@@ -84,15 +82,28 @@ define([
             //Radio.channel('main').trigger('show:content', editWikiView);
         },
 
+        //Edit an existing wiki record
         editWiki: function(wikiModel, options){
             options = options || {};
             this.wikiLayout = new WikiLayout();
             Radio.channel('main').trigger('show:content', this.wikiLayout);
             var editWikiView = new EditWikiView({model: wikiModel});
-            var toolbarView = new WikiToolbarView({model: wikiModel});
             this.wikiLayout.pageViewRegion.show(editWikiView);
-            this.wikiLayout.toolbarRegion.show(toolbarView);
+            this.showToolbar(wikiModel);
             Backbone.history.navigate('/wikis/' + wikiModel.get('slug') + '/edit');
+        },
+
+        //Should we show the toolbar?
+        showToolbar: function(wikiModel){
+            var self = this;
+            Radio.channel('userManager').request("get:currentUser").done(function(user){
+                if(typeof user === 'undefined' || user.isGuest()){
+                    console.log("Guest user, not showing wiki toolbar")
+                } else {
+                    var toolbarView = new WikiToolbarView({model: wikiModel});
+                    self.wikiLayout.toolbarRegion.show(toolbarView);
+                }
+            });
         },
 
         //Show a page's breadcrumbs
