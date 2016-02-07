@@ -491,16 +491,6 @@ func (um *UserManager) RequestPasswordReset(id string) error {
 	return nil
 }
 
-//Login a user and create a new session
-func (um *UserManager) Login(credentials *UserLoginCredentials) (*couchdb.CookieAuth, error) {
-	return Connection.CreateSession(credentials.UserName, credentials.Password)
-}
-
-//Logout
-func (um *UserManager) Logout(sessionToken string) error {
-	return Connection.DestroySession(&couchdb.CookieAuth{AuthToken: sessionToken})
-}
-
 //Get list of users
 func (um *UserManager) GetUserList(pageNum int, numPerPage int,
 	ulr *UserListQueryResponse, curUser *CurrentUserInfo) error {

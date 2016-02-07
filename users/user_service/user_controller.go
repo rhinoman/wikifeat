@@ -157,17 +157,6 @@ func (uc UsersController) Register(container *restful.Container) {
 		Param(usersWebService.PathParameter("user-id", "User Name").DataType("string")).
 		Writes(BooleanResponse{}))
 
-	usersWebService.Route(usersWebService.POST("/login").To(uc.login).
-		Doc("Creates a new User Session").
-		Operation("login").
-		Reads(UserLoginCredentials{}).
-		Writes(BooleanResponse{}))
-
-	usersWebService.Route(usersWebService.DELETE("/login").To(uc.logout).
-		Doc("Destroys User Session").
-		Operation("logout").
-		Writes(BooleanResponse{}))
-
 	usersWebService.Route(usersWebService.GET("").To(uc.list).
 		Filter(AuthUser).
 		Doc("Gets a list of users").
@@ -440,74 +429,6 @@ func (uc UsersController) del(request *restful.Request,
 	rr := BooleanResponse{Success: true}
 	SetAuth(response, curUser.Auth)
 	response.WriteEntity(rr)
-}
-
-//User login
-func (uc UsersController) login(request *restful.Request,
-	response *restful.Response) {
-	loginCredentials := new(UserLoginCredentials)
-	err := request.ReadEntity(loginCredentials)
-	if err != nil {
-		LogError(request, response, err)
-		WriteIllegalRequestError(response)
-		return
-	}
-	cookieAuth, err := new(UserManager).Login(loginCredentials)
-	if err != nil {
-		LogError(request, response, err)
-		WriteError(err, response)
-		return
-	}
-	//Create an Auth cookie
-	authCookie := http.Cookie{
-		Name:     "AuthSession",
-		Value:    cookieAuth.AuthToken,
-		Path:     "/",
-		HttpOnly: true,
-	}
-	//Create a CSRF cookie for this session
-	//Subsequent requests must include this in a header field
-	//X-Csrf-Token
-	csrfCookie := http.Cookie{
-		Name:     "CsrfToken",
-		Value:    util.GenHashString(cookieAuth.AuthToken),
-		Path:     "/",
-		HttpOnly: false,
-	}
-	response.AddHeader("Set-Cookie", authCookie.String())
-	response.AddHeader("Set-Cookie", csrfCookie.String())
-	response.WriteEntity(BooleanResponse{Success: true})
-}
-
-//User logout
-func (uc UsersController) logout(request *restful.Request,
-	response *restful.Response) {
-	token := func() string {
-		for _, cookie := range request.Request.Cookies() {
-			if cookie.Name == "AuthSession" {
-				return cookie.Value
-			}
-		}
-		return ""
-	}()
-	err := new(UserManager).Logout(token)
-	if err != nil {
-		LogError(request, response, err)
-		WriteError(err, response)
-		return
-	}
-	//Because CouchDB doesn't actually destroy the session,
-	//best we can do is clear the cookie in the browser.
-	//This is apparently "not a bug" :|
-	//http://webmail.dev411.com/t/couchdb/dev/141xwf5vb0/jira-created-couchdb-2042-session-not-cleared-after-delete-session-cookie-auth
-	theCookie := http.Cookie{
-		Name:     "AuthSession",
-		Value:    "",
-		Path:     "/",
-		HttpOnly: true,
-	}
-	response.AddHeader("Set-Cookie", theCookie.String())
-	response.WriteEntity(BooleanResponse{Success: true})
 }
 
 //Get user list
