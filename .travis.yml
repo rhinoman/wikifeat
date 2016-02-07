@@ -15,25 +15,25 @@ before_script:
  - tar xzvf etcd-v2.2.5-linux-amd64.tar.gz
  - cd etcd-v2.2.5-linux-amd64
  - ./etcd&
- - sleep 4s
+ - sleep 2s
  - cd ..
 script:
- - sleep 4s
+ - sleep 5s
  - cd scripts
  - ./setup.py localhost 5984 --user=adminuser --password=password --skip_master
- - sleep 8s
+ - sleep 12s
  - cd ..
  - cd users
  - go test -v ./...
- - sleep 3s
+ - sleep 1s
  - cd ../wikis
  - go test -v ./...
- - sleep 3s
+ - sleep 1s
  - cd ../notifications
  - go test -v ./...
- - sleep 3s
+ - sleep 1s
  - cd ../frontend
  - go test -v ./...
- - sleep 3s
+ - sleep 1s
  - cd ../auth
  - go test -v ./...
