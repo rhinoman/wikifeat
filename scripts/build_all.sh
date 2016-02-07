@@ -7,7 +7,7 @@
 CC=gcc
 export CC
 
-VERSION=0.5.0-alpha
+VERSION=0.6.0-alpha
 ARCH=`uname -p`
 OS=`uname`
 BUILDNAME=wikifeat_${VERSION}.${OS}-${ARCH}
@@ -19,6 +19,7 @@ rm -rf ../build
 # Make some directories
 mkdir ../build
 mkdir $BUILD_DIR
+mkdir ${BUILD_DIR}/auth
 mkdir ${BUILD_DIR}/users
 mkdir ${BUILD_DIR}/scripts
 mkdir ${BUILD_DIR}/scripts/db_update
@@ -27,11 +28,13 @@ mkdir ${BUILD_DIR}/notifications
 mkdir ${BUILD_DIR}/frontend
 mkdir ${BUILD_DIR}/frontend/web_app
 # Build stuff
-go build -v -o ${BUILD_DIR}/users/users ../users
-go build -v -o ${BUILD_DIR}/wikis/wikis ../wikis 
-go build -v -o ${BUILD_DIR}/notifications/notifications ../notifications
-go build -v -o ${BUILD_DIR}/frontend/frontend ../frontend 
+go build -v -o ${BUILD_DIR}/auth/wikifeat-auth ../auth
+go build -v -o ${BUILD_DIR}/users/wikifeat-users ../users
+go build -v -o ${BUILD_DIR}/wikis/wikifeat-wikis ../wikis
+go build -v -o ${BUILD_DIR}/notifications/wikifeat-notifications ../notifications
+go build -v -o ${BUILD_DIR}/frontend/wikifeat-frontend ../frontend
 # Copy some supporting files
+cp ../auth/config.ini.example ${BUILD_DIR}/auth/config.ini.example
 cp ../users/config.ini.example ${BUILD_DIR}/users/config.ini.example
 cp ../wikis/config.ini.example ${BUILD_DIR}/wikis/config.ini.example
 cp ../notifications/config.ini.example ${BUILD_DIR}/notifications/config.ini.example

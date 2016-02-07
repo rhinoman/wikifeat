@@ -10,6 +10,10 @@ from argparse import ArgumentParser
 import util
 from libs import configobj
 
+auth_config_template = '../auth/config.ini.example'
+auth_config_file = '../auth/config.ini'
+auth_node_id = 'auth1'
+auth_port = 4130
 
 user_config_template = '../users/config.ini.example'
 user_config_file = '../users/config.ini'
@@ -34,6 +38,24 @@ frontend_index_template = '../frontend/index.html.template'
 frontend_index_file = '../frontend/index.html'
 frontend_plugin_template = '../frontend/plugins/plugins.ini.example'
 frontend_plugin_file = '../frontend/plugins/plugins.ini'
+
+
+def config_auth_service(common_params, db_params):
+    print("Configuring auth service...")
+    try:
+        config = configobj.ConfigObj(auth_config_template, file_error=True)
+    except IOError:
+        return False
+    # Configure the Service section
+    config['Service']['domainName'] = common_params['domainName']
+    config['Service']['nodeId'] = auth_node_id
+    config['Service']['port'] = str(auth_port)
+    # Now the database section
+    config_database(config, db_params)
+    # Now, write the config file
+    with open(auth_config_file, 'w') as out_file:
+        config.write(out_file)
+    return True
 
 
 def config_user_service(common_params, db_params):
@@ -121,6 +143,7 @@ def config_database(config, db_params):
 
 def config_all(common_params, db_params):
     print("Configuring services...")
+    config_auth_service(common_params, db_params)
     config_user_service(common_params, db_params)
     config_wiki_service(common_params, db_params)
     config_frontend_service(common_params, db_params)

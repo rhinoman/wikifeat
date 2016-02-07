@@ -53,7 +53,8 @@ define([
 
         events: {
             'click #deleteCommentButton' : 'deleteComment',
-            'click #editCommentButton' : 'editComment'
+            'click #editCommentButton' : 'editComment',
+            'click .comment-content a' : 'clickCommentLink'
         },
 
         initialize: function(options){
@@ -104,11 +105,33 @@ define([
                 .trigger('show:dialog', confirmDialog);
         },
 
+        clickCommentLink: function(event){
+            var r = new RegExp('^(?:[a-z]+:)?//');
+            var dest = $(event.currentTarget).attr("href");
+            if(!r.test(dest)){
+                event.preventDefault();
+                //we have an internal link
+                var path = dest.trim().split("/");
+                //The first element is an empty string, so..
+                path.shift();
+                if(path[0] === "wikis"){
+                    //We have a link to a wiki (or wiki page)
+                    var theWiki = path[1];
+                    var thePage = path[2];
+                    if(theWiki){
+                        Radio.channel('wiki').trigger('show:wiki', theWiki, thePage);
+                    }
+                }
+                //Other possibilities... plugins
+            }
+        },
+
         onRender: function(){
             if(typeof this.model !== "undefined") {
                 var author = this.model.get("author");
                 this.$("#commentAuthorName").html(author);
-                var time = moment(this.model.get("created_time"));
+                var timestamp = this.model.get("createdTime");
+                var time = moment(timestamp);
                 var timestring = time.format("HH:mm on D MMM YYYY");
                 this.$("#commentDatetime").html(timestring);
                 var content = this.model.get("content");

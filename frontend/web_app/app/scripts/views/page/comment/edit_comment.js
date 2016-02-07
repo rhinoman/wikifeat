@@ -35,15 +35,18 @@ define([
     'underscore',
     'marionette',
     'backbone.radio',
-    'markdown',
+    'markette',
     'entities/wiki/comment',
     'views/main/alert',
+    'views/page/edit/insert_link_dialog',
+    'views/page/edit/insert_image_dialog',
     'text!templates/page/edit_comment.html'
-], function($,_,Marionette,Radio,Markdown,
-            CommentModel,AlertView,EditCommentTemplate){
+], function($,_,Marionette,Radio,Markette,
+            CommentModel,AlertView,InsertLinkDialog,
+            InsertImageDialog,EditCommentTemplate){
 
-    return Marionette.ItemView.extend({
-        Model: CommentModel,
+    return Markette.EditorView.extend({
+        model: CommentModel,
         template: _.template(EditCommentTemplate),
         id: "edit-comment-view",
 
@@ -52,14 +55,12 @@ define([
             'submit form#editCommentForm' : 'publishComment'
         },
 
-        initialize: function(options){},
-
         //save the comment
         publishComment: function(event){
             event.preventDefault();
             var newComment = false;
             var pageContent = _.clone(this.model.get('content'));
-            pageContent.raw = $("#wmd-input").val();
+            pageContent.raw = this.$("textarea#marketteInput").val();
             this.model.set('content', pageContent);
             if(typeof this.model.id === 'undefined' || this.model.id === null){
                 newComment = true;
@@ -82,16 +83,45 @@ define([
         onRender: function(){
             var content = this.model.get("content");
             if(content.raw !== ""){
-                this.$("#wmd-input").val(content.raw);
+                this.$("textarea#marketteInput").val(content.raw);
             }
-        },
-
-        onShow: function(){
-            var editor = new Markdown.Editor();
-            editor.run();
+            Markette.EditorView.prototype.onRender.call(this);
+            this.$('[data-toggle="tooltip"]').tooltip();
         },
 
         onClose: function(){
+           Markette.EditorView.prototype.onClose.call(this);
+        },
+
+        //Override Link functionality
+        doLink: function(event){
+            var self = this;
+            var ild = new InsertLinkDialog({
+                callback: function(url){
+                    self.$('textarea#marketteInput').focus();
+                    self.doInlineMarkup({
+                        before: '[',
+                        after: '](' + url + ')'
+                    });
+                }
+            });
+            Radio.channel('main').trigger('show:dialog', ild);
+        },
+
+        //Override Image functionality
+        doImage: function(event){
+            var self = this;
+            var imd = new InsertImageDialog({
+                callback: function(url){
+                    self.$('textarea#marketteInput').focus();
+                    self.doInlineMarkup({
+                        before: '![',
+                        after: '](' + url + ')'
+                    });
+                },
+                wikiId: this.model.wikiId
+            });
+            Radio.channel('main').trigger('show:dialog', imd);
         }
 
     });

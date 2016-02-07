@@ -3,8 +3,8 @@ domainName = bsdvm1
 apiVersion = v1
 # Node Id to register with the service registry. 
 # MUST BE UNIQUE!
-nodeId = us1
-port = 4100 
+nodeId = auth1
+port = 4130
 #Serving via https?
 useSSL = false
 #If you're using SSL, you need to provide cert and key files
@@ -34,7 +34,7 @@ dbTimeout = 2000
 mainDb = wikifeat_main_db
 
 [Logging]
-logFile = wikifeat-users.log
+logFile = wikifeat-auth.log
 #Max size in megs
 maxSize = 10 
 maxBackups = 3
@@ -52,7 +52,3 @@ persistentSessions = true
 allowGuestAccess = true
 #Minimum Passowrd length
 minPasswordLength = 6
-
-[Users]
-#The name of the avatar database
-avatarDB = user_avatars
