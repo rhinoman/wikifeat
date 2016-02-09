@@ -71,17 +71,6 @@ define([
                     Radio.channel('main').trigger('show:dialog', editUserDialog);
                 }
             });
-            /*
-            Radio.channel('userManager').request('get:user', this.model.id)
-                .done(function(model){
-                    if(typeof model !== 'undefined'){
-                        self.model = model;
-                        var editUserDialog =
-                            new EditUserDialogView({model: self.model});
-                        Radio.channel('main')
-                            .trigger('show:dialog', editUserDialog);
-                    }
-                });*/
         },
 
         toggleAdmin: function(event){
