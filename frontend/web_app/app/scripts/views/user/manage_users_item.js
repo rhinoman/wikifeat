@@ -65,6 +65,13 @@ define([
         editUser: function(event){
             event.preventDefault();
             var self = this;
+            this.model.fetch({
+                success: function(){
+                    var editUserDialog = new EditUserDialogView({model: self.model})    ;
+                    Radio.channel('main').trigger('show:dialog', editUserDialog);
+                }
+            });
+            /*
             Radio.channel('userManager').request('get:user', this.model.id)
                 .done(function(model){
                     if(typeof model !== 'undefined'){
@@ -74,7 +81,7 @@ define([
                         Radio.channel('main')
                             .trigger('show:dialog', editUserDialog);
                     }
-                });
+                });*/
         },
 
         toggleAdmin: function(event){

@@ -35,7 +35,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/common/util"
@@ -193,12 +192,10 @@ func SetAuth(rw http.ResponseWriter, ca couchdb.Auth) {
 	if authData == nil {
 		return
 	}
-	ttl := time.Duration(config.Auth.SessionTimeout) * time.Second
 	if val, ok := authData["AuthSession"]; ok {
 		authCookie := http.Cookie{
 			Name:     "AuthSession",
 			Value:    val,
-			Expires:  time.Now().Add(ttl),
 			Path:     "/",
 			HttpOnly: true,
 		}
@@ -213,7 +210,6 @@ func ClearAuth(rw http.ResponseWriter) {
 		Name:     "AuthSession",
 		Value:    "",
 		Path:     "/",
-		Expires:  time.Now().Add(-100 * time.Hour),
 		MaxAge:   -1,
 		HttpOnly: true,
 	}
