@@ -63,6 +63,11 @@ var NotificationsLocation = EtcdPrefix + "/services/notifications/"
 var FrontEndLocation = EtcdPrefix + "/services/frontend/"
 var AuthLocation = EtcdPrefix + "/services/auth/"
 var PluginsLocation = EtcdPrefix + "/plugin/"
+
+//Config locations
+var ConfigPrefix = EtcdPrefix + "/config/"
+var DbConfigLocation = ConfigPrefix + "db/"
+
 var ttl time.Duration
 
 func protocolString() string {

@@ -108,6 +108,15 @@ var Notifications struct {
 	FromEmail        string
 }
 
+//Config Locations in Etcd
+var ConfigPrefix = "/wikifeat/config/"
+var DbConfigLocation = ConfigPrefix + "db/"
+var LogConfigLocation = ConfigPrefix + "log/"
+var AuthConfigLocation = ConfigPrefix + "auth/"
+var NotificationsConfigLocation = ConfigPrefix + "notifications/"
+var UsersConfigLocation = ConfigPrefix + "users/"
+var FrontendConfigLocation = ConfigPrefix + "frontend/"
+
 // Initialize Default values
 func LoadDefaults() {
 	execDir, err := util.GetExecDirectory()

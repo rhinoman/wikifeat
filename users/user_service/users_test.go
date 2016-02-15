@@ -54,6 +54,7 @@ var um = new(user_service.UserManager)
 func setup() {
 	config.LoadDefaults()
 	database.InitDb()
+	database.SetupDb()
 }
 
 func getUuid() string {

@@ -37,7 +37,6 @@ import (
 	"github.com/rhinoman/wikifeat/common/entities"
 	"log"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -163,8 +162,18 @@ func InitDb() {
 	}
 	MainDb = config.Database.MainDb
 	AvatarDb = config.Users.AvatarDb
+	//Get the server secret
+	CouchSecret, err = Connection.GetConfigOption("couch_httpd_auth",
+		"secret", AdminAuth)
+	if err != nil {
+		log.Fatalf("Error! %v", err)
+	}
+
+}
+
+func SetupDb() {
 	//Set DB Configuration options
-	err = Connection.SetConfig("couch_httpd_auth",
+	err := Connection.SetConfig("couch_httpd_auth",
 		"proxy_use_secret", "true", AdminAuth)
 	if err != nil {
 		log.Fatalf("Error! %v", err)
@@ -178,19 +187,13 @@ func InitDb() {
 	if err != nil {
 		log.Fatalf("Error! %v", err)
 	}
-	//Get the server secret
-	CouchSecret, err = Connection.GetConfigOption("couch_httpd_auth",
-		"secret", AdminAuth)
-	if err != nil {
-		log.Fatalf("Error! %v", err)
-	}
 	//Enable or Revoke Guest access as appropriate
 	if config.Auth.AllowGuest {
-		if err = EnableGuest(); err != nil {
+		if err = enableGuest(); err != nil {
 			log.Fatalf("Error! %v", err)
 		}
 	} else {
-		if err = DisableGuest(); err != nil {
+		if err = disableGuest(); err != nil {
 			log.Fatalf("Error! %v", err)
 		}
 	}
@@ -198,12 +201,12 @@ func InitDb() {
 
 // Enable Guest access by adding read access on the main database
 // to the guest user
-func EnableGuest() error {
-	_, err := Connection.GrantRole("guest", ReadRole(MainDbName()), AdminAuth)
+func enableGuest() error {
+	_, err := Connection.GrantRole("guest", MainDbName(), AdminAuth)
 	if err != nil {
 		code := checkErrorCode(err)
 		if code == 404 {
-			return CreateGuestUser()
+			return createGuestUser()
 		} else {
 			return err
 		}
@@ -211,22 +214,8 @@ func EnableGuest() error {
 	return nil
 }
 
-func checkErrorCode(err error) int {
-	splitStr := strings.Split(err.Error(), ":")
-	if len(splitStr) > 1 {
-		code, conerr := strconv.Atoi(splitStr[1])
-		if conerr != nil {
-			return 0
-		} else {
-			return code
-		}
-	} else {
-		return 0
-	}
-}
-
 // Revoke Guest access
-func DisableGuest() error {
+func disableGuest() error {
 	_, err := Connection.RevokeRole("guest", ReadRole(MainDbName()), AdminAuth)
 	if err != nil {
 		code := checkErrorCode(err)
@@ -239,10 +228,18 @@ func DisableGuest() error {
 	return nil
 }
 
-func CreateGuestUser() error {
+func createGuestUser() error {
 	_, err := Connection.AddUser("guest", "guest",
 		[]string{AllUsersRole(), ReadRole(MainDbName())}, AdminAuth)
 	return err
+}
+
+func checkErrorCode(err error) int {
+	if cErr, ok := err.(*couchdb.Error); ok {
+		return cErr.StatusCode
+	} else {
+		return 0
+	}
 }
 
 //Sets initial db security

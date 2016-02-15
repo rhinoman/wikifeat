@@ -55,6 +55,7 @@ var fm = new(wiki_service.FileManager)
 func setup() {
 	config.LoadDefaults()
 	InitDb()
+	SetupDb()
 }
 
 func getUuid() string {

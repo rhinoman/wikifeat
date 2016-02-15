@@ -1,0 +1,72 @@
+[ServiceRegistry]
+#etcd settings, mostly
+#How long an entry lives in the service registry (seconds)
+#Services need to send a regular heartbeat to etcd to stay alive
+entryTTL = 60 
+#How often to query etcd for services (seconds)
+cacheRefreshInterval = 75
+
+[Database]
+#IP/port of the couchdb server
+dbAddr = 127.0.0.1
+dbPort = 5984
+#connect to couchdb via SSL? true or false
+useSSL = false
+#Couchdb admin account
+dbAdminUser = adminuser
+dbAdminPassword = password
+#Database action timeout (in milliseconds)
+dbTimeout = 3000
+mainDb = wikifeat_main_db
+
+[Logging]
+logFile = wikifeat-auth.log
+#Max size in megs
+maxSize = 10 
+maxBackups = 3
+#Max age in days
+maxAge = 30
+
+[Auth]
+#Session timeout, in seconds.  Meaningless for basic auth
+sessionTimeout = 6000
+#Persistent session cookies? true or false
+#Also meaningless for basic auth
+persistentSessions = true
+#Allow Guest Access 
+#If you have any 'public' wikis, set this to true
+allowGuestAccess = true
+#Minimum Passowrd length
+minPasswordLength = 6
+
+[Frontend]
+#Frontend specific settings
+webAppDir=web_app/app
+pluginDir=plugins
+# Uncomment this and designate a home page
+# homepage = /wikis/main-wiki/pages/main
+
+[Notifications]
+# Notification Service specific settings
+# Directory where template files are loaded
+templateDirectory = templates
+# Attempts to load an html version of each template in order
+# to send multipart text and html emails
+# If false, sends notifications as plain-text only
+useHtmlTemplates = true
+# Main URL for wikifeat site
+# This is used for hyperlinks in various templates
+mainSiteUrl = http://localhost:8081
+#The following settings are for your SMTP server
+smtpServer = localhost
+# SSL should normally be false, as you ought to be using STARTTLS
+# But if you need SSL (normally port 465)...
+useSSL = false
+smtpPort = 587
+smtpUser = user
+smtpPassword = password
+fromEmail = admin@localhost
+
+[Users]
+#The name of the avatar database
+avatarDB = user_avatars

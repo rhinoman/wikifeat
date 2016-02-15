@@ -54,6 +54,7 @@ func setup(t *testing.T) {
 	config.LoadDefaults()
 	config.ServiceRegistry.CacheRefreshInterval = 1000
 	database.InitDb()
+	database.SetupDb()
 	//This will cause the registry manager to complain, but we don't
 	//really need the service being registered here.
 	registry.Init("TestAuth", "/database/test/auth")
