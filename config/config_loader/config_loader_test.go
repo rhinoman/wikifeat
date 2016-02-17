@@ -48,5 +48,16 @@ func cleanup() {
 func TestConfigLoader(t *testing.T) {
 	setupTest()
 	defer cleanup()
+	//Set some config items
+	config.Notifications.FromEmail = "turd.furgeson@nowhere.com"
+	//Put them in Etcd
 	config_loader.SetConfig()
+	//Reset the local config to defaults
+	config.LoadDefaults()
+	//Load config from etcd
+	config.FetchConfig()
+	//Check the config items we set
+	if config.Notifications.FromEmail != "turd.furgeson@nowhere.com" {
+		t.Errorf("Notifications.FromEmail not set: %v", config.Notifications.FromEmail)
+	}
 }

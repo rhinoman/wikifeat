@@ -34,9 +34,12 @@ package config
 import (
 	"fmt"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/alyu/configparser"
+	etcd "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/coreos/etcd/client"
 	"github.com/rhinoman/wikifeat/common/util"
+	"golang.org/x/net/context"
 	"log"
 	"path"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -116,6 +119,7 @@ var AuthConfigLocation = ConfigPrefix + "auth/"
 var NotificationsConfigLocation = ConfigPrefix + "notifications/"
 var UsersConfigLocation = ConfigPrefix + "users/"
 var FrontendConfigLocation = ConfigPrefix + "frontend/"
+var RegistryConfigLocation = ConfigPrefix + "registry/"
 
 // Initialize Default values
 func LoadDefaults() {
@@ -158,6 +162,86 @@ func LoadDefaults() {
 	Notifications.SmtpUser = "user"
 	Notifications.SmtpPassword = "password"
 	Notifications.FromEmail = "admin@localhost"
+}
+
+// Fetch configuration from etcd
+// Because golang has no generics, this makes heavy use of reflection :|
+func FetchConfig() {
+	LoadDefaults()
+	log.Printf("\nFetching Configuration from %v\n", Service.RegistryLocation)
+	// Get an etcd Client
+	etcdCfg := etcd.Config{
+		Endpoints: []string{Service.RegistryLocation},
+		Transport: etcd.DefaultTransport,
+	}
+	etcdClient, err := etcd.New(etcdCfg)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	kapi := etcd.NewKeysAPI(etcdClient)
+
+	// Fetch config sections from etcd
+	fetchConfigSection(&Database, DbConfigLocation, kapi)
+	fetchConfigSection(&Logger, LogConfigLocation, kapi)
+	fetchConfigSection(&ServiceRegistry, RegistryConfigLocation, kapi)
+	fetchConfigSection(&Auth, AuthConfigLocation, kapi)
+	fetchConfigSection(&Notifications, NotificationsConfigLocation, kapi)
+	fetchConfigSection(&Users, UsersConfigLocation, kapi)
+	fetchConfigSection(&Frontend, FrontendConfigLocation, kapi)
+}
+
+func setConfigVal(str string, field reflect.Value) error {
+	t := field.Kind()
+	switch {
+	case t == reflect.String:
+		log.Printf("STR: %v\n", str)
+		field.SetString(str)
+	case t >= reflect.Int && t <= reflect.Int64:
+		if x, err := strconv.ParseInt(str, 10, 64); err != nil {
+			return err
+		} else {
+			field.SetInt(x)
+		}
+	case t >= reflect.Uint && t <= reflect.Uint64:
+		if x, err := strconv.ParseUint(str, 10, 64); err != nil {
+			return err
+		} else {
+			field.SetUint(x)
+		}
+	case t >= reflect.Float32 && t <= reflect.Float64:
+		if x, err := strconv.ParseFloat(str, 64); err != nil {
+			return err
+		} else {
+			field.SetFloat(x)
+		}
+	case t == reflect.Bool:
+		if x, err := strconv.ParseBool(str); err != nil {
+			return err
+		} else {
+			field.SetBool(x)
+		}
+	default:
+		return nil
+	}
+	return nil
+}
+
+//Fetches a single config section
+func fetchConfigSection(configStruct interface{}, location string, kapi etcd.KeysAPI) {
+	cfg := reflect.ValueOf(configStruct).Elem()
+	for i := 0; i < cfg.NumField(); i++ {
+		key := cfg.Type().Field(i).Name
+		resp, getErr := kapi.Get(context.Background(), location+key, nil)
+		if getErr != nil {
+			log.Printf("Error getting key %v: %v\n", key, getErr)
+			continue
+		}
+		valErr := setConfigVal(resp.Node.Value, cfg.Field(i))
+		if valErr != nil {
+			log.Printf("Error setting config field %v: %v\n", key, valErr)
+		}
+	}
 }
 
 // Load config values from file
