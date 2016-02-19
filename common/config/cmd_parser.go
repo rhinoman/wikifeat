@@ -1,5 +1,3 @@
-package main
-
 /*
  *  Licensed to Wikifeat under one or more contributor license agreements.
  *  See the LICENSE.txt file distributed with this work for additional information
@@ -29,46 +27,36 @@ package main
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-
-/**
- * Configuration Loader
- * This program loads the wikifeat configuration from a file into etcd
- * It also performs some initialization of supporting services.
- */
+package config
 
 import (
 	"flag"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
-	"github.com/rhinoman/wikifeat/common/config"
-	"github.com/rhinoman/wikifeat/common/util"
-	"github.com/rhinoman/wikifeat/config/config_loader"
-	"log"
 )
 
-func main() {
-	defaultConfig, err := util.DefaultConfigLocation()
-	if err != nil {
-		log.Fatalf("Error setting config file: %v", err)
-	}
-	// Get command line arguments
-	configFile := flag.String("config", defaultConfig, "config file to load")
-	registryLocation := flag.String("registryLocation", "http://localhost:2379", "etcd location URL")
+type DefaultCmdLine struct {
+	HostName         string
+	NodeId           string
+	Port             string
+	UseSSL           bool
+	SSLCertFile      string
+	SSLKeyFile       string
+	RegistryLocation string
+}
+
+func ParseCmdParams(defaults DefaultCmdLine) {
+	hostName := flag.String("hostName", defaults.HostName, "The host name for this instance")
+	nodeId := flag.String("nodeId", defaults.NodeId, "The node Id for this instance")
+	port := flag.String("port", defaults.Port, "The port number for this instance")
+	useSSL := flag.Bool("useSSL", defaults.UseSSL, "use SSL")
+	sslCertFile := flag.String("sslCertFile", defaults.SSLCertFile, "The SSL certificate file")
+	sslKeyFile := flag.String("sslKeyFile", defaults.SSLKeyFile, "The SSL key file")
+	registryLocation := flag.String("registryLocation", defaults.RegistryLocation, "URL for etcd")
 	flag.Parse()
-	// Load Configuration
-	config.LoadConfig(*configFile)
-	config.Service.RegistryLocation = *registryLocation
-	// Set up Logger
-	log.SetOutput(&lumberjack.Logger{
-		Filename:   config.Logger.LogFile,
-		MaxSize:    config.Logger.MaxSize,
-		MaxBackups: config.Logger.MaxBackups,
-		MaxAge:     config.Logger.MaxAge,
-	})
-	// Initialize our etcd and couchdb connections
-	config_loader.InitRegistry()
-	config_loader.InitDatabase()
-	// Clear out any old config that may be hanging around
-	config_loader.ClearConfig()
-	// Set the configuration keys in etcd
-	config_loader.SetConfig()
+	Service.DomainName = *hostName
+	Service.NodeId = *nodeId
+	Service.Port = *port
+	Service.UseSSL = *useSSL
+	Service.SSLCertFile = *sslCertFile
+	Service.SSLKeyFile = *sslKeyFile
+	Service.RegistryLocation = *registryLocation
 }

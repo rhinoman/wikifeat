@@ -75,6 +75,7 @@ notifications/wikifeat-notifications
 auth/auth
 auth/wikifeat-auth
 config/config
+config/wikifeat-config
 build/
 dist/
 *.log
