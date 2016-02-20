@@ -43,14 +43,6 @@ import (
 )
 
 func main() {
-	//defaultConfig, err := util.DefaultConfigLocation()
-	//if err != nil {
-	//	log.Fatalf("Error setting config file: %v", err)
-	//}
-	// Get command line arguments
-	//configFile := flag.String("config", defaultConfig, "config file to load")
-	//flag.Parse()
-
 	//Parse the command line parameters
 	config.ParseCmdParams(config.DefaultCmdLine{
 		HostName:         "localhost",

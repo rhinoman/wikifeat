@@ -1,5 +1,8 @@
 #!/bin/sh
 
+cd config
+go clean; go build -o wikifeat-config
+cd ..
 cd auth
 go clean; go build -o wikifeat-auth
 cd ..

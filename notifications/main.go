@@ -32,28 +32,27 @@
 package main
 
 import (
-	"flag"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/registry"
-	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/notifications/notification_service"
 	"log"
 	"net/http"
 )
 
 func main() {
-	defaultConfig, err := util.DefaultConfigLocation()
-	if err != nil {
-		log.Fatalf("Error setting config file: %v", err)
-	}
-	// Get command line arguments
-	configFile := flag.String("config", defaultConfig, "config file to load")
-	flag.Parse()
-	// Load Configuration
-	config.LoadConfig(*configFile)
+	//Parse the command line parameters
+	config.ParseCmdParams(config.DefaultCmdLine{
+		HostName:         "localhost",
+		NodeId:           "ns1",
+		Port:             "4120",
+		UseSSL:           false,
+		RegistryLocation: "http://localhost:2379",
+	})
+	// Fetch Configuration from etcd
+	config.FetchConfig()
 	// Set up Logger
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   config.Logger.LogFile,

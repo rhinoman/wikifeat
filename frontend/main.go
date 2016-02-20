@@ -32,27 +32,27 @@
 package main
 
 import (
-	"flag"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/registry"
-	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/frontend/fserv"
 	"github.com/rhinoman/wikifeat/frontend/routing"
 	"log"
 )
 
 func main() {
-	defaultConfig, err := util.DefaultConfigLocation()
-	if err != nil {
-		log.Fatalf("Error settting config file: %v", err)
-	}
-	// Get Command line arguments
-	configFile := flag.String("config", defaultConfig, "config file to load")
-	flag.Parse()
-	// Load configuration
-	config.LoadConfig(*configFile)
+	//Parse the command line parameters
+	config.ParseCmdParams(config.DefaultCmdLine{
+		HostName:         "localhost",
+		NodeId:           "fe1",
+		Port:             "8081",
+		UseSSL:           false,
+		RegistryLocation: "http://localhost:2379",
+	})
+	// Fetch Configuration from etcd
+	config.FetchConfig()
+	// Load plugin ini
 	fserv.LoadPluginData(config.Frontend.PluginDir + "/plugins.ini")
 	database.InitDb()
 	// Set up the core logger

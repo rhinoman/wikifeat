@@ -51,7 +51,6 @@ var RegistryConfigLocation = ConfigPrefix + "registry/"
 // Fetch configuration from etcd
 // Because golang has no generics, this makes heavy use of reflection :|
 func FetchConfig() {
-	LoadDefaults()
 	log.Printf("\nFetching Configuration from %v\n", Service.RegistryLocation)
 	// Get an etcd Client
 	etcdCfg := etcd.Config{

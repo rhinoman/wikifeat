@@ -68,6 +68,8 @@ func InitDatabase() {
 
 //Load the configuration into etcd
 func SetConfig() {
+	log.Println("Setting service registry config")
+	setConfigItems(config.ServiceRegistry, config.RegistryConfigLocation)
 	log.Println("Setting database config")
 	setConfigItems(config.Database, config.DbConfigLocation)
 	log.Println("Setting logger config")
