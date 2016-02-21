@@ -127,7 +127,7 @@ func LoadDefaults() {
 	Database.DbAdminPassword = "password"
 	Database.DbTimeout = "500"
 	Database.MainDb = "main_ut"
-	Logger.LogFile = "out.log"
+	Logger.LogFile = "wikifeat-service.log"
 	Logger.MaxSize = 10
 	Logger.MaxBackups = 3
 	Logger.MaxAge = 30

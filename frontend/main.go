@@ -42,6 +42,8 @@ import (
 )
 
 func main() {
+	// Load default config
+	config.LoadDefaults()
 	//Parse the command line parameters
 	config.ParseCmdParams(config.DefaultCmdLine{
 		HostName:         "localhost",
@@ -51,7 +53,9 @@ func main() {
 		RegistryLocation: "http://localhost:2379",
 	})
 	// Fetch Configuration from etcd
-	config.FetchConfig()
+	config.InitEtcd()
+	config.FetchCommonConfig()
+	config.FetchServiceSection(config.FrontendService)
 	// Load plugin ini
 	fserv.LoadPluginData(config.Frontend.PluginDir + "/plugins.ini")
 	database.InitDb()

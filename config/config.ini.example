@@ -20,7 +20,6 @@ dbTimeout = 3000
 mainDb = wikifeat_main_db
 
 [Logging]
-logFile = wikifeat-auth.log
 #Max size in megs
 maxSize = 10 
 maxBackups = 3
@@ -41,8 +40,8 @@ minPasswordLength = 6
 
 [Frontend]
 #Frontend specific settings
-webAppDir=web_app/app
-pluginDir=plugins
+webAppDir=/usr/local/wikifeat/frontend/web_app/app
+pluginDir=/usr/local/wikifeat/frontend/plugins
 # Uncomment this and designate a home page
 # homepage = /wikis/main-wiki/pages/main
 

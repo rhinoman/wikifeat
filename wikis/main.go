@@ -43,6 +43,8 @@ import (
 )
 
 func main() {
+	// Load default config
+	config.LoadDefaults()
 	// Parse the command line parameters
 	config.ParseCmdParams(config.DefaultCmdLine{
 		HostName:         "localhost",
@@ -52,7 +54,9 @@ func main() {
 		RegistryLocation: "http://localhost:2379",
 	})
 	// Fetch configuration from etcd
-	config.FetchConfig()
+	config.InitEtcd()
+	config.FetchCommonConfig()
+	config.FetchServiceSection(config.WikiService)
 	// Set up Logger
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   config.Logger.LogFile,

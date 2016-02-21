@@ -2,18 +2,19 @@ require.config({
 	baseUrl: "/app/plugin/OpenLayers/resource/",
 	paths: {
 	},
-	packages: [],
+	packages: []
 });
 
 var OpenLayers = {
 
-    start: function(){
+    start: function(started){
         require(['ol-app'], function(OLApp){
-	    OLApp.start();
-	    OpenLayers.getContentView = function(el, contentId){
+            OLApp.start();
+            OpenLayers.getContentView = function(el, contentId){
                 return OLApp.getContentView(el, contentId);
-	    }
-	});
+            };
+            started.resolve();
+	    });
     }
 
 };

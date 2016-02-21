@@ -68,13 +68,15 @@ define([
                 console.log("PLUGIN: " + pluginName + ", ID: " + resourceId);
                 var pg = window[pluginName];
                 if(typeof pg !== 'undefined') {
-                    try {
-                        var contentView = pg.getContentView(field, resourceId);
-                        contentView.render();
-                    }
-                    catch(e){ //Bad Plugin! Bad!
-                        console.log(e);
-                    }
+                    $.when(pg._is_started).done(function() {
+                        try {
+                            var contentView = pg.getContentView(field, resourceId);
+                            contentView.render();
+                        }
+                        catch (e) { //Bad Plugin! Bad!
+                            console.log(e);
+                        }
+                    });
                 } else {
                     console.log("Plugin " + pluginName + " is undefined");
                 }

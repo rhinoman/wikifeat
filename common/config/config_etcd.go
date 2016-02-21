@@ -38,7 +38,7 @@ import (
 	"strconv"
 )
 
-//Config Locations in Etcd
+// Config Locations in Etcd
 var ConfigPrefix = "/wikifeat/config/"
 var DbConfigLocation = ConfigPrefix + "db/"
 var LogConfigLocation = ConfigPrefix + "log/"
@@ -48,10 +48,22 @@ var UsersConfigLocation = ConfigPrefix + "users/"
 var FrontendConfigLocation = ConfigPrefix + "frontend/"
 var RegistryConfigLocation = ConfigPrefix + "registry/"
 
-// Fetch configuration from etcd
-// Because golang has no generics, this makes heavy use of reflection :|
-func FetchConfig() {
-	log.Printf("\nFetching Configuration from %v\n", Service.RegistryLocation)
+// The Etcd keys client
+var kapi etcd.KeysAPI
+
+// Service section enum
+type ServiceSection int
+
+const (
+	AuthService ServiceSection = iota
+	UserService
+	NotificationService
+	WikiService
+	FrontendService
+)
+
+func InitEtcd() {
+	log.Printf("Initializing etcd config connection")
 	// Get an etcd Client
 	etcdCfg := etcd.Config{
 		Endpoints: []string{Service.RegistryLocation},
@@ -62,16 +74,36 @@ func FetchConfig() {
 		log.Fatal(err)
 		return
 	}
-	kapi := etcd.NewKeysAPI(etcdClient)
+	kapi = etcd.NewKeysAPI(etcdClient)
+}
 
-	// Fetch config sections from etcd
+// Fetch common configuration from etcd
+// Because golang has no generics, this makes heavy use of reflection :|
+func FetchCommonConfig() {
+	log.Printf("\nFetching Configuration from %v\n", Service.RegistryLocation)
+
+	// 'common' sections from etcd
 	fetchConfigSection(&Database, DbConfigLocation, kapi)
 	fetchConfigSection(&Logger, LogConfigLocation, kapi)
 	fetchConfigSection(&ServiceRegistry, RegistryConfigLocation, kapi)
-	fetchConfigSection(&Auth, AuthConfigLocation, kapi)
-	fetchConfigSection(&Notifications, NotificationsConfigLocation, kapi)
-	fetchConfigSection(&Users, UsersConfigLocation, kapi)
-	fetchConfigSection(&Frontend, FrontendConfigLocation, kapi)
+}
+
+// Fetch shared configuration for a particular service
+func FetchServiceSection(service ServiceSection) {
+	switch service {
+	case AuthService:
+		fetchConfigSection(&Auth, AuthConfigLocation, kapi)
+	case UserService:
+		fetchConfigSection(&Users, UsersConfigLocation, kapi)
+	case NotificationService:
+		fetchConfigSection(&Notifications, NotificationsConfigLocation, kapi)
+	case WikiService:
+		//Do nothing
+	case FrontendService:
+		fetchConfigSection(&Frontend, FrontendConfigLocation, kapi)
+	default:
+		log.Println("Unknown Service config requested")
+	}
 }
 
 func setConfigVal(str string, field reflect.Value) error {
