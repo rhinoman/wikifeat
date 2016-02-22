@@ -87,8 +87,9 @@ define([
             var ps = window[ns];
             pl[index].resolve(ns);
             try {
-                ps._is_started = $.Deferred();
-                ps.start(ps._is_started);
+                var dfrd = $.Deferred();
+                ps._is_started = dfrd.promise();
+                ps.start(dfrd);
             } catch(e) { //Bad Plugin!
                 console.log(e);
             }

@@ -32,6 +32,10 @@ if couchdb_admin_pass == "":
     print("You must specify a CouchDB admin password!")
     sys.exit(-1)
 
+wikifeat_home = input("Enter the Wikifeat installation directory(/usr/local/wikifeat): ")
+if wikifeat_home == "":
+    wikifeat_home = "/usr/local/wikifeat"
+
 if couchdb_server == "":
     couchdb_server = "localhost"
 if couchdb_port == "":
@@ -56,5 +60,5 @@ print("Running database setup...")
 setup.main(couch_params, main_db, avatar_db, master_params)
 print("")
 print("Configuring Wikifeat...")
-config.main(domain_name, couch_params)
+config.main(domain_name, couch_params, wikifeat_home)
 
