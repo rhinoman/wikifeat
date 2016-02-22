@@ -63,6 +63,11 @@ require.config({
             'backbone.wreqr': 'backbone.radio'
         }
     },
+    config: {
+        moment: {
+            noGlobal: true
+        }
+    },
     packages: [
 
     ]

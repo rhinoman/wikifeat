@@ -74,7 +74,7 @@ define([
             '#lastEditTime': {
                 observe: 'timestamp',
                 onGet: function(timestamp){
-                    var time = moment(timestamp);
+                    var time = Moment(timestamp);
                     return time.format("HH:mm on D MMM YYYY");
                 }
             }

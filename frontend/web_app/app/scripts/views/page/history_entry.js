@@ -32,11 +32,12 @@ define([
     'jquery',
     'underscore',
     'marionette',
+    'moment',
     'backbone.stickit',
     'backbone.radio',
     'entities/wiki/history_entry',
     'text!templates/page/history_entry.html'
-], function($,_,Marionette,Stickit,Radio,
+], function($,_,Marionette,Moment,Stickit,Radio,
             HistoryEntryModel,HistoryEntryTemplate){
     'use strict';
 
@@ -53,7 +54,7 @@ define([
                 observe: 'timestamp',
                 updateMethod: 'html',
                 onGet: function(timestamp){
-                    var time = moment(timestamp);
+                    var time = Moment(timestamp);
                     var timeStr = time.format("HH:mm on D MMM YYYY");
                     return '<a id="viewRevisionLink" href="#">' + timeStr + '</a>'
                 }

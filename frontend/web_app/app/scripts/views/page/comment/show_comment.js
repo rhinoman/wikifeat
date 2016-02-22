@@ -115,7 +115,7 @@ define([
                 var author = this.model.get("author");
                 this.$("#commentAuthorName").html(author);
                 var timestamp = this.model.get("createdTime");
-                var time = moment(timestamp);
+                var time = Moment(timestamp);
                 var timestring = time.format("HH:mm on D MMM YYYY");
                 this.$("#commentDatetime").html(timestring);
                 var content = this.model.get("content");

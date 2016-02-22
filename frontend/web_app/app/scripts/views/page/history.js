@@ -32,12 +32,11 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'moment',
     'backbone.radio',
     'views/paginated_table_view',
     'views/page/history_entry',
     'text!templates/page/history.html'
-], function($,_,Marionette,Moment,Radio,PaginatedTableView,
+], function($,_,Marionette,Radio,PaginatedTableView,
             HistoryEntryView,HistoryTemplate){
 
     'use strict';

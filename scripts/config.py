@@ -58,6 +58,7 @@ def config_webapp(config):
     config['Frontend']['webAppDir'] = wikifeat_path + "/frontend/web_app/app"
     config['Frontend']['pluginDir'] = wikifeat_path + "/frontend/plugins"
 
+
 def config_all(common_params, db_params):
     print("Configuring wikifeat...")
     try:
