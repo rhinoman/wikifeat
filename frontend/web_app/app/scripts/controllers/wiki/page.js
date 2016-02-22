@@ -90,7 +90,9 @@ define([
                 } else {
                     Backbone.history.navigate(genStateString(wikiModel, pageModel));
                     var region = Radio.channel('wiki').request('get:pageRegion');
-                    region.show(new ShowPageView({model: pageModel, wikiModel: wikiModel}));
+                    var showPageView = new ShowPageView({model: pageModel, wikiModel: wikiModel});
+                    $('body').scrollTop(0);
+                    region.show(showPageView);
                 }
             });
         },
