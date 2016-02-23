@@ -32,7 +32,7 @@ def parse_args():
     parser.set_defaults(main_db='wikifeat_main_db')
     parser.set_defaults(avatar_db='user_avatars')
     parser.set_defaults(skip_master=False)
-    parser.set_defaults(wikifeat_home=os.curdir)
+    parser.set_defaults(wikifeat_home=os.path.realpath(os.path.join(os.curdir, os.pardir)))
 
     args = parser.parse_args()
 
