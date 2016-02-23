@@ -6,7 +6,7 @@
 """
 
 import json
-import sys
+import sys, os
 import util
 
 # Set up some values
@@ -16,6 +16,8 @@ Wikifeat Setup
 This script performs initial setup of the Wikifeat system.
 It will create a few CouchDB databases and populate some design documents.
 """
+
+wf_dir = "."
 
 
 def setup_main_db(conn, main_db):
@@ -28,8 +30,7 @@ def setup_main_db(conn, main_db):
             (userCtx.roles.indexOf("admin") === -1) &&
             (userCtx.roles.indexOf("master") === -1) &&
             (userCtx.roles.indexOf("_admin") === -1)){
-                throw({forbidden: "Not authorized"});
-            }
+                throw({forbidden: "Not authorized"}); }
     }
     """ % write_role
 
@@ -71,7 +72,7 @@ def setup_main_db(conn, main_db):
             print("Main auth doc update failed.")
     # Now load the main db security document
     sec_url = main_db_url + '/_security'
-    main_sec = util.load_json_file("ddoc/main_access.json")
+    main_sec = util.load_json_file(os.path.join(wf_dir, "scripts/ddoc/main_access.json"))
     req_body = json.dumps(main_sec)
     conn.request("PUT", sec_url, body=req_body, headers=ph)
     resp = conn.getresponse()
@@ -85,7 +86,7 @@ def setup_main_db(conn, main_db):
     conn.request("GET", main_ddoc_url, headers=gh)
     resp = conn.getresponse()
     existing_ddoc = util.decode_response(resp)
-    main_ddoc = util.load_json_file("ddoc/main_ddoc.json")
+    main_ddoc = util.load_json_file(os.path.join(wf_dir, "scripts/ddoc/main_ddoc.json"))
     if resp.getcode() == 200:
         # Set the rev so we can update
         print("Main design doc exists.  Updating.")
@@ -119,7 +120,7 @@ def setup_user_db(conn):
     conn.request("GET", url, headers=gh)
     resp = conn.getresponse()
     old_ddoc = util.decode_response(resp)
-    user_ddoc = util.load_json_file("ddoc/user_ddoc.json")
+    user_ddoc = util.load_json_file(os.path.join(wf_dir, "scripts/ddoc/user_ddoc.json"))
     if resp.getcode() != 404:
         user_ddoc['_rev'] = old_ddoc['_rev']
     req_body = json.dumps(user_ddoc)
@@ -148,7 +149,7 @@ def setup_avatar_db(conn, adb):
     auth_url = adb_url + '/_design/_auth'
     conn.request("GET", auth_url, headers=gh)
     resp = conn.getresponse()
-    addoc = util.load_json_file('ddoc/avatar_auth.json')
+    addoc = util.load_json_file(os.path.join(wf_dir, 'scripts/ddoc/avatar_auth.json'))
     addoc_old = util.decode_response(resp)
     if resp.getcode() == 200:
         print("Avatar auth doc already exists.  Updating.")
@@ -197,12 +198,14 @@ def create_master_user(conn, master):
         print("Creating master user failed.")
 
 
-def main(couch_params, main_db, avatar_db, master_params):
+def main(couch_params, main_db, avatar_db, master_params, wikifeat_home):
     # Set up credentials
     credentials = util.get_credentials(couch_params.adminuser, couch_params.adminpass)
     global gh, ph
     gh = util.get_headers(credentials)
     ph = util.put_headers(credentials)
+    global wf_dir
+    wf_dir = wikifeat_home
     # Establish a connection to couchdb
     conn = util.get_connection(
         couch_params.use_ssl,

@@ -4,7 +4,7 @@
     Performs a guided install of Wikifeat on the host system
     Note: Requires python3
 """
-import sys
+import sys, os
 import util
 import setup, config
 
@@ -32,9 +32,10 @@ if couchdb_admin_pass == "":
     print("You must specify a CouchDB admin password!")
     sys.exit(-1)
 
-wikifeat_home = input("Enter the Wikifeat installation directory(/usr/local/wikifeat): ")
+wf_home_default = os.path.realpath(os.path.join(os.curdir, os.pardir))
+wikifeat_home = input("Enter the Wikifeat installation directory(" + wf_home_default + "): ")
 if wikifeat_home == "":
-    wikifeat_home = "/usr/local/wikifeat"
+    wikifeat_home = wf_home_default
 
 if couchdb_server == "":
     couchdb_server = "localhost"
@@ -57,7 +58,7 @@ couch_params.adminpass = couchdb_admin_pass
 master_params = util.MasterUserParameters()
 
 print("Running database setup...")
-setup.main(couch_params, main_db, avatar_db, master_params)
+setup.main(couch_params, main_db, avatar_db, master_params, wikifeat_home)
 print("")
 print("Configuring Wikifeat...")
 config.main(domain_name, couch_params, wikifeat_home)
