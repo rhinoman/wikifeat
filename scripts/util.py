@@ -2,7 +2,7 @@
     Common utility functions for setup scripts
 """
 
-import json
+import json, os
 from argparse import ArgumentParser
 import http.client
 
@@ -26,9 +26,13 @@ def parse_args():
                         help="Master User last name")
     parser.add_argument('--skip_master', dest='skip_master', action='store_true',
                         help="Skip master user setup")
+    parser.add_argument('--wikifeat_home', dest='wikifeat_home',
+                        help='Installation directory for Wikifeat')
+
     parser.set_defaults(main_db='wikifeat_main_db')
     parser.set_defaults(avatar_db='user_avatars')
     parser.set_defaults(skip_master=False)
+    parser.set_defaults(wikifeat_home=os.curdir)
 
     args = parser.parse_args()
 
@@ -54,6 +58,7 @@ def add_couch_params(parser):
     parser.add_argument('--use_ssl', dest='use_ssl', action='store_true',
                         help="Use SSL to connect to CouchDB.  Your python must "
                              "have been compiled with SSL support!")
+
     parser.set_defaults(use_ssl=False)
 
 

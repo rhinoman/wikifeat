@@ -17,7 +17,7 @@ This script performs initial setup of the Wikifeat system.
 It will create a few CouchDB databases and populate some design documents.
 """
 
-wf_dir = "."
+wf_dir = os.curdir
 
 
 def setup_main_db(conn, main_db):
@@ -225,5 +225,6 @@ if __name__ == "__main__":
     main(util.CouchParameters(args),
          args.main_db,
          args.avatar_db,
-         util.MasterUserParameters(args))
+         util.MasterUserParameters(args),
+         args.wikifeat_home)
 
