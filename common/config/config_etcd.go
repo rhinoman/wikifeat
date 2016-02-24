@@ -110,7 +110,6 @@ func setConfigVal(str string, field reflect.Value) error {
 	t := field.Kind()
 	switch {
 	case t == reflect.String:
-		log.Printf("STR: %v\n", str)
 		field.SetString(str)
 	case t >= reflect.Int && t <= reflect.Int64:
 		if x, err := strconv.ParseInt(str, 10, 64); err != nil {

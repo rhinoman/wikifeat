@@ -107,7 +107,6 @@ func setConfigItems(configStruct interface{}, configLocation string) {
 }
 
 func setConfigEntry(key string, value string) error {
-	log.Printf("KEY: %v, VALUE: %v\n", key, value)
 	_, err := kapi.Set(context.Background(), key, value, nil)
 	return err
 }
