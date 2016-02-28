@@ -85,11 +85,15 @@ define([
         },
         startPlugin: function(ns, pl, index, script){
             var ps = window[ns];
-            pl[index].resolve(ns);
+            var timeout = 2000;
             try {
-                var dfrd = $.Deferred();
-                ps._is_started = dfrd.promise();
-                ps.start(dfrd);
+                ps.start(pl[index]);
+                setTimeout(function() {
+                    if(pl[index].state() !== 'resolved'){
+                        console.log("Plugin " + ns + " failed to start in " + timeout + " ms");
+                        pl[index].reject();
+                    }
+                }, timeout);
             } catch(e) { //Bad Plugin!
                 console.log(e);
             }

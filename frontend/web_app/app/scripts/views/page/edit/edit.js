@@ -34,12 +34,12 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'markette',
     'entities/wiki/page',
     'views/page/edit/edit_form',
+    'views/page/edit/preview',
     'text!templates/page/edit_page.html'
-], function($,_,Marionette,Markette,PageModel,
-            EditFormView,EditPageTemplate){
+], function($,_,Marionette,PageModel,
+            EditFormView,Preview,EditPageTemplate){
 
    return Marionette.LayoutView.extend({
        id: "edit-page-view",
@@ -69,7 +69,7 @@ define([
                wikiModel: this.wikiModel,
                homePage: this.homePage
            });
-           this.editPreview = new Markette.Preview();
+           this.editPreview = new Preview();
        },
 
        showEditForm: function(event){
@@ -95,6 +95,6 @@ define([
        onShow: function(){
            this.editorContentRegion.show(this.editFormView);
            this.previewContentRegion.show(this.editPreview);
-       },
+       }
    });
 });

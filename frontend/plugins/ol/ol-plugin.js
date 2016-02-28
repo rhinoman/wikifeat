@@ -13,6 +13,9 @@ var OpenLayers = {
             OpenLayers.getContentView = function(el, contentId){
                 return OLApp.getContentView(el, contentId);
             };
+            OpenLayers.getInsertLabel = function(){
+                return OLApp.getInsertLabel();
+            };
             started.resolve();
 	    });
     }

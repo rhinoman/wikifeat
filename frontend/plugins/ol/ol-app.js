@@ -12,8 +12,12 @@ define(['jquery',
 	});
 
 	OLApp.getContentView = function(el, contentId){
-		console.log("Shwoing OpenLayers content");
+		console.log("Showing OpenLayers content");
 		return new OLMapView({el: el});
+	};
+
+	OLApp.getInsertLabel = function(){
+        return "<span class='glyphicon glyphicon-globe'></span>&nbsp;OpenLayers";
 	};
 	
 	return OLApp;

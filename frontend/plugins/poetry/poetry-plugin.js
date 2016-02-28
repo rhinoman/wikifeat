@@ -84,7 +84,7 @@ var Poetry = (function($, _, Backbone, Marionette, Wikifeat){
   // your plugin must return a few things which may be called by wikifeat
   return {
 		// all plugins must contain a 'start' function, named 'start'
-    start: function(){
+    start: function(started){
 		// do some initialization for our plugin here.
 		console.log("Poetry plugin started");
 		var self = this;
@@ -97,6 +97,7 @@ var Poetry = (function($, _, Backbone, Marionette, Wikifeat){
 				console.log("Could not load resource");
 			});
 		Wikifeat.addMenuItem("PoetryMenu", new PoemMenuView());
+        started.resolve();
     },
     // Plugins that support embeddable content in wiki pages must provide
     // a 'getContentView' function which returns a Backbone/Marionette view.

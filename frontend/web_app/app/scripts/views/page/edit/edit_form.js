@@ -62,7 +62,9 @@ define([
         events: {
             'submit form#editPageForm': 'publishChanges',
             'click .page-cancel-button': 'cancelEdit',
-            'change textarea#marketteInput': 'updateWipText'
+            'change textarea#marketteInput': 'updateWipText',
+            'click #pluginButton' : 'clickPluginButton',
+            'click #pluginDropdown a' : 'clickPluginSelectLink'
         },
         regions: {
             "editorRegion" : "#editorContainer"
@@ -76,6 +78,7 @@ define([
                 this.homePage = options.homePage;
             }
             this.model.on('invalid', this.showError, this);
+            this.pluginsStarted = Radio.channel('plugin').request('get:pluginsStarted');
             Markette.EditorView.prototype.initialize.call(this,options);
         },
 
@@ -156,7 +159,69 @@ define([
                 this.setText(this.model.get('content').raw);
             }
             Markette.EditorView.prototype.onRender.call(this);
+            this.$(".btn-group").after("<div id='pluginBtnGroup' class='btn-group'></div>");
+            this.$("#pluginBtnGroup").append(this.pluginButton());
+            // Add some specific attributes to our plugin button
+            this.$("#pluginButton").addClass("dropdown-toggle");
+            this.$("#pluginButton").attr("data-toggle", "dropdown");
+            this.$("#pluginButton").attr("aria-haspopup", "true");
+            this.$("#pluginButton").attr("aria-expanded", "false");
             this.$('[data-toggle="tooltip"]').tooltip({container: this.el});
+            this.$('.dropdown-toggle').dropdown();
+        },
+
+        onShow: function(){
+            var self = this;
+            // When the plugins are started,
+            // add them to the plugin button dropdown
+            $.when(this.pluginsStarted).done(function(){
+                self.insertPluginDropdown(self.$("#pluginButton"));
+            });
+        },
+
+        /**
+         * Draw the plugin dropdown menu
+         * @returns {*}
+         */
+        pluginButton: function(){
+            return this.buttonTemplate()({
+                btnId: "pluginButton",
+                glyph: "<span class='mk-btn-text'>Plugins</span> <span class='caret'></span>",
+                tooltip: "Insert Plugin"
+            })
+        },
+
+        /**
+         * Insert individual plugins into the plugin select dropdown
+         * @param pluginButton
+         */
+        insertPluginDropdown: function(pluginButton){
+            var self = this;
+            pluginButton.after("<ul class='dropdown-menu' id='pluginDropdown'></ul>");
+            Radio.channel('plugin').request('get:pluginList').done(function(pluginList){
+                const pluginModels = pluginList.models;
+                for (var i = 0; i < pluginModels.length; i++){
+                    const pluginModel = pluginModels[i];
+                    const ns = pluginModel.id;
+                    const plugin = window[ns];
+                    if(typeof plugin.getInsertLabel !== 'undefined') {
+                        $.when(plugin._is_started).done(function() {
+                            self.$("#pluginDropdown").append("<li><a href='#' data-plugin-link='" + ns + "'>"
+                                + plugin.getInsertLabel() + "</a></li>")
+                        });
+                    }
+                }
+            });
+        },
+
+        /**
+         * User clicked a plugin link, need to display the plugin's editor view
+         * @param event
+         */
+        clickPluginSelectLink: function(event){
+            event.preventDefault();
+            const target = event.currentTarget;
+            const pName = $(target).attr("data-plugin-link");
         },
 
         onClose: function(){

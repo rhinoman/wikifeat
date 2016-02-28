@@ -39,26 +39,23 @@ define([
 
     return Marionette.ItemView.extend({
         template: _.template('<div id="formatted"></div>'),
-        pluginViews: $.Deferred(),
 
         initialize: function(){
             this.pluginsStarted = Radio.channel('plugin').request('get:pluginsStarted');
         },
+
         onRender: function(){
             this.$("#formatted").html(this.model.get("content").formatted);
 
         },
+
         onShow: function(){
             var self = this;
             $.when(this.pluginsStarted).done(function(){
                     self.loadContentPlugins();
             });
-            //$.when(this.pluginViews).done(function(views){
-            //    _.each(views, function(view){
-            //        view.render();
-            //    });
-            //});
         },
+
         loadContentPlugins: function(){
             var contentFields = this.$("#formatted").find("[data-plugin]");
             //var pvs = [];
@@ -68,15 +65,13 @@ define([
                 console.log("PLUGIN: " + pluginName + ", ID: " + resourceId);
                 var pg = window[pluginName];
                 if(typeof pg !== 'undefined') {
-                    $.when(pg._is_started).done(function() {
-                        try {
-                            var contentView = pg.getContentView(field, resourceId);
-                            contentView.render();
-                        }
-                        catch (e) { //Bad Plugin! Bad!
-                            console.log(e);
-                        }
-                    });
+                    try {
+                        var contentView = pg.getContentView(field, resourceId);
+                        contentView.render();
+                    }
+                    catch (e) { //Bad Plugin! Bad!
+                        // console.log(e);
+                    }
                 } else {
                     console.log("Plugin " + pluginName + " is undefined");
                 }
