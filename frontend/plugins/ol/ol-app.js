@@ -1,9 +1,8 @@
-define(['jquery',
-	'underscore',
-	'marionette',
+define([
 	'views/menuview',
-	'views/mapview'
-], function($,_,Marionette,OLMenuView,OLMapView){
+	'views/mapview',
+    'views/insertview'
+], function(OLMenuView,OLMapView,OLInsertView){
 
 	var OLApp = new Backbone.Marionette.Application();
 
@@ -19,6 +18,10 @@ define(['jquery',
 	OLApp.getInsertLabel = function(){
         return "<span class='glyphicon glyphicon-globe'></span>&nbsp;OpenLayers";
 	};
+
+    OLApp.getInsertView = function(options){
+        return new OLInsertView(options);
+    };
 	
 	return OLApp;
 });

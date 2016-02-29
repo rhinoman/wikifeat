@@ -7,6 +7,7 @@ define(['jquery',
 	return Marionette.ItemView.extend({
 		id: 'ol-map-view',
 		events: {},
+
 		template: _.template('<div id="mapContainer" class="map"></div>'),
 
 		initialize: function(){
@@ -20,8 +21,8 @@ define(['jquery',
 		onBeforeRender: function(){
 			var self = this;
 			var timeoutId = setInterval(function(){
-				if(document.getElementById("mapContainer")){
-					self.domReady.resolve(document.getElementById("mapContainer"));
+				if(this.$("#mapContainer").get()){
+					self.domReady.resolve(this.$("#mapContainer").get());
 					clearTimeout(timeoutId);
 				}
 			}, 100);
@@ -39,7 +40,7 @@ define(['jquery',
 				target: 'mapContainer',
 				layers: [
 					new ol.layer.Tile({
-						source: new ol.source.MapQuest({layer: 'sat'})
+						source: new ol.source.MapQuest({layer: 'osm'})
 					})
 				],
 				view: new ol.View({

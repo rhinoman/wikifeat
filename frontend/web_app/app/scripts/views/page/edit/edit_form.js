@@ -220,8 +220,24 @@ define([
          */
         clickPluginSelectLink: function(event){
             event.preventDefault();
+            const result = $.Deferred();
             const target = event.currentTarget;
             const pName = $(target).attr("data-plugin-link");
+            const editView = window[pName].getInsertView({result: result});
+            if(typeof editView !== 'undefined') {
+                Radio.channel('main').trigger('show:dialog', editView);
+            }
+            var self = this;
+            $.when(result).done(function(data){
+                self.insertPluginBlock(data);
+            });
+        },
+
+        insertPluginBlock: function(data){
+            this.doBlockMarkup({
+                before: data,
+                after: ''
+            },"");
         },
 
         onClose: function(){
