@@ -88,7 +88,6 @@ define([
             }
         },
         events: {
-            'shown.bs.modal' : 'showModal',
             'click #saveButton' : function(){$('#theSubmit').trigger('click')},
             'submit form': 'submitForm'
         },
@@ -189,6 +188,10 @@ define([
 
         onClose: function(){
             this.unstickit();
+        },
+
+        onDestroy: function(){
+            this.model.off(null, null, this);
         }
 
     });

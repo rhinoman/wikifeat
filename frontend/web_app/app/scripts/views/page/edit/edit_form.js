@@ -211,6 +211,9 @@ define([
                         });
                     }
                 }
+                if(self.$("#pluginDropdown").children('li').length === 0){
+                    self.$("#pluginDropdown").append("<li>&nbsp;No plugins loaded</li>");
+                }
             });
         },
 

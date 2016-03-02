@@ -63,6 +63,7 @@ crashlytics-build.properties
 config.ini
 frontend/index.html
 frontend/plugins/plugins.ini
+frontend/web_app/app/img/wflogo1_wb.png
 default.etcd/
 users/users
 users/wikifeat-users
