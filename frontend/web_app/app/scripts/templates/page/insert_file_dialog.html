@@ -1,0 +1,30 @@
+<div class="modal fade" id="insertFileModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="insertFileTitle">Insert File Link</h4>
+            </div>
+            <div class="modal-body">
+                <div id="alertBox"></div>
+                <form class="insertFileForm" role="form" autocomplete="off">
+                    <div id="fleSelectContainer">
+                        <div class="form-group">
+                            <label for="fileSelect">Select File</label>
+                            <select id="fileSelect" class="form-control">
+                                <option value="0">Select File...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="hidden" id="theSubmit"></button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelButton" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="insertButton" type="button" class="btn btn-primary">Insert</button>
+            </div>
+        </div>
+    </div>
+</div>

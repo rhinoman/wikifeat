@@ -41,10 +41,11 @@ define([
     'views/main/alert',
     'views/page/edit/insert_link_dialog',
     'views/page/edit/insert_image_dialog',
+    'views/page/edit/insert_file_dialog',
     'text!templates/page/edit_page_form.html'
 ], function($,_,Marionette,Radio,Stickit,Bootstrap,Markette,
             PageModel,AlertView,InsertLinkDialog,
-            InsertImageDialog,EditPageFormTemplate){
+            InsertImageDialog,InsertFileDialog,EditPageFormTemplate){
 
     return Markette.EditorView.extend({
         model: PageModel,
@@ -63,6 +64,7 @@ define([
             'submit form#editPageForm': 'publishChanges',
             'click .page-cancel-button': 'cancelEdit',
             'change textarea#marketteInput': 'updateWipText',
+            'click #fileLinkButton': 'doFileLink',
             'click #pluginButton' : 'clickPluginButton',
             'click #pluginDropdown a' : 'clickPluginSelectLink'
         },
@@ -159,6 +161,9 @@ define([
                 this.setText(this.model.get('content').raw);
             }
             Markette.EditorView.prototype.onRender.call(this);
+            //Add the file link button to the button bar
+            this.$(".btn-group").append(this.fileButton());
+            // Need to add our plugin dropdown to the button bar
             this.$(".btn-group").after("<div id='pluginBtnGroup' class='btn-group'></div>");
             this.$("#pluginBtnGroup").append(this.pluginButton());
             // Add some specific attributes to our plugin button
@@ -177,6 +182,18 @@ define([
             $.when(this.pluginsStarted).done(function(){
                 self.insertPluginDropdown(self.$("#pluginButton"));
             });
+        },
+
+        /**
+         * Draw the file link button
+         * @returns {*}
+         */
+        fileButton: function(){
+            return this.buttonTemplate()({
+                btnId: "fileLinkButton",
+                glyph: "<span class='glyphicon glyphicon-cloud-download'></span>",
+                tooltip: "Insert File Link"
+            })
         },
 
         /**
@@ -277,6 +294,21 @@ define([
                 wikiId: this.wikiModel.get('id')
             });
             Radio.channel('main').trigger('show:dialog', imd);
+        },
+
+        doFileLink: function(event){
+            var self = this;
+            var ifd = new InsertFileDialog({
+                callback: function(url){
+                    self.$('textarea#marketteInput').focus();
+                    self.doInlineMarkup({
+                        before: '[',
+                        after: '](' + url + ')'
+                    });
+                },
+                wikiId: this.wikiModel.get('id')
+            });
+            Radio.channel('main').trigger('show:dialog', ifd);
         }
 
     });
