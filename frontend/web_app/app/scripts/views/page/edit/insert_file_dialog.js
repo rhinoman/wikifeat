@@ -69,12 +69,36 @@ define([
             });
         },
 
+        optionTemplate: function(){
+            return _.template("<option value='<%= id %>'><%= name %></option>");
+        },
+
         onRender: function(){
             this.$("#insertFileModal").modal();
+            var self = this;
+            this.fileList.done(function(data){
+                var select = self.$("select#fileSelect");
+                select.html('<option value="0">Select File...</option>');
+                if(typeof data !== 'undefined'){
+                    _.each(data.models, function(file){
+                        select.append(self.optionTemplate()({id: file.get('id'), name: file.get('name')}));
+                    }, self);
+                }
+            });
         },
 
         submitForm: function(event){
             event.preventDefault();
+            const fileId = this.$("select#fileSelect").val();
+            var theUrl = "http://";
+            this.fileList.done(function(fc){
+                const fileModel = fc.get(fileId);
+                if(typeof fileModel !== 'undefined' && fileModel !== null){
+                    theUrl = fileModel.getDownloadLink();
+                }
+            });
+            this.callback(theUrl);
+            this.$("#insertFileModal").modal('hide');
         }
     });
 

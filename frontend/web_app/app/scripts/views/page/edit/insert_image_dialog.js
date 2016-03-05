@@ -94,7 +94,7 @@ define([
                 this.fileList.done(function(data){
                     var select = self.$("select#fileSelect");
                     select.html('<option value="0">Select Image File...</option>');
-                    if(data !== 'undefined'){
+                    if(typeof data !== 'undefined'){
                         _.each(data.models, function(file){
                             select.append(self.optionTemplate()({id: file.get('id'), name: file.get('name')}));
                         }, self);
