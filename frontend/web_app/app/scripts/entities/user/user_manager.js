@@ -67,8 +67,13 @@ define([
     UserManager.prototype.currentUser = null;
 
     //Special function -- gets currently authenticated user
-    UserManager.prototype.getCurrentUser = function(){
-        if(this.currentUser === null){
+    UserManager.prototype.getCurrentUser = function(options){
+        options = options || {};
+        var refresh = false;
+        if(options.hasOwnProperty('refresh')){
+            refresh = options.refresh;
+        }
+        if(this.currentUser === null || refresh === true){
             var entity = new UserModel();
             entity.url = "/api/v1/users/current_user";
             this.currentUser = this.fetchDeferred(entity);

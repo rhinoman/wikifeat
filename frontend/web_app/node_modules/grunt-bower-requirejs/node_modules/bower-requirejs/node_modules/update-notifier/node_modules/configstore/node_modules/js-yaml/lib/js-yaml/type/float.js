@@ -1,8 +1,7 @@
 'use strict';
 
-
-var Type = require('../type');
-
+var common = require('../common');
+var Type   = require('../type');
 
 var YAML_FLOAT_PATTERN = new RegExp(
   '^(?:[-+]?(?:[0-9][0-9_]*)\\.[0-9_]*(?:[eE][-+][0-9]+)?' +
@@ -11,32 +10,32 @@ var YAML_FLOAT_PATTERN = new RegExp(
   '|[-+]?\\.(?:inf|Inf|INF)' +
   '|\\.(?:nan|NaN|NAN))$');
 
+function resolveYamlFloat(data) {
+  if (data === null) return false;
 
-function resolveYamlFloat(state) {
-  var value, sign, base, digits,
-      object = state.result;
+  if (!YAML_FLOAT_PATTERN.test(data)) return false;
 
-  if (!YAML_FLOAT_PATTERN.test(object)) {
-    return false;
-  }
+  return true;
+}
 
-  value  = object.replace(/_/g, '').toLowerCase();
-  sign   = '-' === value[0] ? -1 : 1;
+function constructYamlFloat(data) {
+  var value, sign, base, digits;
+
+  value  = data.replace(/_/g, '').toLowerCase();
+  sign   = value[0] === '-' ? -1 : 1;
   digits = [];
 
-  if (0 <= '+-'.indexOf(value[0])) {
+  if ('+-'.indexOf(value[0]) >= 0) {
     value = value.slice(1);
   }
 
-  if ('.inf' === value) {
-    state.result = (1 === sign) ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
-    return true;
+  if (value === '.inf') {
+    return (sign === 1) ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
 
-  } else if ('.nan' === value) {
-    state.result = NaN;
-    return true;
+  } else if (value === '.nan') {
+    return NaN;
 
-  } else if (0 <= value.indexOf(':')) {
+  } else if (value.indexOf(':') >= 0) {
     value.split(':').forEach(function (v) {
       digits.unshift(parseFloat(v, 10));
     });
@@ -49,60 +48,58 @@ function resolveYamlFloat(state) {
       base *= 60;
     });
 
-    state.result = sign * value;
-    return true;
+    return sign * value;
 
-  } else {
-    state.result = sign * parseFloat(value, 10);
-    return true;
   }
+  return sign * parseFloat(value, 10);
 }
 
 
+var SCIENTIFIC_WITHOUT_DOT = /^[-+]?[0-9]+e/;
+
 function representYamlFloat(object, style) {
+  var res;
+
   if (isNaN(object)) {
     switch (style) {
-    case 'lowercase':
-      return '.nan';
-    case 'uppercase':
-      return '.NAN';
-    case 'camelcase':
-      return '.NaN';
+      case 'lowercase': return '.nan';
+      case 'uppercase': return '.NAN';
+      case 'camelcase': return '.NaN';
     }
   } else if (Number.POSITIVE_INFINITY === object) {
     switch (style) {
-    case 'lowercase':
-      return '.inf';
-    case 'uppercase':
-      return '.INF';
-    case 'camelcase':
-      return '.Inf';
+      case 'lowercase': return '.inf';
+      case 'uppercase': return '.INF';
+      case 'camelcase': return '.Inf';
     }
   } else if (Number.NEGATIVE_INFINITY === object) {
     switch (style) {
-    case 'lowercase':
-      return '-.inf';
-    case 'uppercase':
-      return '-.INF';
-    case 'camelcase':
-      return '-.Inf';
+      case 'lowercase': return '-.inf';
+      case 'uppercase': return '-.INF';
+      case 'camelcase': return '-.Inf';
     }
-  } else {
-    return object.toString(10);
+  } else if (common.isNegativeZero(object)) {
+    return '-0.0';
   }
-}
 
+  res = object.toString(10);
+
+  // JS stringifier can build scientific format without dots: 5e-100,
+  // while YAML requres dot: 5.e-100. Fix it with simple hack
+
+  return SCIENTIFIC_WITHOUT_DOT.test(res) ? res.replace('e', '.e') : res;
+}
 
 function isFloat(object) {
-  return ('[object Number]' === Object.prototype.toString.call(object)) &&
-         (0 !== object % 1);
+  return (Object.prototype.toString.call(object) === '[object Number]') &&
+         (object % 1 !== 0 || common.isNegativeZero(object));
 }
 
-
 module.exports = new Type('tag:yaml.org,2002:float', {
-  loadKind: 'scalar',
-  loadResolver: resolveYamlFloat,
-  dumpPredicate: isFloat,
-  dumpRepresenter: representYamlFloat,
-  dumpDefaultStyle: 'lowercase'
+  kind: 'scalar',
+  resolve: resolveYamlFloat,
+  construct: constructYamlFloat,
+  predicate: isFloat,
+  represent: representYamlFloat,
+  defaultStyle: 'lowercase'
 });

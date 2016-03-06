@@ -1,3 +1,4 @@
+'use strict';
 module.exports = {
   warn: function(msg) {
     console.log('WARN: ' + msg);

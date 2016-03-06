@@ -49,8 +49,8 @@ define([
     var userManager = new UserManager();
     var userChannel = Radio.channel('userManager');
 
-    userChannel.reply("get:currentUser", function(){
-        return userManager.getCurrentUser();
+    userChannel.reply("get:currentUser", function(options){
+        return userManager.getCurrentUser(options);
     });
 
     userChannel.reply("get:user", function(id){

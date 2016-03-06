@@ -60,6 +60,7 @@ crashlytics.properties
 crashlytics-build.properties
 
 #Other project specific stuff
+dev1_start.sh
 config.ini
 frontend/index.html
 frontend/plugins/plugins.ini

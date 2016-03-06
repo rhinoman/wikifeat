@@ -54,7 +54,7 @@ define([
         },
 
         accountSettings: function(options){
-            Radio.channel('userManager').request('get:currentUser')
+            Radio.channel('userManager').request('get:currentUser',{refresh: true})
                 .done(function(curUser){
                     if(typeof curUser === 'undefined'){
                         console.log("Error fetching current user.");

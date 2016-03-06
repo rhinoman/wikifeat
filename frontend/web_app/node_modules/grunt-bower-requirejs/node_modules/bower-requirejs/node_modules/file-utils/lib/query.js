@@ -1,3 +1,4 @@
+'use strict';
 /**
  * File/Path comparison and queries
  */

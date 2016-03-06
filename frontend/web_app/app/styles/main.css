@@ -1,7 +1,7 @@
+@import url(../scripts/vendor/markette/css/markette.css);
 /* Color Scheme */
 /* Wiki Styles */
 /* Color Scheme */
-@import url(../scripts/vendor/markette/css/markette.css);
 #wiki-toolbar {
   background-color: #333333;
   margin-bottom: 5px;
@@ -86,7 +86,7 @@ div.tool-menu ul.dropdown-menu a#deletePageLink {
   border: 1px solid #888;
 }
 .page-container .page-view table:not(.table) thead {
-  background-color: #DEDEDE;
+  background-color: #dedede;
 }
 .page-container .page-view table:not(.table) thead th {
   border: 1px solid #888;
@@ -123,19 +123,19 @@ img {
 }
 
 .page-create-button {
-  color: #1ABC9C;
+  color: #1abc9c;
 }
 .page-create-button:hover {
   color: white;
-  background-color: #1ABC9C;
+  background-color: #1abc9c;
 }
 
 .page-edit-button {
-  color: #1ABC9C;
+  color: #1abc9c;
 }
 .page-edit-button:hover {
   color: white;
-  background-color: #1ABC9C;
+  background-color: #1abc9c;
 }
 
 .page-content-mode-link {
@@ -166,12 +166,12 @@ form#editPageForm {
 .page-publish-button {
   margin: 2px;
   border-radius: 0;
-  color: #1ABC9C;
+  color: #1abc9c;
   border: none;
 }
 .page-publish-button:hover, .page-publish-button:active, .page-publish-button:focus {
   color: white;
-  background-color: #1ABC9C;
+  background-color: #1abc9c;
 }
 
 .page-cancel-button {
@@ -249,7 +249,7 @@ div.table-controls button.control-button {
   display: inline;
   border: none;
   border-radius: 0;
-  color: #1ABC9C;
+  color: #1abc9c;
   background-color: white;
 }
 div.table-controls button.control-button span.plus-prepend {
@@ -257,7 +257,7 @@ div.table-controls button.control-button span.plus-prepend {
 }
 div.table-controls button.control-button:hover {
   color: white;
-  background-color: #1ABC9C;
+  background-color: #1abc9c;
 }
 
 tr#manage-users-item > td:last-child {
@@ -356,13 +356,13 @@ button.btn {
 }
 
 button.primary-color-btn {
-  color: #1ABC9C;
+  color: #1abc9c;
   background-color: white;
-  border: 1px solid #1ABC9C;
+  border: 1px solid #1abc9c;
 }
 button.primary-color-btn:hover {
   color: white;
-  background-color: #1ABC9C;
+  background-color: #1abc9c;
 }
 
 div.modal div.modal-dialog div.modal-content {
@@ -376,13 +376,13 @@ div.modal div.modal-dialog div.modal-content div.modal-footer .btn:hover {
   color: white;
 }
 div.modal div.modal-dialog div.modal-content div.modal-footer .btn-primary {
-  border: 1px solid #1ABC9C;
-  color: #1ABC9C;
+  border: 1px solid #1abc9c;
+  color: #1abc9c;
   background-color: white;
 }
 div.modal div.modal-dialog div.modal-content div.modal-footer .btn-primary:hover {
   color: white;
-  background-color: #1ABC9C;
+  background-color: #1abc9c;
 }
 div.modal div.modal-dialog div.modal-content div.modal-footer .btn-danger {
   border: 1px solid lightcoral;
@@ -427,7 +427,7 @@ pre {
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
-  color: #DEDEDE;
+  color: #dedede;
 }
 .sidebar div#logo-view {
   text-align: center;
@@ -451,15 +451,15 @@ div#container div#content {
 
 .addon-clickable {
   background-color: white;
-  color: #1ABC9C;
+  color: #1abc9c;
 }
 .addon-clickable:hover {
   cursor: pointer;
-  background-color: #1ABC9C;
+  background-color: #1abc9c;
   color: white;
 }
 .addon-clickable:active {
-  background-color: #16A085;
+  background-color: #16a085;
 }
 
 div#container.toggled {
@@ -492,5 +492,3 @@ div#container.toggled div#content {
     padding-right: 10px;
   }
 }
-
-/*# sourceMappingURL=main.css.map */

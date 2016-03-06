@@ -1,8 +1,6 @@
 'use strict';
 
-
 var Type = require('../type');
-
 
 var YAML_TIMESTAMP_REGEXP = new RegExp(
   '^([0-9][0-9][0-9][0-9])'          + // [1] year
@@ -16,16 +14,19 @@ var YAML_TIMESTAMP_REGEXP = new RegExp(
   '(?:[ \\t]*(Z|([-+])([0-9][0-9]?)' + // [8] tz [9] tz_sign [10] tz_hour
   '(?::([0-9][0-9]))?))?)?$');         // [11] tz_minute
 
+function resolveYamlTimestamp(data) {
+  if (data === null) return false;
+  if (YAML_TIMESTAMP_REGEXP.exec(data) === null) return false;
+  return true;
+}
 
-function resolveYamlTimestamp(state) {
+function constructYamlTimestamp(data) {
   var match, year, month, day, hour, minute, second, fraction = 0,
-      delta = null, tz_hour, tz_minute, data;
+      delta = null, tz_hour, tz_minute, date;
 
-  match = YAML_TIMESTAMP_REGEXP.exec(state.result);
+  match = YAML_TIMESTAMP_REGEXP.exec(data);
 
-  if (null === match) {
-    return false;
-  }
+  if (match === null) throw new Error('Date resolve error');
 
   // match: [1] year [2] month [3] day
 
@@ -34,8 +35,7 @@ function resolveYamlTimestamp(state) {
   day = +(match[3]);
 
   if (!match[4]) { // no hour
-    state.result = new Date(Date.UTC(year, month, day));
-    return true;
+    return new Date(Date.UTC(year, month, day));
   }
 
   // match: [4] hour [5] minute [6] second [7] fraction
@@ -58,30 +58,24 @@ function resolveYamlTimestamp(state) {
     tz_hour = +(match[10]);
     tz_minute = +(match[11] || 0);
     delta = (tz_hour * 60 + tz_minute) * 60000; // delta in mili-seconds
-    if ('-' === match[9]) {
-      delta = -delta;
-    }
+    if (match[9] === '-') delta = -delta;
   }
 
-  data = new Date(Date.UTC(year, month, day, hour, minute, second, fraction));
+  date = new Date(Date.UTC(year, month, day, hour, minute, second, fraction));
 
-  if (delta) {
-    data.setTime(data.getTime() - delta);
-  }
+  if (delta) date.setTime(date.getTime() - delta);
 
-  state.result = data;
-  return true;
+  return date;
 }
-
 
 function representYamlTimestamp(object /*, style*/) {
   return object.toISOString();
 }
 
-
 module.exports = new Type('tag:yaml.org,2002:timestamp', {
-  loadKind: 'scalar',
-  loadResolver: resolveYamlTimestamp,
-  dumpInstanceOf: Date,
-  dumpRepresenter: representYamlTimestamp
+  kind: 'scalar',
+  resolve: resolveYamlTimestamp,
+  construct: constructYamlTimestamp,
+  instanceOf: Date,
+  represent: representYamlTimestamp
 });

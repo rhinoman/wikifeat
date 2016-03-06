@@ -1,9 +1,10 @@
-JS-YAML - YAML 1.2 parser and serializer for JavaScript
-=======================================================
+JS-YAML - YAML 1.2 parser / writer for JavaScript
+=================================================
 
-[![Build Status](https://secure.travis-ci.org/nodeca/js-yaml.png)](http://travis-ci.org/nodeca/js-yaml)
+[![Build Status](https://travis-ci.org/nodeca/js-yaml.svg?branch=master)](https://travis-ci.org/nodeca/js-yaml)
+[![NPM version](https://img.shields.io/npm/v/js-yaml.svg)](https://www.npmjs.org/package/js-yaml)
 
-[Online Demo](http://nodeca.github.com/js-yaml/)
+__[Online Demo](http://nodeca.github.com/js-yaml/)__
 
 
 This is an implementation of [YAML](http://yaml.org/), a human friendly data
@@ -62,7 +63,7 @@ needs [es5-shims](https://github.com/kriskowal/es5-shim) to operate.
 
 Notes:
 
-1. We have no resourses to support browserified version. Don't expect it to be
+1. We have no resources to support browserified version. Don't expect it to be
    well tested. Don't expect fast fixes if something goes wrong there.
 2. `!!js/function` in browser bundle will not work by default. If you really need
    it - load `esprima` parser first (via amd or directly).
@@ -102,8 +103,8 @@ options:
 
 - `filename` _(default: null)_ - string to be used as a file path in
   error/warning messages.
-- `strict` _(default - false)_ makes the loader to throw errors instead of
-  warnings.
+- `onWarning` _(default: null)_ - function to call on warning messages.
+  Loader will throw on warnings if this function is not provided.
 - `schema` _(default: `DEFAULT_SAFE_SCHEMA`)_ - specifies a schema to use.
   - `FAILSAFE_SCHEMA` - only strings, arrays and plain objects:
     http://www.yaml.org/spec/1.2/spec.html#id2802346
@@ -115,13 +116,14 @@ options:
     (`!!js/undefined`, `!!js/regexp` and `!!js/function`):
     http://yaml.org/type/
   - `DEFAULT_FULL_SCHEMA` - all supported YAML types.
+- `json` _(default: false)_ - compatibility with JSON.parse behaviour. If true, then duplicate keys in a mapping will override values rather than throwing an error.
 
 NOTE: This function **does not** understand multi-document sources, it throws
 exception on those.
 
 NOTE: JS-YAML **does not** support schema-specific tag resolution restrictions.
 So, JSON schema is not as strict as defined in the YAML specification.
-It allows numbers in any notaion, use `Null` and `NULL` as `null`, etc.
+It allows numbers in any notation, use `Null` and `NULL` as `null`, etc.
 Core schema also has no such restrictions. It allows binary notation for integers.
 
 
@@ -174,6 +176,10 @@ options:
   block to flow style for collections. -1 means block style everwhere
 - `styles` - "tag" => "style" map. Each tag may have own set of styles.
 - `schema` _(default: `DEFAULT_SAFE_SCHEMA`)_ specifies a schema to use.
+- `sortKeys` _(default: `false`)_ - if `true`, sort keys when dumping YAML. If a
+  function, use the function to sort the keys.
+- `lineWidth` _(default: `80`)_ - set max line width.
+- `noRefs` _(default: `false`)_ - if `true`, don't convert duplicate objects into references
 
 styles:
 
@@ -235,7 +241,7 @@ The list of standard YAML tags and corresponding JavaScipt types. See also
 Caveats
 -------
 
-Note, that you use arrays or objects as key in JS-YAML. JS do not allows objects
+Note, that you use arrays or objects as key in JS-YAML. JS does not allow objects
 or array as keys, and stringifies (by calling .toString method) them at the
 moment of adding them.
 
@@ -264,13 +270,13 @@ So, the following YAML document cannot be loaded.
 ```
 
 
-Breaking changes in 2.x.x -> 3.0.x
+Breaking changes in 2.x.x -> 3.x.x
 ----------------------------------
 
-If your have not used __custom__ tags or loader classes and not loaded yaml
+If you have not used __custom__ tags or loader classes and not loaded yaml
 files via `require()` - no changes needed. Just upgrade library.
 
-In other case, you should:
+Otherwise, you should:
 
 1. Replace all occurences of `require('xxxx.yml')` by `fs.readFileSync()` +
   `yaml.safeLoad()`.

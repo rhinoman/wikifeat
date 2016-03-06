@@ -1,3 +1,4 @@
+'use strict';
 /*
  * grunt
  * http://gruntjs.com/
