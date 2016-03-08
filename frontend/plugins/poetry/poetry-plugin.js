@@ -32,6 +32,10 @@ var Poetry = (function ($, _, Backbone, Marionette, Wikifeat) {
         }
     });
 
+    /**
+     *  Embeddable 'content' plugins should have a 'helper' view that will be shown
+     *  when the user selects the plugin from the editor view 'plugins' dropdown
+     */
     var PoemInsertView = Marionette.ItemView.extend({
         template: _.template('<div class="modal fade" id="poetryInsertModal">'+
                 '<div class="modal-dialog">' +
@@ -60,6 +64,7 @@ var Poetry = (function ($, _, Backbone, Marionette, Wikifeat) {
             event.preventDefault();
             const dataId = this.$("#inputDataId").val() || "emerson";
             const result = "<div data-plugin='Poetry' data-id='" + dataId + "'></div>";
+            //Resolve the result, so the Wikifeat editor knows what to insert.
             this.result.resolve(result);
         }
     });
@@ -113,7 +118,7 @@ var Poetry = (function ($, _, Backbone, Marionette, Wikifeat) {
     });
     //Create the router
     var pr = new PoetryRouter();
-    // your plugin must return a few things which may be called by wikifeat
+    // Your plugin must return a few things which may be called by wikifeat
     return {
         // all plugins must contain a 'start' function, named 'start'
         start: function (started) {
@@ -131,11 +136,13 @@ var Poetry = (function ($, _, Backbone, Marionette, Wikifeat) {
             Wikifeat.addMenuItem("PoetryMenu", new PoemMenuView());
             started.resolve();
         },
-        // Plugins that support embeddable content in wiki pages must provide
-        // a 'getContentView' function which returns a Backbone/Marionette view.
-        // The getContentView function takes an el parameter - the DOM element the
-        // content will be embedded in, and a 'contentId' - used by your plugin as
-        // a resource identifier.
+        /**
+         * Plugins that support embeddable content in wiki pages must provide
+         * a 'getContentView' function which returns a Backbone/Marionette view.
+         * The getContentView function takes an el parameter - the DOM element the
+         * content will be embedded in, and a 'contentId' - used by your plugin as
+         * a resource identifier.
+        */
         getContentView: function (el, contentId) {
             console.log("Showing Poetry content");
             var poem = new Poem({id: contentId});
@@ -154,6 +161,17 @@ var Poetry = (function ($, _, Backbone, Marionette, Wikifeat) {
             return "<span class='glyphicon glyphicon-paperclip'></span>&nbsp;Poetry";
         },
 
+        /**
+         * Plugins that support embeddable content should provide a
+         * 'getInsertView' function.  This returns a plugin 'helper/editor view'
+         * used when the user wants to insert plugin content.
+         *
+         * As part of the options object, a 'result' field will be passed in
+         * containing a $.Deferred object.  The result should be resolved with
+         * the resultant 'div' tag for the plugin when the user has finished with the view.
+         * @param options - should contain a $.Deferred object called 'result'
+         * @returns {*}
+         */
         getInsertView: function(options){
             return new PoemInsertView(options);
         }
