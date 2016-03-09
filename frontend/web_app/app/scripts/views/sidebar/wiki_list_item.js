@@ -71,7 +71,7 @@ define([
                 this.$('a').attr("id", this.model.id);
                 this.$('a').attr("title", this.model.get('description'));
                 this.$('a').attr("href", "/app/wikis/" + this.model.get('slug'));
-                this.$('[data-toggle="tooltip"]').tooltip();
+                this.$('[data-toggle="tooltip"]').tooltip({container: 'body'});
             }
         },
 
