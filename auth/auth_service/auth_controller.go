@@ -113,13 +113,17 @@ func (ac AuthController) del(request *restful.Request,
 	//Get the session id
 	sessId, err := am.GetSessionId(request.Request)
 	if err != nil {
+		auth.ClearAuth(response.ResponseWriter)
 		Unauthenticated(request, response)
 		return
 	}
 	//Read the session
 	sess, err := am.ReadSession(sessId)
 	if err != nil {
-		Unauthenticated(request, response)
+		// Most likely, we have an expired session.
+		// Just clear the session cookie and move on
+		auth.ClearAuth(response.ResponseWriter)
+		response.WriteEntity(BooleanResponse{Success: true})
 		return
 	}
 	if err = am.Destroy(sess); err != nil {

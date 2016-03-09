@@ -106,9 +106,15 @@ define([
                     break;
                 //If we get an 'Unauthenticated' response, redirect to the login page.
                 case 401:
-                    var currentUrl = document.location.href;
-                    encodeURI(currentUrl);
-                    window.location = '/login?ref=' + encodeURI(currentUrl);
+                    //Clear out session cookie
+                    $.ajax({
+                        url: "/api/v1/auth/session",
+                        type: "DELETE"
+                    }).complete(function() {
+                        var currentUrl = document.location.href;
+                        encodeURI(currentUrl);
+                        window.location = '/login?ref=' + encodeURI(currentUrl);
+                    });
                     break;
                 case 404:
                     WikiClient.getRegion('contentRegion').show(
