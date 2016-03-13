@@ -102,6 +102,10 @@ func TestCreateWiki(t *testing.T) {
 
 func TestPages(t *testing.T) {
 	wikiName, user := createTestWiki(t)
+	defer func() {
+		deleteDb(t, wikiName)
+		deleteUser(t, user)
+	}()
 	ba := &couchdb.BasicAuth{user, "password"}
 	theWiki := SelectWiki(connection, wikiName, ba)
 	t.Logf("dbname: %v\n", wikiName)
@@ -213,12 +217,15 @@ func TestPages(t *testing.T) {
 	rev, err = theWiki.DeletePage(theId, rev)
 	printError(t, err)
 	t.Logf("Deleted rev: %v\n", rev)
-	deleteDb(t, wikiName)
-	deleteUser(t, user)
+
 }
 
 func TestReadPage(t *testing.T) {
 	wikiName, user := createTestWiki(t)
+	defer func() {
+		deleteDb(t, wikiName)
+		deleteUser(t, user)
+	}()
 	ba := &couchdb.BasicAuth{user, "password"}
 	theWiki := SelectWiki(connection, wikiName, ba)
 	t.Logf("dbname: %v\n", wikiName)
@@ -256,15 +263,16 @@ func TestReadPage(t *testing.T) {
 	printError(t, err)
 	t.Logf("read doc by slug: %v\n", readPage)
 	t.Logf("read doc rev by slug: %v\n", readRev)
-	deleteDb(t, wikiName)
-	deleteUser(t, user)
-
 }
 
 func TestFiles(t *testing.T) {
 	const tinyJpeg = "ffd8ffe000104a46494600010101004800480000ffdb0043000302020302020303030304030304050805050404050a070706080c0a0c0c0b0a0b0b0d0e12100d0e110e0b0b1016101113141515150c0f171816141812141514ffc2000b080002000201011100ffc40014000100000000000000000000000000000007ffda00080101000000011effc400161001010100000000000000000000000000050604ffda0008010100010502a1a15303ff00ffc4001a100003010101010000000000000000000001020304050021ffda0008010100063f02e966cdd2d99f3474d2728caeca88a1880a003f07bfffc40017100100030000000000000000000000000001001121ffda0008010100013f21a27af3de5800006013ffda0008010100000010ff00ffc4001510010100000000000000000000000000000100ffda0008010100013f103fe8904041f2800002ffd9"
 
 	wikiName, user := createTestWiki(t)
+	defer func() {
+		deleteDb(t, wikiName)
+		deleteUser(t, user)
+	}()
 	ba := &couchdb.BasicAuth{user, "password"}
 	theWiki := SelectWiki(connection, wikiName, ba)
 	t.Logf("dbname: %v\n", wikiName)
@@ -336,14 +344,14 @@ func TestFiles(t *testing.T) {
 	if dRev == "" {
 		t.Errorf("Deleted Rev blank.")
 	}
-	deleteDb(t, wikiName)
-	deleteUser(t, user)
 }
 
 func TestComments(t *testing.T) {
 	wikiName, user := createTestWiki(t)
-	defer deleteDb(t, wikiName)
-	defer deleteUser(t, user)
+	defer func() {
+		deleteDb(t, wikiName)
+		deleteUser(t, user)
+	}()
 	ba := &couchdb.BasicAuth{user, "password"}
 	theWiki := SelectWiki(connection, wikiName, ba)
 	t.Logf("dbnam: %v\n", wikiName)

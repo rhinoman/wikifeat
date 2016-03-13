@@ -61,6 +61,7 @@ crashlytics-build.properties
 
 #Other project specific stuff
 dev1_start.sh
+torture_test.sh
 config.ini
 frontend/index.html
 frontend/plugins/plugins.ini

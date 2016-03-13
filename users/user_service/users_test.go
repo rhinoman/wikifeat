@@ -32,7 +32,6 @@ package user_service_test
 import (
 	"fmt"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/smartystreets/goconvey/convey"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/database"
@@ -101,201 +100,214 @@ func TestUsers(t *testing.T) {
 		}
 		um.Delete("Steven.Smith", getSmithUser())
 	}()
-	Convey("Given a new account registration", t, func() {
-		user := entities.User{
-			UserName: "Steven.Smith",
-			Password: "jabberwocky",
-			Public: entities.UserPublic{
-				LastName:  "Smith",
-				FirstName: "Steven",
-			},
-		}
-		registration := user_service.Registration{
-			NewUser: user,
-		}
-		Convey("When the new user is registered", func() {
-			rev, err := um.SetUp(&registration)
-			Convey("The revision should be set and the error should be nil", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-				t.Logf("New user revision: %v", rev)
-			})
-		})
-		Convey("When a new user for the account is created", func() {
-			subUser := entities.User{
-				UserName: "Sally.Smith",
-				Password: "123456",
-				Public: entities.UserPublic{
-					LastName:  "Smith",
-					FirstName: "Sally",
-				},
-			}
-			rev, err := um.Create(&subUser, smithUser())
-			Convey("The revision should be set and the error should be nil", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-			})
-			Convey("The user should have the appropriate roles", func() {
-				So(util.HasRole(subUser.Roles, "all_users"), ShouldEqual, true)
-			})
-		})
-		Convey("When the user is updated", func() {
-			auth := couchdb.BasicAuth{Username: "Sally.Smith", Password: "123456"}
-			updateUser := entities.User{}
-			rev, err := um.Read("Sally.Smith", &updateUser, smithUser())
-			So(err, ShouldBeNil)
-			curUser := entities.CurrentUserInfo{
-				User: &updateUser,
-				Auth: &auth,
-			}
+	//Create a new master user
+	user := entities.User{
+		UserName: "Steven.Smith",
+		Password: "jabberwocky",
+		Public: entities.UserPublic{
+			LastName:  "Smith",
+			FirstName: "Steven",
+		},
+	}
+	registration := user_service.Registration{
+		NewUser: user,
+	}
+	rev, err := um.SetUp(&registration)
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("rev is empty!")
+	}
+	t.Logf("New user revision: %v", rev)
+	//Create a new subuser
+	subUser := entities.User{
+		UserName: "Sally.Smith",
+		Password: "123456",
+		Public: entities.UserPublic{
+			LastName:  "Smith",
+			FirstName: "Sally",
+		},
+	}
+	rev, err = um.Create(&subUser, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("rev is empty!")
+	}
+	if !util.HasRole(subUser.Roles, "all_users"){
+		t.Error("user doesn't have all_users role!")
+	}
+	//Update user
+	auth := couchdb.BasicAuth{Username: "Sally.Smith", Password: "123456"}
+	updateUser := entities.User{}
+	rev, err = um.Read("Sally.Smith", &updateUser, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	curUser := entities.CurrentUserInfo{
+		User: &updateUser,
+		Auth: &auth,
+	}
 
-			updateUser.Public.MiddleName = "Marie"
-			rev, err = um.Update("Sally.Smith", rev, &updateUser, &curUser)
-			Convey("Error should be nil and the revision should be set", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-			})
-			rev, err = um.Read("Sally.Smith", &updateUser, smithUser())
-			Convey("The user's password should still be valid", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-			})
-
-		})
-		Convey("When the user's password is changed", func() {
-			auth := couchdb.BasicAuth{Username: "Sally.Smith", Password: "123456"}
-			updateUser := entities.User{}
-			rev, err := um.Read("Sally.Smith", &updateUser, smithUser())
-			So(err, ShouldBeNil)
-			curUser := entities.CurrentUserInfo{
-				User: &updateUser,
-				Auth: &auth,
-			}
-			newPassword := "234567"
-			cpr := user_service.ChangePasswordRequest{
-				NewPassword: newPassword,
-				OldPassword: "123456",
-			}
-			rev, err = um.ChangePassword("Sally.Smith", rev, &cpr, &curUser)
-			Convey("Error should be nil and the revision should be set", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-			})
-			rev, err = um.Read("Sally.Smith", &updateUser, &curUser)
-			Convey("Old password should NOT work", func() {
-				So(err, ShouldNotBeNil)
-			})
-			curUser.Auth = &couchdb.BasicAuth{Username: "Sally.Smith", Password: "234567"}
-			rev, err = um.Read("Sally.Smith", &updateUser, &curUser)
-			Convey("New password should work", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-			})
-
-		})
-		Convey("When a user is granted a role", func() {
-			curUser := smithUser()
-			roleRequest := user_service.RoleRequest{
-				ResourceType: "main",
-				ResourceId:   "",
-				AccessType:   "write",
-			}
-			rev, err := um.GrantRole("Sally.Smith", &roleRequest, curUser)
-			Convey("The revision should be set and the error should be nil", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-			})
-			Convey("User should have her new role", func() {
-				readUser := new(entities.User)
-				_, err := um.Read("Sally.Smith", readUser, smithUser())
-				So(err, ShouldBeNil)
-				t.Logf("Sally's Record: %v", readUser)
-				searchRole := "main_" + ":write"
-				searchRoleFound := false
-				if readUser.Roles[2] == searchRole {
-					searchRoleFound = true
-				}
-				So(searchRoleFound, ShouldEqual, true)
-			})
-
-		})
-		Convey("When a user has a role revoked", func() {
-			curUser := smithUser()
-			roleRequest := user_service.RoleRequest{
-				ResourceType: "main",
-				ResourceId:   "",
-				AccessType:   "write",
-			}
-			rev, err := um.RevokeRole("Sally.Smith", &roleRequest, curUser)
-			Convey("The revision should be set and the error should be nil", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-			})
-			Convey("User should no longer have her role", func() {
-				readUser := new(entities.User)
-				_, err := um.Read("Sally.Smith", readUser, smithUser())
-				So(err, ShouldBeNil)
-				searchRole := "main" + ":write"
-				searchRoleFound := false
-				if len(readUser.Roles) > 1 && readUser.Roles[1] == searchRole {
-					searchRoleFound = true
-				}
-				So(searchRoleFound, ShouldEqual, false)
-
-			})
-		})
-		Convey("When the user list is requested", func() {
-			userList := user_service.UserListQueryResponse{}
-			err := um.GetUserList(1, 5, &userList, smithUser())
-			Convey("Error should be nil and we should have some results", func() {
-				So(err, ShouldBeNil)
-				So(len(userList.Rows) >= 2, ShouldBeTrue)
-				t.Logf("UserListResponse: %v", userList)
-			})
-		})
-		Convey("When a user search is requested", func() {
-			userList := user_service.UserListQueryResponse{}
-			err := um.SearchForUsersByName(1, 5, "Smith", &userList, smithUser())
-			Convey("Error should be nil and we should have some results", func() {
-				So(err, ShouldBeNil)
-				So(len(userList.Rows), ShouldEqual, 2)
-				t.Logf("UserListResponse: %v", userList)
-			})
-		})
-		Convey("When the user is read", func() {
-			readUser := entities.User{}
-			rev, err := um.Read(user.UserName, &readUser, smithUser())
-			Convey("The revision should be set and the error should be nil", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-			})
-			Convey("The user data should be set", func() {
-				So(readUser.CreatedAt, ShouldNotBeNil)
-				So(readUser.UserName, ShouldEqual, "Steven.Smith")
-			})
-		})
-		Convey("When the user by roles list is requested", func() {
-			userList := user_service.UserListQueryResponse{}
-			err := um.GetUserListForRole(1, 5, []string{"all_users"},
-				&userList, smithUser())
-			Convey("The error should be nil and we should have some results", func() {
-				So(err, ShouldBeNil)
-				t.Logf("Response: %v", userList)
-			})
-		})
-		Convey("When a user password reset is requested", func() {
-			err := um.RequestPasswordReset("Steven.Smith")
-			Convey("The error should indicate no notifcation services are present", func() {
-				So(err.Error(), ShouldEqual, "No notifications services listed!")
-			})
-		})
-		Convey("When the user is deleted", func() {
-			rev, err := um.Delete("Sally.Smith", smithUser())
-			Convey("The revision should be set and the error should be nil", func() {
-				So(err, ShouldBeNil)
-				So(rev, ShouldNotEqual, "")
-				t.Logf("Deleted User rev: %v", rev)
-			})
-		})
-	})
+	updateUser.Public.MiddleName = "Marie"
+	rev, err = um.Update("Sally.Smith", rev, &updateUser, &curUser)
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("rev is empty!")
+	}
+	rev, err = um.Read("Sally.Smith", &updateUser, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("rev is empty!")
+	}
+	//Change password
+	auth = couchdb.BasicAuth{Username: "Sally.Smith", Password: "123456"}
+	updateUser = entities.User{}
+	rev, err = um.Read("Sally.Smith", &updateUser, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	curUser = entities.CurrentUserInfo{
+		User: &updateUser,
+		Auth: &auth,
+	}
+	newPassword := "234567"
+	cpr := user_service.ChangePasswordRequest{
+		NewPassword: newPassword,
+		OldPassword: "123456",
+	}
+	rev, err = um.ChangePassword("Sally.Smith", rev, &cpr, &curUser)
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("rev is empty!")
+	}
+	rev, err = um.Read("Sally.Smith", &updateUser, &curUser)
+	if err == nil {
+		t.Error("Old password should not have worked!")
+	}
+	curUser.Auth = &couchdb.BasicAuth{Username: "Sally.Smith", Password: "234567"}
+	rev, err = um.Read("Sally.Smith", &updateUser, &curUser)
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("rev is empty!")
+	}
+	//Grant role
+	curUser = *smithUser()
+	roleRequest := user_service.RoleRequest{
+		ResourceType: "main",
+		ResourceId:   "",
+		AccessType:   "write",
+	}
+	rev, err = um.GrantRole("Sally.Smith", &roleRequest, &curUser)
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("rev is empty!")
+	}
+	readUser := new(entities.User)
+	_, err = um.Read("Sally.Smith", readUser, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("Sally's Record: %v", readUser)
+	searchRole := "main_" + ":write"
+	searchRoleFound := false
+	if readUser.Roles[2] == searchRole {
+		searchRoleFound = true
+	}
+	if !searchRoleFound{
+		t.Error("Role not found!")
+	}
+	//Revoke role
+	curUser = *smithUser()
+	roleRequest = user_service.RoleRequest{
+		ResourceType: "main",
+		ResourceId:   "",
+		AccessType:   "write",
+	}
+	rev, err = um.RevokeRole("Sally.Smith", &roleRequest, &curUser)
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("rev is empty!")
+	}
+	readUser = new(entities.User)
+	_, err = um.Read("Sally.Smith", readUser, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	searchRole = "main" + ":write"
+	searchRoleFound = false
+	if len(readUser.Roles) > 1 && readUser.Roles[1] == searchRole {
+		searchRoleFound = true
+	}
+	if searchRoleFound {
+		t.Error("Role should not have been found!")
+	}
+	//User List
+	userList := user_service.UserListQueryResponse{}
+	err = um.GetUserList(1, 5, &userList, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	if !(len(userList.Rows) >= 2){
+		t.Error("User list should be greater than or equal to 2!")
+	}
+	t.Logf("UserListResponse: %v", userList)
+	//User search
+	userList = user_service.UserListQueryResponse{}
+	err = um.SearchForUsersByName(1, 5, "Smith", &userList, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	if len(userList.Rows) != 2{
+		t.Errorf("Userlist should be length 2 was %v", len(userList.Rows))
+	}
+	t.Logf("UserListResponse: %v", userList)
+	//Read user
+	readUser = &entities.User{}
+	rev, err = um.Read(user.UserName, readUser, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("Rev is empty!")
+	}
+	if readUser.UserName != "Steven.Smith"{
+		t.Errorf("username should be Seteven.Smith, was %v", readUser.UserName)
+	}
+	//User by Roles list
+	userList = user_service.UserListQueryResponse{}
+	err = um.GetUserListForRole(1, 5, []string{"all_users"},
+		&userList, smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("Response: %v", userList)
+	//Password reset
+	err = um.RequestPasswordReset("Steven.Smith")
+	if err.Error() != "No notifications services listed!"{
+		t.Error("Error is wrong")
+	}
+	//Delete user
+	rev, err = um.Delete("Sally.Smith", smithUser())
+	if err != nil {
+		t.Error(err)
+	}
+	if rev == "" {
+		t.Error("Rev is empty!")
+	}
+	t.Logf("Deleted User rev: %v", rev)
 }

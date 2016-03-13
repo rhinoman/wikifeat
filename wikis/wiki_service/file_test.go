@@ -32,18 +32,19 @@ package wiki_service_test
 
 import (
 	"bytes"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/users/user_service"
 	"github.com/rhinoman/wikifeat/wikis/wiki_service/wikit"
 	"io/ioutil"
 	"testing"
+	"time"
 )
 
 func beforeFileTest(t *testing.T) error {
-	setup()
+	time.Sleep(200 * time.Millisecond)
+	setup("main_files_test")
 	user := User{
-		UserName: "John.Smith",
+		UserName: "Jim.Smith",
 		Password: "password",
 	}
 	registration := user_service.Registration{
@@ -56,29 +57,14 @@ func beforeFileTest(t *testing.T) error {
 	return nil
 }
 
-func TestFileCRUD(t *testing.T) {
-	err := beforeFileTest(t)
-	jsAuth := &couchdb.BasicAuth{
-		Username: "John.Smith",
-		Password: "password",
-	}
-	if err != nil {
-		t.Error(err)
-	}
-	theUser := User{}
-	_, err = grabUser("John.Smith", &theUser, jsAuth)
-	if err != nil {
-		t.Error(err)
-	}
-	defer afterTest(&theUser)
+func doFileTest(t *testing.T) {
 	//Create a wiki
-	curUser := getCurUser(jsAuth)
 	wikiId := getUuid()
 	wikiRecord := WikiRecord{
 		Name:        "Cafe Project",
 		Description: "Wiki for the Cafe Project",
 	}
-	_, err = wm.Create(wikiId, &wikiRecord, curUser)
+	_, err := wm.Create(wikiId, &wikiRecord, curUser)
 	if err != nil {
 		t.Error(err)
 	}

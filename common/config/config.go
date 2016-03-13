@@ -125,7 +125,7 @@ func LoadDefaults() {
 	Database.UseSSL = false
 	Database.DbAdminUser = "adminuser"
 	Database.DbAdminPassword = "password"
-	Database.DbTimeout = "500"
+	Database.DbTimeout = "0"
 	Database.MainDb = "main_ut"
 	Logger.LogFile = "wikifeat-service.log"
 	Logger.MaxSize = 10

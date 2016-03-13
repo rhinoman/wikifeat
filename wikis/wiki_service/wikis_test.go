@@ -51,9 +51,13 @@ var pm = new(wiki_service.PageManager)
 var wm = new(wiki_service.WikiManager)
 var um = new(user_service.UserManager)
 var fm = new(wiki_service.FileManager)
+var theUser = User{}
+var curUser *CurrentUserInfo
+var jsAuth *couchdb.BasicAuth
 
-func setup() {
+func setup(mainDb string) {
 	config.LoadDefaults()
+	config.Database.MainDb = mainDb
 	InitDb()
 	SetupDb()
 }
@@ -64,8 +68,8 @@ func getUuid() string {
 }
 
 func grabUser(id string, user *User, auth couchdb.Auth) (string, error) {
-	curUser := getCurUser(auth)
-	return um.Read(id, user, curUser)
+	daUser := getCurUser(auth)
+	return um.Read(id, user, daUser)
 }
 
 func getCurUser(auth couchdb.Auth) *CurrentUserInfo {
@@ -81,7 +85,8 @@ func getCurUser(auth couchdb.Auth) *CurrentUserInfo {
 }
 
 func beforeTest(t *testing.T) {
-	setup()
+	time.Sleep(1 * time.Second)
+	setup("main_wikis_test")
 	user := User{
 		UserName: "John.Smith",
 		Password: "password",
@@ -96,7 +101,8 @@ func beforeTest(t *testing.T) {
 }
 
 func afterTest(user *User) {
-	curUser := &CurrentUserInfo{
+	time.Sleep(500 * time.Millisecond)
+	daUser := &CurrentUserInfo{
 		User: user,
 		Auth: &couchdb.BasicAuth{
 			Username: user.UserName,
@@ -104,24 +110,28 @@ func afterTest(user *User) {
 		},
 	}
 	DeleteDb(MainDbName())
-	um.Delete(user.UserName, curUser)
+	um.Delete(user.UserName, daUser)
 
 }
 
-func TestWiki(t *testing.T) {
+func TestWikiService(t *testing.T){
 	beforeTest(t)
+	defer afterTest(&theUser)
 	jsAuth := &couchdb.BasicAuth{
 		Username: "John.Smith",
 		Password: "password",
 	}
-	curUser := getCurUser(jsAuth)
-
-	theUser := User{}
+	curUser = getCurUser(jsAuth)
 	_, err := um.Read("John.Smith", &theUser, curUser)
 	if err != nil {
 		t.Error(err)
 	}
-	defer afterTest(&theUser)
+	doWikiTest(t)
+	doPageTest(t)
+	doFileTest(t)
+}
+
+func doWikiTest(t *testing.T) {
 	wikiId := getUuid()
 	otherWikiId := getUuid()
 	badWikiId := getUuid()

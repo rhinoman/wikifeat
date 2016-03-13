@@ -54,8 +54,6 @@ func TestConfigLoader(t *testing.T) {
 	config_loader.SetConfig()
 	//Reset the local config to defaults
 	config.LoadDefaults()
-	//Load config from etcd
-	config.FetchConfig()
 	//Check the config items we set
 	if config.Notifications.FromEmail != "turd.furgeson@nowhere.com" {
 		t.Errorf("Notifications.FromEmail not set: %v", config.Notifications.FromEmail)
