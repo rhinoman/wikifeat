@@ -43,17 +43,12 @@ import (
 	"time"
 )
 
-var timeout = time.Duration(500 * time.Millisecond)
-var server = "127.0.0.1"
-var adminAuth = &couchdb.BasicAuth{Username: "adminuser", Password: "password"}
-
 var pm = new(wiki_service.PageManager)
 var wm = new(wiki_service.WikiManager)
 var um = new(user_service.UserManager)
 var fm = new(wiki_service.FileManager)
 var theUser = User{}
 var curUser *CurrentUserInfo
-var jsAuth *couchdb.BasicAuth
 
 func setup(mainDb string) {
 	config.LoadDefaults()
