@@ -34,7 +34,6 @@ define([
     'marionette',
     'moment',
     'backbone.radio',
-    'backbone.stickit',
     'entities/wiki/page',
     'entities/user/user',
     'views/page/child_index',
@@ -45,7 +44,7 @@ define([
     'views/page/comment/comments',
     'util/common_events',
     'text!templates/page/page_layout.html'
-], function($,_,Marionette,Moment,Radio,Stickit,
+], function($,_,Marionette,Moment,Radio,
             PageModel,UserModel,ChildIndexView,
             PageToolMenu,RawContentView,FormattedContentView,
             UserInfoDialog,CommentsView,CommonEvents,
@@ -59,25 +58,11 @@ define([
         wikiModel: null,
         editorModel: null,
         oldRevision: false,
-        pageChildren: $.Promise,
-        pageComments: $.Promise,
         regions: {
             pageToolMenuRegion: "#pageTools",
             pageContentRegion: "#pageContent",
             pageChildIndexRegion: '#childIndex',
             pageCommentsRegion: '#pageComments'
-        },
-        bindings: {
-            '#editorName': {
-                observe: 'editor'
-            },
-            '#lastEditTime': {
-                observe: 'timestamp',
-                onGet: function(timestamp){
-                    var time = Moment(timestamp);
-                    return time.format("HH:mm on D MMM YYYY");
-                }
-            }
         },
         events: {
             'click a#viewCurrentPageLink': 'showCurrentPage',
@@ -95,9 +80,9 @@ define([
                 this.wikiModel = options.wikiModel;
                 //Load the list of this page's children
                 if(!this.oldRevision) {
-                    this.pageChildren = Radio.channel('wikiManager')
+                    this.pageChildrenPromise = Radio.channel('wikiManager')
                         .request('get:page:children', this.model.id, this.wikiModel.id);
-                    this.pageComments = Radio.channel('wikiManager')
+                    this.pageCommentsPromise = Radio.channel('wikiManager')
                         .request('get:page:comments', this.model.id, this.wikiModel.id);
                 }
             }
@@ -119,21 +104,26 @@ define([
         onRender: function(){
             var self = this;
             if(typeof this.model !== 'undefined'){
-                this.stickit();
+                //this.stickit();
+                //Display the editor
+                this.$("#editorName").html(this.model.get('editor'));
+                //Display the timestamp of the last edit
+                var time = Moment(this.model.get('timestamp'));
+                this.$("#lastEditTime").html(time.format("HH:mm on D MMM YYYY"));
                 if(this.model.viewMode === 'formatted'){
                     this.pageContentRegion.show(new FormattedContentView({model: this.model}));
                 } else {
                     this.pageContentRegion.show(new RawContentView({model: this.model}));
                 }
-                if(!this.oldRevision) {
+                /*if(!this.oldRevision) {
                     this.pageToolMenuRegion.show(new PageToolMenu({
                         model: this.model, wikiModel: this.wikiModel
                     }));
-                }
+                }*/
                 //Draw the child page index and comments
                 if(this.model.id != "" && !this.oldRevision) {
-                    this.pageChildren.done(this.drawChildIndex.bind(this));
-                    this.pageComments.done(this.drawComments.bind(this));
+                    this.pageChildrenPromise.done(this.drawChildIndex.bind(this));
+                    this.pageCommentsPromise.done(this.drawComments.bind(this));
                 } else {
                     this.$("div#childIndex").hide();
                 }
@@ -165,18 +155,20 @@ define([
 
         drawChildIndex: function(response){
             this.$("div#childIndex").show();
+            this.pageChildren = response;
             this.pageChildIndexRegion.show(
                 new ChildIndexView({
-                    collection: response,
+                    collection: this.pageChildren,
                     wikiModel: this.wikiModel
                 })
             )
         },
 
         drawComments: function(response){
+            this.pageComments = response;
             this.pageCommentsRegion.show(
                 new CommentsView({
-                    collection: response,
+                    collection: this.pageComments,
                     wikiId: this.wikiModel.id,
                     pageId: this.model.id,
                     commentsDisabled: this.model.get("commentsDisabled")
@@ -184,8 +176,7 @@ define([
             )
         },
 
-        onClose: function(){
-            this.unstickit();
+        onDestroy: function(){
         }
     });
 

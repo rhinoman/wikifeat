@@ -130,7 +130,12 @@ define([
             }
         });
 
-        Radio.channel('sidebar').trigger('init:layout', this.sidebarRegion);
+        //Slow network connections very occasionally resulted in attempting to draw the sidebar before the DOM
+        //was fully loaded :(
+        //Solution: wrap this call in a good 'ol $(document).ready()
+        $(document).ready(function(){
+            Radio.channel('sidebar').trigger('init:layout', this.sidebarRegion);
+        }.bind(this));
         if (this.getCurrentRoute() === "") {
             WikiClient.trigger("showHome");
         }
@@ -142,7 +147,6 @@ define([
         Radio.channel('main').on('show:dialog', function(content){
             WikiClient.getRegion('dialogRegion').show(content);
         });
-
         new MainRouter();
         new WikiRouter();
         new UserRouter();
@@ -159,6 +163,8 @@ define([
             });
 
     });
+
+    WikiClient.on("")
 
     return WikiClient;
 });

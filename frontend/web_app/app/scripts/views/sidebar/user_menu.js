@@ -33,13 +33,12 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'backbone.stickit',
     'backbone.radio',
     'bootstrap',
     'text!templates/sidebar/user_menu.html',
     'entities/user/user'
-], function($,_,Marionette, Stickit, Radio,
-            Bootstrap, UserMenuTemplate, UserModel){
+], function($,_,Marionette,Radio,Bootstrap,
+            UserMenuTemplate,UserModel){
 
     return Marionette.ItemView.extend({
         id: 'user-menu-view',
@@ -47,11 +46,6 @@ define([
             console.log("initializing User Menu View");
         },
         model: UserModel,
-        bindings: {
-            '#userNameText': {
-                observe: 'name'
-            }
-        },
         events: {
             "click a#accountSettingsLink": "accountSettings",
             "click a#logoutLink": "logout"
@@ -100,7 +94,7 @@ define([
         /* on render callback */
         onRender: function(){
             if(typeof this.model !== 'undefined') {
-                this.stickit();
+                this.$("#userNameText").html(this.model.get('name'));
                 this.$("#currentUserThumb").html(this.model.getAvatarThumbnail());
             }
             if(this.activeMenu !== null){
@@ -113,7 +107,6 @@ define([
         },
 
         onClose: function(){
-            this.unstickit();
         }
     });
 });

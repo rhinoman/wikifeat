@@ -95,7 +95,7 @@ define([
             }
         },
 
-        onClose: function(){
+        onDestroy: function(){
             this.unstickit();
         }
 

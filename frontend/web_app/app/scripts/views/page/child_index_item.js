@@ -32,11 +32,10 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'backbone.stickit',
     'backbone.radio',
     'entities/wiki/page',
     'text!templates/page/child_index_item.html'
-], function($,_,Marionette,Stickit,Radio,
+], function($,_,Marionette,Radio,
             PageModel,ChildIndexItemTemplate){
     'use strict';
     return Marionette.ItemView.extend({
@@ -45,11 +44,6 @@ define([
         template: _.template(ChildIndexItemTemplate),
         model: PageModel,
         wikiModel: null,
-        bindings: {
-            '#childPageTitle': {
-                observe: 'title'
-            }
-        },
         events: {
             'click a.index-link': 'navigateToChildPage'
         },
@@ -63,7 +57,7 @@ define([
 
         onRender: function(){
             if(typeof this.model !== 'undefined'){
-                this.stickit();
+                this.$("#childPageTitle").html(this.model.get('title'));
                 var theLink = $(this.el).find('a.index-link');
                 theLink.prop('href', this.model.get('slug'));
             }
@@ -76,8 +70,10 @@ define([
             }
         },
 
-        onClose: function(){
-            this.unstickit();
+        onDestroy: function(){
+            this.unbind();
+            this.model.unbind();
+            delete this.model;
         }
 
     });

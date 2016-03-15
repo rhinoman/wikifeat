@@ -28,10 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Created by jcadam on 2/28/15.
- */
-
 'use strict';
 
 define([
@@ -48,8 +44,7 @@ define([
         childView: BreadcrumbItemView,
         initialize: function(options){},
 
-        onClose:function(){
-            this.unbind();
+        onDestroy:function(){
         }
     });
 

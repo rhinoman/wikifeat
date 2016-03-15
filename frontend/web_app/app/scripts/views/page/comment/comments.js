@@ -100,6 +100,11 @@ define([
                 this.$("nav#commentsPaginationNav").show();
             }
             PaginatedTableView.prototype.onRender.call(this);
+        },
+
+        onDestroy: function(){
+            Radio.channel('commentsView').reset();
+            this.rm.destroy();
         }
 
     });

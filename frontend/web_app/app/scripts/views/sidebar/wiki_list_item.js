@@ -38,23 +38,17 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'backbone.stickit',
     'backbone.radio',
     'bootstrap',
     'entities/wiki/wiki',
     'text!templates/sidebar/wiki_list_item.html'
-], function($,_,Marionette,Stickit,Radio,
-            Bootstrap,WikiModel,WikiListItemTemplate){
+], function($,_,Marionette,Radio,Bootstrap,
+            WikiModel,WikiListItemTemplate){
 
     return Marionette.ItemView.extend({
         id: 'wiki-list-item-view',
         template: _.template(WikiListItemTemplate),
         model: WikiModel,
-        bindings: {
-            '#wikiNameText': {
-                observe: 'name'
-            }
-        },
         events: {
            "click a": "navigateToWiki"
         },
@@ -67,7 +61,7 @@ define([
         },
         onRender: function(){
             if(typeof this.model !== 'undefined'){
-                this.stickit();
+                this.$("#wikiNameText").html(this.model.get('name'));
                 this.$('a').attr("id", this.model.id);
                 this.$('a').attr("title", this.model.get('description'));
                 this.$('a').attr("href", "/app/wikis/" + this.model.get('slug'));
@@ -76,7 +70,6 @@ define([
         },
 
         onClose: function(){
-            this.unstickit();
         }
     });
 

@@ -36,22 +36,15 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'backbone.stickit',
     'backbone.radio',
     'entities/wiki/breadcrumb'
-], function($,_,Marionette,Stickit,Radio,
-            BreadcrumbModel){
+], function($,_,Marionette,Radio,BreadcrumbModel){
 
     return Marionette.ItemView.extend({
         id: "wiki-breadcrumb-item-view",
         tagName: "li",
         model: BreadcrumbModel,
         template: _.template('<a href="#" class="breadLink"></a>'),
-        bindings: {
-            '.breadLink': {
-                observe: 'name'
-            }
-        },
         events: {
             "click a": "navigateToCrumb"
         },
@@ -65,12 +58,11 @@ define([
 
         onRender: function(){
             if(typeof this.model !== 'undefined'){
-                this.stickit();
+                this.$('a.breadLink').html(this.model.get('name'));
             }
         },
 
-        onClose: function(){
-            this.unstickit();
+        onDestroy: function(){
         }
     });
 
