@@ -115,11 +115,11 @@ define([
                 } else {
                     this.pageContentRegion.show(new RawContentView({model: this.model}));
                 }
-                /*if(!this.oldRevision) {
+                if(!this.oldRevision) {
                     this.pageToolMenuRegion.show(new PageToolMenu({
                         model: this.model, wikiModel: this.wikiModel
                     }));
-                }*/
+                }
                 //Draw the child page index and comments
                 if(this.model.id != "" && !this.oldRevision) {
                     this.pageChildrenPromise.done(this.drawChildIndex.bind(this));
