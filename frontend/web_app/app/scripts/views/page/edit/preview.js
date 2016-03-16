@@ -39,6 +39,7 @@ define([
     return Markette.Preview.extend({
         initialize: function(options){
             this.pluginsStarted = Radio.channel('plugin').request('get:pluginsStarted');
+            this.pluginContentViews = [];
             Markette.Preview.prototype.initialize.call(this, options);
         },
 
@@ -61,6 +62,7 @@ define([
                 if(typeof pg !== 'undefined') {
                     try {
                         var contentView = pg.getContentView(field, resourceId);
+                        this.pluginContentViews.push(contentView);
                         contentView.render();
                     }
                     catch (e) { //Bad Plugin! Bad!
@@ -68,6 +70,20 @@ define([
                     }
                 } else {
                     console.log("Plugin " + pluginName + " is undefined");
+                }
+            }.bind(this));
+        },
+
+        onDestroy: function(){
+            _.each(this.pluginContentViews, function(cv){
+                if(typeof cv.destroy !== 'undefined'){
+                    //It's a marionette view, just call destroy
+                    cv.destroy();
+                } else {
+                    //Assume a plain backbone view
+                    cv.undelegateEvents();
+                    cv.remove();
+                    cv.unbind();
                 }
             });
         }

@@ -25,7 +25,7 @@ var Poetry = (function ($, _, Backbone, Marionette, Wikifeat) {
         template: _.template('<div class="poetry" id="poem"></div>'),
         model: Poem,
         initialize: function () {
-            this.model.on("change", this.render, this);
+            this.model.listenTo("change", this.render, this);
         },
         onRender: function () {
             this.$("#poem").html(this.model.get('text'));

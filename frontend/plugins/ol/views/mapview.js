@@ -15,7 +15,7 @@ define(['jquery',
 			this.domReady = $.Deferred();
 		},
 	         
-                // OpenLayers is very DOM dependent.  We MUST make sure Marionette has actually drawn
+        // OpenLayers is very DOM dependent.  We MUST make sure Marionette has actually drawn
 		// The freaking DOM elements (not just 'rendered' -- thanks for the confusion Marionette docs)
 		// to the screen/page before we try to render the map.
 		onBeforeRender: function(){
@@ -36,7 +36,7 @@ define(['jquery',
 		},
 
 		drawMap: function(){
-			var map = new ol.Map({
+			this.map = new ol.Map({
 				target: 'mapContainer',
 				layers: [
 					new ol.layer.Tile({
@@ -48,6 +48,13 @@ define(['jquery',
 					zoom: 4
 				})
 			});
+		},
+
+		onDestroy: function(){
+            if(typeof this.map !== "undefined"){
+                this.map.setTarget(null);
+                this.map = null;
+            }
 		}
 		
 	});
