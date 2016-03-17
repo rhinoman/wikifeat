@@ -59,7 +59,7 @@ define([
         },
 
         initialize: function(options){
-            this.model.listenTo('change', this.render, this);
+            this.listenTo(this.model, 'change', this.render);
             this.rm = new Marionette.RegionManager();
             this.rm.addRegion("editor", "#editorContainer_" + this.model.id);
         },

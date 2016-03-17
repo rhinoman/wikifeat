@@ -79,7 +79,7 @@ define([
             if(options.hasOwnProperty('homePage')){
                 this.homePage = options.homePage;
             }
-            this.model.on('invalid', this.showError, this);
+            this.listenTo(this.model, 'invalid', this.showError);
             this.pluginsStarted = Radio.channel('plugin').request('get:pluginsStarted');
             Markette.EditorView.prototype.initialize.call(this,options);
         },
