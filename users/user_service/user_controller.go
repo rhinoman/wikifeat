@@ -493,6 +493,7 @@ func (uc UsersController) list(request *restful.Request,
 	response.WriteEntity(uir)
 }
 
+// Generates a List Response
 func (uc UsersController) genUserListResponse(curUser *CurrentUserInfo,
 	ulr *UserListQueryResponse) UserListResponse {
 	uir := UserListResponse{}
@@ -507,6 +508,7 @@ func (uc UsersController) genUserListResponse(curUser *CurrentUserInfo,
 	return uir
 }
 
+// Generates a single User record response
 func (uc UsersController) genRecordResponse(curUser *CurrentUserInfo,
 	userId string, user *User) UserResponse {
 
@@ -518,6 +520,7 @@ func (uc UsersController) genRecordResponse(curUser *CurrentUserInfo,
 	}
 }
 
+// Generate links for a user record response
 func (uc UsersController) genUserRecordLinks(userRoles []string,
 	userId string, curUserId string, uri string) HatLinks {
 	links := HatLinks{}

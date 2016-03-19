@@ -167,6 +167,10 @@ func (um *UserManager) Create(newUser *User,
 	if err != nil {
 		return "", err
 	}
+	err = um.validatePassword(newUser.Password)
+	if err != nil {
+		return "", err
+	}
 	newUser.Roles = []string{ReadRole(MainDbName()), AllUsersRole()}
 	newUser.Type = "user"
 	namestring := UserPrefix + newUser.UserName
@@ -216,6 +220,9 @@ func (um *UserManager) Update(id string, rev string, updatedUser *User,
 		auth = AdminAuth
 	} else {
 		auth = curUser.Auth
+	}
+	if err := um.validateUser(updatedUser); err != nil {
+		return "", err
 	}
 	userDb := Connection.SelectDB(UserDbName, auth)
 	//pull the user record
@@ -655,10 +662,9 @@ func (um *UserManager) GetUserListForRole(pageNum int, numPerPage int,
 //Simple validation of user data
 func (um *UserManager) validateUser(user *User) error {
 	var err error
-	if len(user.UserName) < 3 {
+	if len(user.UserName) < 3 || len(user.UserName) > 80{
 		err = errors.New("Username invalid")
 	}
-	err = um.validatePassword(user.Password)
 	return err
 }
 
