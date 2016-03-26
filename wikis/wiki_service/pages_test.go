@@ -37,7 +37,7 @@ import (
 	"testing"
 )
 
-func cleanup(wikiId string){
+func cleanup(wikiId string) {
 	wm.Delete(wikiId, curUser)
 }
 
@@ -84,7 +84,7 @@ func doPageTest(t *testing.T) {
 	rev, err := pm.Save(wikiId, &page, pageId, "", curUser)
 	sRev, sErr := pm.Save(wikiId, &sPage, sPageId, "", curUser)
 	pageSlug = page.Slug
-	if rev == ""{
+	if rev == "" {
 		t.Error("rev is empty")
 	}
 	if err != nil {
@@ -110,10 +110,10 @@ func doPageTest(t *testing.T) {
 	}
 
 	content = rPage.Content
-	if content.Formatted != "<h1>About</h1>\n<h2>About the project</h2>\n\n"{
+	if content.Formatted != "<h1>About</h1>\n<h2>About the project</h2>\n\n" {
 		t.Error("content.Formatted is wrong!")
 	}
-	if rPage.LastEditor != "John.Smith"{
+	if rPage.LastEditor != "John.Smith" {
 		t.Error("rPage is not John.Smith!")
 	}
 	//Update Page
@@ -137,12 +137,12 @@ func doPageTest(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if len(hist.Rows) != 2{
+	if len(hist.Rows) != 2 {
 		t.Errorf("Insufficient history length, should be 2 was %v", len(hist.Rows))
 	}
 	for _, hvr := range hist.Rows {
 		t.Logf("history item: %v", hvr)
-		if hvr.Value.Editor != "John.Smith"{
+		if hvr.Value.Editor != "John.Smith" {
 			t.Error("Editor is wrong!")
 		}
 	}
@@ -159,7 +159,7 @@ func doPageTest(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if len(index) != 1{
+	if len(index) != 1 {
 		t.Errorf("Index should be 1, was %v", len(index))
 	}
 	//Breadcrumbs
@@ -167,14 +167,14 @@ func doPageTest(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if len(crumbs) != 1{
+	if len(crumbs) != 1 {
 		t.Errorf("Should be 1 breadcrumb, was %v", len(crumbs))
 	}
 	crumbs, err = pm.GetBreadcrumbs(wikiId, sPageId, curUser)
-	if err != nil{
+	if err != nil {
 		t.Error(err)
 	}
-	if len(crumbs) != 2{
+	if len(crumbs) != 2 {
 		t.Errorf("Length should be 2, was %v", len(crumbs))
 	}
 	//Comments
@@ -202,10 +202,10 @@ func doPageTest(t *testing.T) {
 	if err1 != nil {
 		t.Error(err1)
 	}
-	if err2 != nil{
+	if err2 != nil {
 		t.Error(err2)
 	}
-	if err3 != nil{
+	if err3 != nil {
 		t.Error(err3)
 	}
 	//Comment queries
@@ -222,10 +222,10 @@ func doPageTest(t *testing.T) {
 	readComment := wikit.Comment{}
 	sCommentRev, err := pm.ReadComment(wikiId, sCommentId,
 		&readComment, curUser)
-	if err != nil{
+	if err != nil {
 		t.Error(err)
 	}
-	if sCommentRev == ""{
+	if sCommentRev == "" {
 		t.Error("sCommentRev is empty")
 	}
 	t.Logf("Comment rev: %v\n", sCommentRev)
@@ -235,10 +235,10 @@ func doPageTest(t *testing.T) {
 		&readComment, curUser)
 	t.Logf("Comment rev: %v\n", sCommentRev)
 	dRev, err := pm.DeleteComment(wikiId, sCommentId, curUser)
-	if err != nil{
+	if err != nil {
 		t.Error(err)
 	}
-	if dRev == ""{
+	if dRev == "" {
 		t.Error("dRev is empty!")
 	}
 	//Delete Page
@@ -253,7 +253,7 @@ func doPageTest(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if rev == ""{
+	if rev == "" {
 		t.Error("dRev is empty!")
 	}
 

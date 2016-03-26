@@ -38,25 +38,46 @@ package main
 
 import (
 	"flag"
+	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
 	"github.com/rhinoman/wikifeat/common/config"
+	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/config/config_loader"
+	"github.com/rhinoman/wikifeat/config/config_service"
 	"log"
+	"net/http"
 )
 
-func main() {
+func parseCmdParams() string {
 	defaultConfig, err := util.DefaultConfigLocation()
 	if err != nil {
 		log.Fatalf("Error setting config file: %v", err)
 	}
-	// Get command line arguments
+	hostName := flag.String("hostName", "localhost", "The host name for this instance")
+	nodeId := flag.String("nodeId", "cfg1", "The node Id for this instance")
+	port := flag.String("port", "4140", "The port number for this instance")
+	useSSL := flag.Bool("useSSL", false, "use SSL")
+	sslCertFile := flag.String("sslCertFile", "", "The SSL certificate file")
+	sslKeyFile := flag.String("sslKeyFile", "", "The SSL key file")
+	registryLocation := flag.String("registryLocation", "http://localhost:2379", "URL for etcd")
 	configFile := flag.String("config", defaultConfig, "config file to load")
-	registryLocation := flag.String("registryLocation", "http://localhost:2379", "etcd location URL")
 	flag.Parse()
-	// Load Configuration
-	config.LoadConfig(*configFile)
+	config.Service.DomainName = *hostName
+	config.Service.NodeId = *nodeId
+	config.Service.Port = *port
+	config.Service.UseSSL = *useSSL
+	config.Service.SSLCertFile = *sslCertFile
+	config.Service.SSLKeyFile = *sslKeyFile
 	config.Service.RegistryLocation = *registryLocation
+	return *configFile
+}
+
+func main() {
+	// Get command line arguments
+	configFile := parseCmdParams()
+	// Load Configuration
+	config.LoadConfig(configFile)
 	// Set up Logger
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   config.Logger.LogFile,
@@ -71,4 +92,21 @@ func main() {
 	config_loader.ClearConfig()
 	// Set the configuration keys in etcd
 	config_loader.SetConfig()
+	//Start up the config service
+	wsContainer := restful.NewContainer()
+	wsContainer.Router(restful.CurlyRouter{})
+	//Enable GZIP support
+	wsContainer.EnableContentEncoding(true)
+	cc := config_service.ConfigController{}
+	cc.Register(wsContainer)
+	registry.Init("Config", registry.ConfigServiceLocation)
+	httpAddr := ":" + config.Service.Port
+	if config.Service.UseSSL == true {
+		certFile := config.Service.SSLCertFile
+		keyFile := config.Service.SSLKeyFile
+		log.Fatal(http.ListenAndServeTLS(httpAddr,
+			certFile, keyFile, wsContainer))
+	} else {
+		log.Fatal(http.ListenAndServe(httpAddr, wsContainer))
+	}
 }

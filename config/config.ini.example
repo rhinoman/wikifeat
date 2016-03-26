@@ -35,6 +35,8 @@ persistentSessions = true
 #Allow Guest Access 
 #If you have any 'public' wikis, set this to true
 allowGuestAccess = true
+#Allow new user registration
+allowNewUserRegistration = false
 #Minimum Passowrd length
 minPasswordLength = 6
 

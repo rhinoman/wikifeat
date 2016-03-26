@@ -73,7 +73,7 @@ type BooleanResponse struct {
 }
 
 func ApiVersion() string {
-	return config.Service.ApiVersion
+	return config.ApiVersion
 }
 
 func ApiPrefix() string {

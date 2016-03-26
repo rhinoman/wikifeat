@@ -31,6 +31,7 @@
 package config
 
 import (
+	"errors"
 	etcd "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/coreos/etcd/client"
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/golang.org/x/net/context"
 	"log"
@@ -55,12 +56,30 @@ var kapi etcd.KeysAPI
 type ServiceSection int
 
 const (
-	AuthService ServiceSection = iota
+	NONE ServiceSection = iota
+	AuthService
 	UserService
 	NotificationService
 	WikiService
 	FrontendService
 )
+
+func ServiceSectionFromString(sectionStr string) (ServiceSection, error) {
+	switch sectionStr {
+	case "auth":
+		return AuthService, nil
+	case "user":
+		return UserService, nil
+	case "notification":
+		return NotificationService, nil
+	case "wiki":
+		return WikiService, nil
+	case "frontend":
+		return FrontendService, nil
+	default:
+		return NONE, errors.New("Unknown section")
+	}
+}
 
 func InitEtcd() {
 	log.Printf("Initializing etcd config connection")

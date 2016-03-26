@@ -3,7 +3,7 @@
 WIKIPATH=$GOPATH/src/github.com/rhinoman/wikifeat
 
 cd $WIKIPATH/config
-./wikifeat-config
+./wikifeat-config&
 cd $WIKIPATH/auth
 ./wikifeat-auth&
 sleep 2

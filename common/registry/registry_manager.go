@@ -63,6 +63,7 @@ var NotificationsLocation = EtcdPrefix + "/services/notifications/"
 var FrontEndLocation = EtcdPrefix + "/services/frontend/"
 var AuthLocation = EtcdPrefix + "/services/auth/"
 var PluginsLocation = EtcdPrefix + "/plugin/"
+var ConfigServiceLocation = EtcdPrefix + "/services/config/"
 
 //Config locations
 var ConfigPrefix = EtcdPrefix + "/config/"
@@ -185,6 +186,10 @@ func fetchServiceLists() {
 	if err != nil {
 		log.Println("Error fetching auth services: " + err.Error())
 	}
+	configNodes, err := getServiceNodes(ConfigServiceLocation)
+	if err != nil {
+		log.Println("Error fetching config services: " + err.Error())
+	}
 	serviceCache.Lock()
 	defer serviceCache.Unlock()
 	serviceCache.m["users"] = userNodes
@@ -192,6 +197,7 @@ func fetchServiceLists() {
 	serviceCache.m["notifications"] = notificationNodes
 	serviceCache.m["frontend"] = frontendNodes
 	serviceCache.m["auth"] = authNodes
+	serviceCache.m["config"] = configNodes
 }
 
 //Read nodes from an etcd response

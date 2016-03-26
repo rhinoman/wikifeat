@@ -136,7 +136,7 @@ func TestUsers(t *testing.T) {
 	if rev == "" {
 		t.Error("rev is empty!")
 	}
-	if !util.HasRole(subUser.Roles, "all_users"){
+	if !util.HasRole(subUser.Roles, "all_users") {
 		t.Error("user doesn't have all_users role!")
 	}
 	//Update user
@@ -226,7 +226,7 @@ func TestUsers(t *testing.T) {
 	if readUser.Roles[2] == searchRole {
 		searchRoleFound = true
 	}
-	if !searchRoleFound{
+	if !searchRoleFound {
 		t.Error("Role not found!")
 	}
 	//Revoke role
@@ -262,7 +262,7 @@ func TestUsers(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if !(len(userList.Rows) >= 2){
+	if !(len(userList.Rows) >= 2) {
 		t.Error("User list should be greater than or equal to 2!")
 	}
 	t.Logf("UserListResponse: %v", userList)
@@ -272,7 +272,7 @@ func TestUsers(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if len(userList.Rows) != 2{
+	if len(userList.Rows) != 2 {
 		t.Errorf("Userlist should be length 2 was %v", len(userList.Rows))
 	}
 	t.Logf("UserListResponse: %v", userList)
@@ -285,7 +285,7 @@ func TestUsers(t *testing.T) {
 	if rev == "" {
 		t.Error("Rev is empty!")
 	}
-	if readUser.UserName != "Steven.Smith"{
+	if readUser.UserName != "Steven.Smith" {
 		t.Errorf("username should be Seteven.Smith, was %v", readUser.UserName)
 	}
 	//User by Roles list
@@ -298,7 +298,7 @@ func TestUsers(t *testing.T) {
 	t.Logf("Response: %v", userList)
 	//Password reset
 	err = um.RequestPasswordReset("Steven.Smith")
-	if err.Error() != "No notifications services listed!"{
+	if err.Error() != "No notifications services listed!" {
 		t.Error("Error is wrong")
 	}
 	//Delete user

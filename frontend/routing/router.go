@@ -76,14 +76,14 @@ func Start() {
 	r.PathPrefix("/app/resource/").
 		Methods("GET").
 		Handler(httpgzip.NewHandler(http.StripPrefix("/app/resource/",
-		http.FileServer(http.Dir(webAppDir)))))
+			http.FileServer(http.Dir(webAppDir)))))
 	//Handle other routes
 	r.PathPrefix("/app/wikis").HandlerFunc(getAppRoot)
 	r.PathPrefix("/app/users").HandlerFunc(getAppRoot)
 	// Custom extensions (plugins) should use /app/x routes on the front end
 	r.PathPrefix("/app/x").HandlerFunc(getAppRoot)
 	// Handle API requests
-	ar := r.PathPrefix("/api/" + config.Service.ApiVersion).Subrouter()
+	ar := r.PathPrefix("/api/" + config.ApiVersion).Subrouter()
 	handleApiRoutes(ar)
 	// Handle Plugin requests for frontend resources
 	pr := r.PathPrefix("/app/plugin").Subrouter()

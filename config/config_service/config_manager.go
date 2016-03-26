@@ -27,63 +27,45 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package routing
+
+package config_service
 
 import (
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/gorilla/mux"
+	"errors"
+	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/registry"
-	"log"
-	"net/http"
+	"strconv"
+	"strings"
 )
 
-func handleApiRoutes(ar *mux.Router) {
-	ar.PathPrefix("/users").HandlerFunc(userHandler)
-	ar.PathPrefix("/wikis").HandlerFunc(wikiHandler)
-	ar.PathPrefix("/auth").HandlerFunc(authHandler)
-	ar.PathPrefix("/config").HandlerFunc(configHandler)
-}
+type ConfigManager struct{}
 
-func userHandler(w http.ResponseWriter, r *http.Request) {
-	if endpoint, err := registry.GetServiceLocation("users"); err != nil {
-		log.Println("No Available User Services!")
-		w.WriteHeader(http.StatusServiceUnavailable)
-	} else {
-		logRequest(r, endpoint)
-		reverseProxy(endpoint, w, r)
+var configLocation = registry.EtcdPrefix + "/config/"
+
+//Get a config parameter
+func (cm *ConfigManager) getConfigParam(section string,
+	paramName string) (string, error) {
+	serviceSection, err := config.ServiceSectionFromString(section)
+	if err != nil {
+		return "", err
 	}
-}
-
-func wikiHandler(w http.ResponseWriter, r *http.Request) {
-	if endpoint, err := registry.GetServiceLocation("wikis"); err != nil {
-		log.Println("No Available Wiki Services!")
-		w.WriteHeader(http.StatusServiceUnavailable)
-	} else {
-		logRequest(r, endpoint)
-		reverseProxy(endpoint, w, r)
+	switch serviceSection {
+	case config.AuthService:
+		return cm.getAuthParam(strings.ToLower(paramName))
+	default:
+		return "", errors.New("Invalid config section requested")
 	}
+
 }
 
-func authHandler(w http.ResponseWriter, r *http.Request) {
-	if endpoint, err := registry.GetServiceLocation("auth"); err != nil {
-		log.Println("No Available Auth Services!")
-		w.WriteHeader(http.StatusServiceUnavailable)
-	} else {
-		logRequest(r, endpoint)
-		reverseProxy(endpoint, w, r)
+//Get an Auth config parameter
+func (cm *ConfigManager) getAuthParam(paramName string) (string, error) {
+	switch paramName {
+	case "allowguestaccess":
+		return strconv.FormatBool(config.Auth.AllowGuest), nil
+	case "allownewuserregistration":
+		return strconv.FormatBool(config.Auth.AllowNewUserRegistration), nil
+	default:
+		return "", errors.New("Invalid auth config parameter requested")
 	}
-}
-
-func configHandler(w http.ResponseWriter, r *http.Request) {
-	if endpoint, err := registry.GetServiceLocation("config"); err != nil {
-		log.Println("No Available Config Services!")
-		w.WriteHeader(http.StatusServiceUnavailable)
-	} else {
-		logRequest(r, endpoint)
-		reverseProxy(endpoint, w, r)
-	}
-}
-
-func logRequest(r *http.Request, endpoint string) {
-	log.Printf("%v %v From %v -- Routing to: %v", r.Method, r.RequestURI,
-		r.Referer(), endpoint)
 }

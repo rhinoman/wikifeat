@@ -662,7 +662,7 @@ func (um *UserManager) GetUserListForRole(pageNum int, numPerPage int,
 //Simple validation of user data
 func (um *UserManager) validateUser(user *User) error {
 	var err error
-	if len(user.UserName) < 3 || len(user.UserName) > 80{
+	if len(user.UserName) < 3 || len(user.UserName) > 80 {
 		err = errors.New("Username invalid")
 	}
 	return err

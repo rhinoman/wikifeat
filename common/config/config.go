@@ -36,6 +36,8 @@ import (
 	"path"
 )
 
+var ApiVersion = "v1"
+
 var Service struct {
 	DomainName       string
 	NodeId           string
@@ -75,11 +77,12 @@ var Logger struct {
 }
 
 var Auth struct {
-	Authenticator      string
-	SessionTimeout     uint64
-	PersistentSessions bool
-	AllowGuest         bool
-	MinPasswordLength  int
+	Authenticator            string
+	SessionTimeout           uint64
+	PersistentSessions       bool
+	AllowGuest               bool
+	AllowNewUserRegistration bool
+	MinPasswordLength        int
 }
 
 var ServiceRegistry struct {
@@ -109,12 +112,6 @@ func LoadDefaults() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	Service.DomainName = "127.0.0.1"
-	Service.RegistryLocation = "http://127.0.0.1:2379"
-	Service.Port = "6000"
-	Service.ApiVersion = "v1"
-	Service.NodeId = "cs1"
-	Service.UseSSL = false
 	ServiceRegistry.CacheRefreshInterval = 75
 	ServiceRegistry.EntryTTL = 60
 	Frontend.WebAppDir = path.Join(execDir, "web_app/app")
@@ -135,6 +132,7 @@ func LoadDefaults() {
 	Auth.SessionTimeout = 600
 	Auth.PersistentSessions = true
 	Auth.AllowGuest = true
+	Auth.AllowNewUserRegistration = false
 	Auth.MinPasswordLength = 6
 	Users.AvatarDb = "avatar_ut"
 	Notifications.TemplateDir = "templates"

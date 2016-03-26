@@ -89,30 +89,6 @@ func LoadConfig(filename string) {
 	setRegistryConfig(registrySection)
 }
 
-// Load Service configuration options
-func setServiceConfig(serverSection *configparser.Section) {
-	for key, value := range serverSection.Options() {
-		switch key {
-		case "domainName":
-			Service.DomainName = value
-		case "port":
-			Service.Port = value
-		case "nodeId":
-			Service.NodeId = value
-		case "registryLocation":
-			Service.RegistryLocation = value
-		case "apiVersion":
-			Service.ApiVersion = value
-		case "useSSL":
-			Service.UseSSL = stringToBool(value)
-		case "sslCertFile":
-			Service.SSLCertFile = value
-		case "sslKeyFile":
-			Service.SSLKeyFile = value
-		}
-	}
-}
-
 // Load Frontend configuration options
 func SetFrontendConfig(frontendSection *configparser.Section) {
 	execDir, _ := util.GetExecDirectory()
@@ -248,6 +224,8 @@ func setAuthConfig(authSection *configparser.Section) {
 			Auth.PersistentSessions = stringToBool(value)
 		case "allowGuestAccess":
 			Auth.AllowGuest = stringToBool(value)
+		case "allowNewUserRegistration":
+			Auth.AllowNewUserRegistration = stringToBool(value)
 		case "minPasswordLength":
 			setIntVal(value, &Auth.MinPasswordLength)
 		}

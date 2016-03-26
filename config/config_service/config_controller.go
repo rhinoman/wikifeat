@@ -28,73 +28,78 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package notification_service
+package config_service
 
 import (
 	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
-	. "github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/common/services"
 )
 
-type NotificationsController struct{}
+/**
+  We need to be able to query a few select configuration parameters at runtime.
+  Might eventually expand this to allow on-the-fly configuration changes.
+*/
 
-func (nc NotificationsController) notificationUri() string {
-	return ApiPrefix() + "/notifications"
+type ConfigController struct{}
+
+type ConfigResponse struct {
+	Links      HatLinks `json:"_links"`
+	ParamName  string   `json:"paramName"`
+	ParamValue string   `json:"paramValue"`
 }
 
-var notificationsWebService *restful.WebService
+var configWebService *restful.WebService
 
-func (nc NotificationsController) Service() *restful.WebService {
-	return notificationsWebService
+func (cc ConfigController) configUri() string {
+	return ApiPrefix() + "/config"
+}
+
+func (cc ConfigController) Service() *restful.WebService {
+	return configWebService
 }
 
 //Define routes
-func (nc NotificationsController) Register(container *restful.Container) {
-	notificationsWebService := new(restful.WebService)
-	notificationsWebService.Filter(LogRequest).
+func (cc ConfigController) Register(container *restful.Container) {
+	configWebService = new(restful.WebService)
+	configWebService.Filter(LogRequest)
+	configWebService.
+		Path(cc.configUri()).
+		Doc("Query system configuration").
 		ApiVersion(ApiVersion()).
-		Path(nc.notificationUri()).
-		Doc("Send Notifications").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	notificationsWebService.Route(notificationsWebService.POST("{notification-id}/send").
-		To(nc.send).
-		Operation("send").
-		Param(notificationsWebService.PathParameter("notification-id",
-			"Notification Template").DataType("string")).
-		Reads(NotificationRequest{}).
-		Writes(BooleanResponse{}))
+	configWebService.Route(configWebService.GET("/{section}/{parameter}").To(cc.getConfigParam).
+		Doc("Get a single configuration parameter value").
+		Operation("getConfigParam").
+		Param(configWebService.PathParameter("section", "Section").DataType("string")).
+		Param(configWebService.PathParameter("parameter", "Parameter").DataType("string")).
+		Writes(ConfigResponse{}))
 
-	//Add the notifications controller to the container
-	container.Add(notificationsWebService)
+	container.Add(configWebService)
 }
 
-func (nc NotificationsController) genNotifUri(notifId string) string {
-	return nc.notificationUri() + "/" + notifId
-}
-
-func (nc NotificationsController) send(request *restful.Request,
+// Get an individual config parameter
+func (cc ConfigController) getConfigParam(request *restful.Request,
 	response *restful.Response) {
-	notificationId := request.PathParameter("notification-id")
-	nr := new(NotificationRequest)
-	err := request.ReadEntity(nr)
-	if err != nil || !nc.ValidateNotificationRequest(nr) {
-		WriteBadRequestError(response)
-		return
-	}
-	err = new(NotificationManager).Send(notificationId, nr)
+	section := request.PathParameter("section")
+	param := request.PathParameter("parameter")
+	value, err := new(ConfigManager).getConfigParam(section, param)
 	if err != nil {
-		WriteError(err, response)
+		WriteIllegalRequestError(response)
 		return
 	}
-	response.WriteEntity(BooleanResponse{Success: true})
+	configResponse := cc.genConfigResponse(param, value)
+	response.WriteEntity(configResponse)
 }
 
-func (nc NotificationsController) ValidateNotificationRequest(nr *NotificationRequest) bool {
-	if nr.To == "" || nr.Subject == "" || nr.Data == nil {
-		return false
-	} else {
-		return true
+func (cc ConfigController) genConfigResponse(paramName, paramValue string) ConfigResponse {
+	links := HatLinks{}
+	uri := cc.configUri() + "/" + paramName
+	links.Self = &HatLink{Href: uri, Method: "GET"}
+	return ConfigResponse{
+		Links:      links,
+		ParamName:  paramName,
+		ParamValue: paramValue,
 	}
 }

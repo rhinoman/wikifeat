@@ -109,7 +109,7 @@ func afterTest(user *User) {
 
 }
 
-func TestWikiService(t *testing.T){
+func TestWikiService(t *testing.T) {
 	beforeTest(t)
 	defer afterTest(&theUser)
 	jsAuth := &couchdb.BasicAuth{
