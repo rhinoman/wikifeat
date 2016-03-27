@@ -171,6 +171,9 @@ func TestCMarkNodeOps(t *testing.T) {
 	root.SetNodeUserData("STRING!")
 	x := root.GetNodeUserData()
 	t.Logf("X: %v", x)
+	if x != "STRING!" {
+		t.Error("NodeUserData is wrong!")
+	}
 	//header2.Free()
 	root.Free()
 }

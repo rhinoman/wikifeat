@@ -2,6 +2,7 @@ package commonmark
 
 /*
 #include <stdlib.h>
+#include <string.h>
 #include "cmark.h"
 */
 import "C"
@@ -182,16 +183,18 @@ func (node *CMarkNode) LastChild() *CMarkNode {
 
 //Accessor functions
 
-//Sets arbiturary user data for node
-func (node *CMarkNode) SetNodeUserData(userData interface{}) bool {
-	return success(C.cmark_node_set_user_data(node.node,
-		unsafe.Pointer(&userData)))
+//Sets arbitrary user data for node
+func (node *CMarkNode) SetNodeUserData(userData string) bool {
+	cstr := C.CString(userData)
+	res := C.cmark_node_set_user_data(node.node, unsafe.Pointer(&cstr))
+	return success(res)
 }
 
 //Returns the user data of the node as an
 //unsafe.Pointer.  Hope you know what you're doing.
-func (node *CMarkNode) GetNodeUserData() interface{} {
-	return C.cmark_node_get_user_data(node.node)
+func (node *CMarkNode) GetNodeUserData() string {
+	data := C.cmark_node_get_user_data(node.node)
+	return C.GoString((*C.char)(*(*unsafe.Pointer)(data)))
 }
 
 //Get the node type
