@@ -32,9 +32,9 @@ package wikit
 
 import (
 	"errors"
-	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/go-slugification"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
+	. "github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/go-slugification"
+	"github.com/twinj/uuid"
 	"io"
 	"log"
 	"net/http"

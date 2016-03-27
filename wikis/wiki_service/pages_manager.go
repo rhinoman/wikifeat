@@ -32,8 +32,8 @@ package wiki_service
 
 import (
 	"errors"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/microcosm-cc/bluemonday"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/go-commonmark"
+	"github.com/microcosm-cc/bluemonday"
+	"github.com/rhinoman/go-commonmark"
 	. "github.com/rhinoman/wikifeat/common/database"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/util"

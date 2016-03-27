@@ -34,10 +34,10 @@ package config_loader
  */
 
 import (
-	etcd "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/coreos/etcd/client"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/golang.org/x/net/context"
+	etcd "github.com/coreos/etcd/client"
 	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/database"
+	"golang.org/x/net/context"
 	"log"
 	"reflect"
 	"strconv"

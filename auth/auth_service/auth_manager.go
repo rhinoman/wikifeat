@@ -33,15 +33,15 @@ package auth_service
 import (
 	"encoding/json"
 	"errors"
-	etcd "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/coreos/etcd/client"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/golang.org/x/net/context"
+	etcd "github.com/coreos/etcd/client"
+	"github.com/rhinoman/couchdb-go"
 	. "github.com/rhinoman/wikifeat/common/auth"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/common/util"
+	"golang.org/x/net/context"
 	"net/http"
 	"time"
 )

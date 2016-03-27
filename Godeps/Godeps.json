@@ -1,6 +1,7 @@
 {
 	"ImportPath": "github.com/rhinoman/wikifeat",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v60",
 	"Packages": [
 		"./..."
 	],
@@ -8,6 +9,16 @@
 		{
 			"ImportPath": "github.com/alyu/configparser",
 			"Rev": "ec4ca64c5c3e8c0156cacdba6e69b9f521cdd1ae"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/Godeps/_workspace/src/github.com/ugorji/go/codec",
+			"Comment": "v2.2.0-156-g8c0db94",
+			"Rev": "8c0db94fef82fbac3a89bb7bd1fef3eaa1dfb0fb"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/Godeps/_workspace/src/golang.org/x/net/context",
+			"Comment": "v2.2.0-156-g8c0db94",
+			"Rev": "8c0db94fef82fbac3a89bb7bd1fef3eaa1dfb0fb"
 		},
 		{
 			"ImportPath": "github.com/coreos/etcd/client",
@@ -42,10 +53,6 @@
 			"Rev": "e444e69cbd2e2e3e0749a2f3c717cec491552bbf"
 		},
 		{
-			"ImportPath": "github.com/jtolds/gls",
-			"Rev": "f1ac7f4f24f50328e6bc838ca4437d1612a0243c"
-		},
-		{
 			"ImportPath": "github.com/microcosm-cc/bluemonday",
 			"Rev": "cb3660f44463dfacda51a0bfdd6b7524c22e2ecb"
 		},
@@ -67,17 +74,8 @@
 			"Rev": "74a9aac4722d946d4dfc1a9ff41edd8c47122eb6"
 		},
 		{
-			"ImportPath": "github.com/smartystreets/goconvey/convey",
-			"Comment": "1.5.0-342-g6d19cf7",
-			"Rev": "6d19cf7374f8e51f0691872e46cb51c5e9794e5a"
-		},
-		{
 			"ImportPath": "github.com/twinj/uuid",
 			"Rev": "4d772442af203e27723acc7d1eea6c93cd319c57"
-		},
-		{
-			"ImportPath": "github.com/ugorji/go/codec",
-			"Rev": "2cb41eb350bb803298e42218d78a525daca640a5"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
@@ -86,6 +84,14 @@
 		{
 			"ImportPath": "golang.org/x/net/html",
 			"Rev": "84ba27dd5b2d8135e9da1395277f2c9333a2ffda"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html/atom",
+			"Rev": "84ba27dd5b2d8135e9da1395277f2c9333a2ffda"
+		},
+		{
+			"ImportPath": "gopkg.in/alexcesaro/quotedprintable.v3",
+			"Rev": "2caba252f4dc53eaf6b553000885530023f54623"
 		},
 		{
 			"ImportPath": "gopkg.in/gomail.v2",

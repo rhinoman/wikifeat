@@ -32,8 +32,8 @@ package services
 
 import (
 	"errors"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/emicklei/go-restful"
+	"github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/common/auth"
 	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/database"

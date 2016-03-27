@@ -34,9 +34,9 @@ package registry
 import (
 	"errors"
 	"fmt"
-	etcd "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/coreos/etcd/client"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/golang.org/x/net/context"
+	etcd "github.com/coreos/etcd/client"
 	"github.com/rhinoman/wikifeat/common/config"
+	"golang.org/x/net/context"
 	"log"
 	"math/rand"
 	"strings"

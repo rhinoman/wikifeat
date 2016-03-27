@@ -32,7 +32,7 @@ package wikit
 
 import (
 	"fmt"
-	. "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	. "github.com/rhinoman/couchdb-go"
 	"net/url"
 	"reflect"
 	"strings"

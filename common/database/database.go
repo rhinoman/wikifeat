@@ -31,10 +31,10 @@
 package database
 
 import (
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
+	"github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/entities"
+	"github.com/twinj/uuid"
 	"log"
 	"strconv"
 	"time"

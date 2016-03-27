@@ -33,8 +33,8 @@ package wiki_service
 // Manager for Wiki Records
 
 import (
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/go-slugification"
+	"github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/go-slugification"
 	. "github.com/rhinoman/wikifeat/common/database"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/util"

@@ -30,7 +30,7 @@
 package routing
 
 import (
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 	"github.com/rhinoman/wikifeat/common/registry"
 	"log"
 	"net/http"

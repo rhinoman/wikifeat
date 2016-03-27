@@ -31,13 +31,13 @@ package user_service_test
 
 import (
 	"fmt"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
+	"github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/entities"
 	"github.com/rhinoman/wikifeat/common/util"
 	"github.com/rhinoman/wikifeat/users/user_service"
+	"github.com/twinj/uuid"
 	"testing"
 	"time"
 )

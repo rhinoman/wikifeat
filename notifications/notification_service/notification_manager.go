@@ -34,9 +34,9 @@ package notification_service
 
 import (
 	"bytes"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/gomail.v2"
 	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/entities"
+	"gopkg.in/gomail.v2"
 	htemplate "html/template"
 	"log"
 	"path/filepath"

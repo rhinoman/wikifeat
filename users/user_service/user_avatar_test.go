@@ -33,7 +33,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/users/user_service"

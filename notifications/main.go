@@ -32,12 +32,12 @@
 package main
 
 import (
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/gopkg.in/natefinch/lumberjack.v2"
+	"github.com/emicklei/go-restful"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/database"
 	"github.com/rhinoman/wikifeat/common/registry"
 	"github.com/rhinoman/wikifeat/notifications/notification_service"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
 	"net/http"
 )

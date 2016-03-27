@@ -31,7 +31,7 @@
 package config_service
 
 import (
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
+	"github.com/emicklei/go-restful"
 	. "github.com/rhinoman/wikifeat/common/services"
 )
 

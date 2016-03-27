@@ -33,7 +33,7 @@ package fserv
 import (
 	"errors"
 	"fmt"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/alyu/configparser"
+	"github.com/alyu/configparser"
 	"log"
 )
 

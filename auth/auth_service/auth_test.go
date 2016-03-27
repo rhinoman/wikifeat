@@ -31,7 +31,7 @@
 package auth_service_test
 
 import (
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/auth/auth_service"
 	"github.com/rhinoman/wikifeat/common/config"
 	"github.com/rhinoman/wikifeat/common/database"
@@ -52,6 +52,7 @@ var user = entities.User{
 
 func setup(t *testing.T) {
 	config.LoadDefaults()
+	config.Service.RegistryLocation = "http://localhost:2379"
 	config.ServiceRegistry.CacheRefreshInterval = 1000
 	database.InitDb()
 	database.SetupDb()

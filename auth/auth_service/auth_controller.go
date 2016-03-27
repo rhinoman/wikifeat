@@ -30,7 +30,7 @@
 
 package auth_service
 
-import "github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/emicklei/go-restful"
+import "github.com/emicklei/go-restful"
 import . "github.com/rhinoman/wikifeat/common/services"
 import (
 	"github.com/rhinoman/wikifeat/common/auth"

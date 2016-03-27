@@ -30,7 +30,7 @@
 package entities
 
 import (
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
+	"github.com/rhinoman/couchdb-go"
 	"time"
 )
 

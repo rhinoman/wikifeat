@@ -33,9 +33,9 @@ package wikit_test
 import (
 	"bytes"
 	"encoding/hex"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/rhinoman/couchdb-go"
-	"github.com/rhinoman/wikifeat/Godeps/_workspace/src/github.com/twinj/uuid"
+	"github.com/rhinoman/couchdb-go"
 	. "github.com/rhinoman/wikifeat/wikis/wiki_service/wikit"
+	"github.com/twinj/uuid"
 	"io/ioutil"
 	"strconv"
 	"testing"
