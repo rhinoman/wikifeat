@@ -64,6 +64,8 @@ func Start() {
 	r := mux.NewRouter()
 	// Serve the login page
 	r.HandleFunc("/login", getLogin).Methods("GET")
+	// Serve the new user registration page
+	r.HandleFunc("/register", getRegistration).Methods("GET")
 	// Serve the forgot password page
 	r.HandleFunc("/forgot_password", getForgotPassword).Methods("GET")
 	// Serve the rest password page
@@ -175,6 +177,19 @@ func getLogin(w http.ResponseWriter, r *http.Request) {
 	LogRequest(r)
 	log.Printf("Serving login page from %s", location)
 	http.ServeFile(w, r, location)
+}
+
+// Serve up the registration page
+func getRegistration(w http.ResponseWriter, r *http.Request) {
+	if config.Auth.AllowNewUserRegistration {
+		location := path.Join(webAppDir, "register.html")
+		LogRequest(r)
+		log.Printf("Serving registration page from %s", location)
+		http.ServeFile(w, r, location)
+	} else {
+		//New user registration isn't enabled
+		w.WriteHeader(http.StatusForbidden)
+	}
 }
 
 // Serve up the forgot password page

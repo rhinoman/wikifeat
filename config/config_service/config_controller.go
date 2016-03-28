@@ -43,9 +43,13 @@ import (
 type ConfigController struct{}
 
 type ConfigResponse struct {
-	Links      HatLinks `json:"_links"`
-	ParamName  string   `json:"paramName"`
-	ParamValue string   `json:"paramValue"`
+	Links HatLinks    `json:"_links"`
+	Param ConfigParam `json:"configParam"`
+}
+
+type ConfigParam struct {
+	ParamName  string `json:"paramName"`
+	ParamValue string `json:"paramValue"`
 }
 
 var configWebService *restful.WebService
@@ -98,8 +102,10 @@ func (cc ConfigController) genConfigResponse(paramName, paramValue string) Confi
 	uri := cc.configUri() + "/" + paramName
 	links.Self = &HatLink{Href: uri, Method: "GET"}
 	return ConfigResponse{
-		Links:      links,
-		ParamName:  paramName,
-		ParamValue: paramValue,
+		Links: links,
+		Param: ConfigParam{
+			ParamName:  paramName,
+			ParamValue: paramValue,
+		},
 	}
 }

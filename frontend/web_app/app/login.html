@@ -29,7 +29,7 @@
       <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
     </form>
     <div class="link-box">
-      <a href="/forgot_password">Forgot Password?</a>
+        <a href="/forgot_password">Forgot Password</a>
     </div>
     </div>
   </div>
@@ -43,6 +43,17 @@
     }
 
     $("div#alertBox").css("display", "none");
+    // Should we display the reigstration link?
+    $.ajax({
+      type: "GET",
+      url: "api/v1/config/auth/allowNewUserRegistration",
+      dataType: "json"
+    }).done(function(param){
+      const paramValue = param.configParam.paramValue;
+      if(paramValue){
+        $("div.link-box").append('&bull;&nbsp;<a href="/register">Register</a>');
+      }
+    });
     $("#loginForm").on("submit", function(event){
       event.preventDefault();
       var loginCredentials = {

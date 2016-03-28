@@ -38,8 +38,9 @@ define([
     'backbone',
     'backbone.radio',
     'entities/user/user_manager',
-    'entities/wiki/wiki_manager'
-], function($,_,Backbone,Radio,UserManager,WikiManager){
+    'entities/wiki/wiki_manager',
+    'entities/config/config_manager'
+], function($,_,Backbone,Radio,UserManager,WikiManager,ConfigManager){
 
     var EntityManager = function(){
         //Might add some stuff here, maybe.
@@ -190,6 +191,14 @@ define([
     });
 
     //-------End Wiki Manager Stuff
+
+    //-------Config Manager stuff
+    var configManager = new ConfigManager();
+    var configChannel = Radio.channel('configManager');
+
+    configChannel.reply("get:configParam", function(section, param){
+        return configManager.getConfigParam(section, param);
+    });
 
     return EntityManager
 });

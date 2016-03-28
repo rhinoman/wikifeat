@@ -7,9 +7,128 @@
     <meta name="description" content="New user registration">
     <title>Register</title>
     <link href="/app/resource/scripts/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/app/resource/styles/register.css" rel="stylesheet">
     <script type="text/javascript" src="/app/resource/scripts/vendor/jquery/dist/jquery.min.js"></script>
 </head>
 <body>
-
+    <div class="container">
+        <div class="register-box">
+            <form id="registerForm">
+                <h2 class="form-register-heading">Register</h2>
+                <p>Create a new account for this site</p>
+                <div id="alertBox" class="alert alert-danger" role="alert"></div>
+                <label for="inputUsername" class="sr-only">Username</label>
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-user" id="user-icon"></span>
+                    <input type="text" id="inputUsername" class="form-control" placeholder="Enter username" required autofocus>
+                </div>
+                <label for="inputEmail" class="sr-only">Email</label>
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-envelope" id="email-icon"></span>
+                    <input type="email" id="inputEmail" class="form-control" placeholder="Enter email address" required>
+                </div>
+                <label for="inputPassword" class="sr-only">Password</label>
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-lock" id="lock-icon"></span>
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Enter a Password" required>
+                </div>
+                <label for="verifyPassword" class="sr-only">Verify Password</label>
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-lock" id="veriy-icon"></span>
+                    <input type="password" id="verifyPassword" class="form-control" placeholder="Verify Password" required>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("div#alertBox").hide();
+    });
+    function validateEmail(email) {
+        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    }
+    function validateUser(user){
+        var errors = [];
+        if(user.name.length < 3 || user.name.length > 80){
+            errors.push("Username invalid");
+        }
+        if(user.password.length < 4){
+            errors.push("Password too short");
+        }
+        if(!validateEmail(user.userPublic.contactInfo.email)){
+            errors.push("Email address is invalid");
+        }
+        return errors;
+    }
+    function showError(errors){
+        var alertBox = $("div#alertBox");
+        var errorStr = "";
+        for(var i = 0; i < errors.length; i++){
+            errorStr += "<li>" + errors[i] + "</li>";
+        }
+        alertBox.html("<p>Couldn't complete registration</p><ul>" + errorStr + "</ul>");
+        alertBox.show();
+    }
+    function login(username, password){
+        const loginCredentials = {
+            name: username,
+            password: password
+        };
+        $.ajax({
+            type: "POST",
+            url: "api/v1/auth/session",
+            data: JSON.stringify(loginCredentials),
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function(){
+            $("div#alertBox").hide();
+            window.location = "/app";
+        }).fail(function(){
+            $("div#alertBox").html("Could not log in.  Please try again later").show();
+        });
+    }
+    $("#registerForm").on("submit", function(event){
+        event.preventDefault();
+        const userName = $("#inputUsername").val();
+        const password = $("#inputPassword").val();
+        const verifyPassword = $("#verifyPassword").val();
+        const email = $("#inputEmail").val();
+        if(password !== verifyPassword){
+            showError(["Password fields do not match"]);
+            return;
+        }
+        const newUser = {
+            name: userName,
+            password: password,
+            userPublic: {
+                contactInfo: {
+                    email: email
+                }
+            }
+        };
+        var errors = validateUser(newUser);
+        if(errors.length > 0){
+            showError(errors);
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "api/v1/users/register",
+                data: JSON.stringify(newUser),
+                contentType: "application/json"
+            }).done(function(){
+                $("div#alertBox").hide();
+                login(userName, password);
+            }).fail(function(jqXHR, reason){
+                if(jqXHR.status === 409){
+                    $("div#alertBox").html("Username already exists.").show();
+                } else {
+                    $("div#alertBox").html("Couldn't create user: " + reason).show();
+                }
+            })
+        }
+    });
+</script>
 </body>
 </html>

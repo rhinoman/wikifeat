@@ -32,6 +32,7 @@ package user_service
 
 import (
 	"github.com/emicklei/go-restful"
+	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/database"
 	. "github.com/rhinoman/wikifeat/common/entities"
 	. "github.com/rhinoman/wikifeat/common/services"
@@ -86,6 +87,11 @@ func (uc UsersController) Register(container *restful.Container) {
 		Operation("create").
 		Reads(User{}).
 		Writes(UserResponse{}))
+
+	usersWebService.Route(usersWebService.POST("/register").To(uc.register).
+		Doc("New user Registration").
+		Operation("register").
+		Reads(User{}))
 
 	usersWebService.Route(usersWebService.PUT("/{user-id}").To(uc.update).
 		Filter(AuthUser).
@@ -188,7 +194,7 @@ func (uc UsersController) create(request *restful.Request,
 	newUser := new(User)
 	err := request.ReadEntity(newUser)
 	if err != nil {
-		WriteServerError(err, response)
+		WriteBadRequestError(response)
 		return
 	}
 	rev, err := new(UserManager).Create(newUser, curUser)
@@ -201,6 +207,27 @@ func (uc UsersController) create(request *restful.Request,
 	SetAuth(response, curUser.Auth)
 	response.WriteHeader(http.StatusCreated)
 	response.WriteEntity(ur)
+}
+
+//New user (self) registration
+func (uc UsersController) register(request *restful.Request,
+	response *restful.Response) {
+	if config.Auth.AllowNewUserRegistration {
+		newUser := new(User)
+		if err := request.ReadEntity(newUser); err != nil {
+			WriteBadRequestError(response)
+			return
+		}
+		rev, err := new(UserManager).Register(newUser)
+		if err != nil {
+			WriteError(err, response)
+			return
+		}
+		response.AddHeader("ETag", rev)
+		response.WriteHeader(http.StatusCreated)
+	} else {
+		response.WriteHeader(http.StatusForbidden)
+	}
 }
 
 //Returns the currently authenticated user

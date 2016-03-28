@@ -56,6 +56,7 @@ func main() {
 	config.InitEtcd()
 	config.FetchCommonConfig()
 	config.FetchServiceSection(config.FrontendService)
+	config.FetchServiceSection(config.AuthService)
 	// Load plugin ini
 	fserv.LoadPluginData(config.Frontend.PluginDir + "/plugins.ini")
 	database.InitDb()

@@ -368,10 +368,10 @@ func (wc WikisController) genWikiLinks(userRoles []string,
 		links.PageIndex = &HatLink{Href: pageUri, Method: "GET"}
 	}
 	if admin || write {
-		links.Update = &HatLink{Href: uri, Method: "PUT"}
 		links.CreatePage = &HatLink{Href: pageUri, Method: "POST"}
 	}
 	if admin {
+		links.Update = &HatLink{Href: uri, Method: "PUT"}
 		links.Delete = &HatLink{Href: uri, Method: "DELETE"}
 	}
 	return links

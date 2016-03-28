@@ -29,39 +29,26 @@
  */
 
 'use strict';
+
 define([
     'jquery',
     'underscore',
-    'marionette',
-    'backbone.radio',
-    'text!templates/sidebar/guest_user_menu.html'
-], function($,_,Marionette,Radio,GuestUserTemplate){
+    'backbone',
+    'entities/base_model'
+], function($,_,Backbone, BaseModel){
 
-    return Marionette.ItemView.extend({
-        id: 'user-menu-view',
-        initialize: function(){
-            console.log("initializing guest user menu view");
-            //Let's check if new user registration is allowed, so we can
-            //display a link if it is.
-            this.regAllowed = Radio.channel("configManager")
-                .request("get:configParam", "auth", "allowNewUserRegistration");
-        },
-        template: _.template(GuestUserTemplate),
+    //Constructor
+    function ConfigParamModel(data, options){
+        BaseModel.call(this, "configParam", data, options);
+    }
 
-        onRender: function(){
-            this.$("a#registerLink").hide();
-            //Check for regAllowed flag
-            this.regAllowed.done(function(param){
-                if(typeof param !== 'undefined'){
-                    const paramName = param.get("paramName");
-                    const paramValue = param.get("paramValue");
-                    if(paramValue === "true") {
-                        this.$("a#registerLink").show();
-                    }
-                }
-            }.bind(this));
-        },
-        onClose: function(){}
-    });
+    ConfigParamModel.prototype = Object.create(BaseModel.prototype);
 
+    ConfigParamModel.prototype.urlRoot = "/api/v1/config";
+    ConfigParamModel.prototype.defaults = {
+        paramName: "",
+        paramValue: ""
+    };
+
+    return ConfigParamModel;
 });

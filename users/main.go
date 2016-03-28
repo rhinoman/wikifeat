@@ -57,6 +57,7 @@ func main() {
 	config.InitEtcd()
 	config.FetchCommonConfig()
 	config.FetchServiceSection(config.UserService)
+	config.FetchServiceSection(config.AuthService)
 	// Set up logger
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   config.Logger.LogFile,

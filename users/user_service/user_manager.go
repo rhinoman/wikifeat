@@ -183,6 +183,12 @@ func (um *UserManager) Create(newUser *User,
 	return userDb.Save(newUser, namestring, "")
 }
 
+//Register a new user
+func (um *UserManager) Register(newUser *User) (string, error) {
+	adminUser := services.GetAdminUser()
+	return um.Create(newUser, adminUser)
+}
+
 //Delete a user
 func (um *UserManager) Delete(id string,
 	curUser *CurrentUserInfo) (string, error) {

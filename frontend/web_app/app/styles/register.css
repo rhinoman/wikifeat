@@ -1,0 +1,48 @@
+body {
+    padding-top: 100px;
+    padding-bottom: 40px;
+    background: url('../img/login_background.jpg');
+    /*background-color: #fff;*/
+}
+
+.register-box{
+    max-width: 600px;
+    padding: 20px;
+    margin: 0 auto;
+    background-color: #eee;
+    border: 10px solid rgba(0,0,0,0.3);
+    background-clip: padding-box;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding;
+}
+
+.register-box .alert {
+    border-radius: 0;
+}
+
+button.btn {
+    border-radius:0;
+}
+button.btn-lg{
+    font-size:16pt;
+    margin-top:10px;
+}
+
+.register-box .form-control {
+    border-radius:0;
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 14pt;
+}
+
+.register-box .input-group {
+    margin-top:5px;
+}
+
+.register-box .input-group span {
+    border-radius:0;
+}
