@@ -230,19 +230,28 @@ func getErrorCode(err error) int {
 
 //Writes and logs errors from the couchdb driver
 func WriteError(err error, response *restful.Response) {
-	str := err.Error()
-	errStrings := strings.Split(str, ":")
-	statusCode := 0
-	var cErr error
-	if len(errStrings) > 1 {
-		statusCode, cErr = strconv.Atoi(errStrings[1])
-	}
-	if cErr != nil || statusCode == 0 {
-		statusCode = 500
+	var statusCode int
+	var reason string = "error"
+	//Is this a couchdb error?
+	cErr, ok := err.(*couchdb.Error)
+	if ok { // Yes!
+		statusCode = cErr.StatusCode
+		reason = cErr.Reason
+	} else { // No, try to parse :(
+		str := err.Error()
+		errStrings := strings.Split(str, ":")
+		statusCode := 0
+		var cErr error
+		if len(errStrings) > 1 {
+			statusCode, cErr = strconv.Atoi(errStrings[1])
+			reason = http.StatusText(statusCode)
+		}
+		if cErr != nil || statusCode == 0 {
+			statusCode = 500
+		}
 	}
 	//Write the error to the response
-	response.WriteErrorString(statusCode,
-		http.StatusText(statusCode))
+	response.WriteErrorString(statusCode, reason)
 	//Log the error
 	log.Printf("%v", err)
 }

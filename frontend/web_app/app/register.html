@@ -91,12 +91,15 @@
     }
     $("#registerForm").on("submit", function(event){
         event.preventDefault();
+        var button = event.currentTarget;
+        $(button).attr("disabled", "disabled");
         const userName = $("#inputUsername").val();
         const password = $("#inputPassword").val();
         const verifyPassword = $("#verifyPassword").val();
         const email = $("#inputEmail").val();
         if(password !== verifyPassword){
             showError(["Password fields do not match"]);
+            $(button).removeAttr("disabled");
             return;
         }
         const newUser = {
@@ -111,6 +114,7 @@
         var errors = validateUser(newUser);
         if(errors.length > 0){
             showError(errors);
+            $(button).removeAttr("disabled");
         } else {
             $.ajax({
                 type: "POST",

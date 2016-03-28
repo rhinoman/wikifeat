@@ -33,7 +33,6 @@ package user_service
 // Manager for User Records
 
 import (
-	"errors"
 	"github.com/rhinoman/couchdb-go"
 	"github.com/rhinoman/wikifeat/common/config"
 	. "github.com/rhinoman/wikifeat/common/database"
@@ -669,7 +668,10 @@ func (um *UserManager) GetUserListForRole(pageNum int, numPerPage int,
 func (um *UserManager) validateUser(user *User) error {
 	var err error
 	if len(user.UserName) < 3 || len(user.UserName) > 80 {
-		err = errors.New("Username invalid")
+		err = &couchdb.Error{
+			StatusCode: 400,
+			Reason:     "Username invalid",
+		}
 	}
 	return err
 }
@@ -677,7 +679,10 @@ func (um *UserManager) validateUser(user *User) error {
 //Validate Password
 func (um *UserManager) validatePassword(password string) error {
 	if len(password) < config.Auth.MinPasswordLength {
-		return errors.New("Password too short")
+		return &couchdb.Error{
+			StatusCode: 400,
+			Reason:     "Password too short",
+		}
 	} else {
 		return nil
 	}

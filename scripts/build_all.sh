@@ -7,7 +7,7 @@
 CC=gcc
 export CC
 
-VERSION=0.8.1-alpha
+VERSION=0.9.0
 ARCH=`uname -p`
 OS=`uname`
 BUILDNAME=wikifeat_${VERSION}.${OS}-${ARCH}
