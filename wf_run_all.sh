@@ -4,6 +4,7 @@ WIKIPATH=$GOPATH/src/github.com/rhinoman/wikifeat
 
 cd $WIKIPATH/config
 ./wikifeat-config&
+sleep 3
 cd $WIKIPATH/auth
 ./wikifeat-auth&
 sleep 2

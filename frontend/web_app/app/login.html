@@ -50,7 +50,7 @@
       dataType: "json"
     }).done(function(param){
       const paramValue = param.configParam.paramValue;
-      if(paramValue){
+      if(paramValue === "true"){
         $("div.link-box").append('&bull;&nbsp;<a href="/register">Register</a>');
       }
     });
