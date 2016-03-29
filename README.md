@@ -45,18 +45,18 @@ Wikifeat's architecture is designed with scalability in mind.  The core system c
 
 Wikifeat is currently under heavy development and should be considered alpha quality software (i.e., not suitable for production).  
 
-For an example of a running Wikifeat installation, see https://www.wikifeat.com
+For an example of a running Wikifeat installation, see https://www.wikifeat.org
 
 See the [Technical Overview][1] for a more detailed introduction.
 
 Documentation
 -------------
 
-Please see the [Wikifeat](https://www.wikifeat.com) website for more information and documentation.  Documentation is also a work in progress.
+Please see the [Wikifeat](https://www.wikifeat.org) website for more information and documentation.  Documentation is also a work in progress.
 
 Contributing
 ------------
 
-Contributions are most welcome.  See https://www.wikifeat.com/app/wikis/wikifeat/pages/contributing for details.
+Contributions are most welcome.  See https://www.wikifeat.org/app/wikis/wikifeat/pages/contributing for details.
 
-  [1]: https://www.wikifeat.com/app/wikis/wikifeat/pages/technical-overview
+  [1]: https://www.wikifeat.org/app/wikis/wikifeat/pages/technical-overview
