@@ -43,7 +43,7 @@ Wikifeat's architecture is designed with scalability in mind.  The core system c
 
 ### Status
 
-Wikifeat is currently under heavy development and should be considered alpha quality software (i.e., not suitable for production).  
+I'm no longer actively developing Wikifeat and have moved on to other projects.  I will accept pull requests, so please feel free to contribute and/or fork.  
 
 For an example of a running Wikifeat installation, see https://www.wikifeat.org
 
